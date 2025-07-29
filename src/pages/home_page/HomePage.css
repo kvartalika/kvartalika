@@ -1,0 +1,237 @@
+.homepage {
+    padding-top: 0;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #4285f4 0%, #1565c0 100%);
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    padding-top: 200px;
+}
+
+.hero-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: calc(100vh - 200px);
+    position: relative;
+    z-index: 2;
+}
+
+.hero-left {
+    flex: 1;
+    color: white;
+    max-width: 500px;
+}
+
+.hero-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 3.5rem;
+    line-height: 1.1;
+    color: white;
+    margin-bottom: 3rem;
+}
+
+.search-container {
+    max-width: 400px;
+}
+
+.hero-right {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-left: 2rem;
+}
+
+/* Promo Card */
+.promo-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 2rem;
+    border-radius: 20px;
+    max-width: 320px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.promo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.promo-badge {
+    background: #4285f4;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+.promo-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #4285f4;
+    margin-bottom: 0.5rem;
+}
+
+.promo-address {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    color: #90a4ae;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.promo-description {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    color: #546e7a;
+    line-height: 1.5;
+}
+
+/* Waves */
+.hero-waves {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.wave-svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Sections */
+.apartments-section {
+    padding: 6rem 0;
+    background: white;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #4285f4 0%, #1565c0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.apartments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2.5rem;
+    justify-items: center;
+}
+
+.apartments-grid > * {
+    animation: fadeIn 0.8s ease-out;
+}
+
+.apartments-grid > *:nth-child(1) { animation-delay: 0.1s; }
+.apartments-grid > *:nth-child(2) { animation-delay: 0.2s; }
+.apartments-grid > *:nth-child(3) { animation-delay: 0.3s; }
+.apartments-grid > *:nth-child(4) { animation-delay: 0.4s; }
+.apartments-grid > *:nth-child(5) { animation-delay: 0.5s; }
+.apartments-grid > *:nth-child(6) { animation-delay: 0.6s; }
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-section {
+        padding-top: 140px;
+    }
+
+    .hero-content {
+        flex-direction: column;
+        padding: 1rem;
+        text-align: center;
+        min-height: calc(100vh - 140px);
+    }
+
+    .hero-left {
+        max-width: 100%;
+        margin-bottom: 2rem;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-right {
+        padding-left: 0;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .promo-card {
+        max-width: 100%;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .apartments-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section {
+        padding-top: 120px;
+    }
+
+    .hero-title {
+        font-size: 2rem;
+    }
+
+    .apartments-section {
+        padding: 4rem 0;
+    }
+
+    .container {
+        padding: 0 1rem;
+    }
+}
