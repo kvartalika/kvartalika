@@ -1,7 +1,30 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Logo from './Logo';
 
 const Footer = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleAboutClick = () => {
+    if (location.pathname === '/') {
+      // If we're on the homepage, just scroll to the section
+      const element = document.getElementById('about');
+      if (element) {
+        const headerOffset = 100;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    } else {
+      // If we're on another page, navigate to home with hash
+      navigate('/#about');
+    }
+  };
+
   return (
     <footer className="bg-gray-900 text-white">
       <div className="container mx-auto px-4 py-12">
@@ -69,9 +92,12 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a href="/#about" className="text-gray-300 hover:text-white transition-colors">
+                <button 
+                  onClick={handleAboutClick}
+                  className="text-gray-300 hover:text-white transition-colors text-left"
+                >
                   О компании
-                </a>
+                </button>
               </li>
             </ul>
           </div>

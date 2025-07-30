@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import Logo from './Logo';
 
@@ -7,7 +7,28 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { setShowBookingModal } = useAppStore();
+
+  const handleAboutClick = () => {
+    if (location.pathname === '/') {
+      // If we're on the homepage, just scroll to the section
+      const element = document.getElementById('about');
+      if (element) {
+        const headerOffset = 100;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    } else {
+      // If we're on another page, navigate to home with hash
+      navigate('/#about');
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,8 +90,8 @@ const Header = () => {
             >
               Квартиры
             </Link>
-            <a
-              href="/#about"
+            <button
+              onClick={handleAboutClick}
               className={`font-medium transition-colors hover:text-blue-600 ${
                 isScrolled || !isHomePage
                   ? 'text-gray-700'
@@ -78,7 +99,7 @@ const Header = () => {
               }`}
             >
               О нас
-            </a>
+            </button>
           </nav>
 
           {/* Make Appointment Button */}
@@ -147,13 +168,15 @@ const Header = () => {
               >
                 Квартиры
               </Link>
-              <a
-                href="/#about"
-                className="text-gray-700 hover:text-blue-600 font-medium px-4 py-2"
-                onClick={() => setIsMobileMenuOpen(false)}
+              <button
+                onClick={() => {
+                  handleAboutClick();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="text-gray-700 hover:text-blue-600 font-medium px-4 py-2 text-left w-full"
               >
                 О нас
-              </a>
+              </button>
               <div className="px-4 py-2 border-t border-gray-200">
                 <button 
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full"

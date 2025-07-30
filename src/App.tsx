@@ -7,6 +7,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import PageLoader from './components/PageLoader';
 import BookingModal from './components/BookingModal';
+import ScrollToAnchor from './components/ScrollToAnchor';
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -177,6 +178,7 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <ScrollToAnchor />
       <div className="min-h-screen flex flex-col bg-gray-50">
         <Header />
 
