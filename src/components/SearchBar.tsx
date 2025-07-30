@@ -19,7 +19,7 @@ const SearchBar = () => {
     }
   };
 
-  const handleFilterChange = (key: string, value: any) => {
+  const handleFilterChange = (key: string, value: unknown) => {
     setSearchFilters({ [key]: value });
   };
 

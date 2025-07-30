@@ -3,6 +3,8 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 import ApartmentCard from '../components/ApartmentCard';
 import SearchBar from '../components/SearchBar';
+import type { Apartment } from '../store/useAppStore';
+import type { SearchFilters } from '../store/useAppStore';
 
 const ApartmentsPage = () => {
   const { filteredApartments, setSelectedApartment, setShowBookingModal, setSearchFilters } = useAppStore();
@@ -37,7 +39,7 @@ const ApartmentsPage = () => {
       return;
     }
     
-    const urlFilters: any = { ...baseFilters };
+    const urlFilters: Partial<SearchFilters> = { ...baseFilters };
     
     // Handle rooms filter
     const roomsParam = searchParams.get('rooms');
@@ -81,7 +83,7 @@ const ApartmentsPage = () => {
     setSearchFilters(urlFilters);
   }, [searchParams, setSearchFilters]);
 
-  const handleBookingClick = (apartment: any) => {
+  const handleBookingClick = (apartment: Apartment) => {
     setSelectedApartment(apartment);
     setShowBookingModal(true);
   };
