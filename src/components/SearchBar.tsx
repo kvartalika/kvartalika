@@ -67,7 +67,7 @@ const SearchBar = () => {
   const finishingOptions = ['Черновая', 'Чистовая', 'Под ключ', 'Дизайнерская'];
 
   return (
-    <div className="w-full relative">
+    <div className="w-full">
       {/* Main Search Bar */}
       <form onSubmit={handleSearch} className="bg-white rounded-2xl shadow-xl p-2">
         <div className="flex flex-col lg:flex-row gap-2">
@@ -117,29 +117,18 @@ const SearchBar = () => {
         </div>
       </form>
 
-      {/* Advanced Filters Overlay */}
+      {/* Advanced Filters */}
       {showFilters && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-2">
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Расширенные фильтры</h3>
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={clearFilters}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                >
-                  Очистить все
-                </button>
-                <button
-                  onClick={() => setShowFilters(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 mt-4 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">Расширенные фильтры</h3>
+            <button
+              onClick={clearFilters}
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            >
+              Очистить все
+            </button>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* Price Range */}
@@ -248,6 +237,24 @@ const SearchBar = () => {
               </select>
             </div>
 
+            {/* Hot Deals */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Специальные предложения
+              </label>
+              <div className="space-y-2">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={searchFilters.isHot || false}
+                    onChange={(e) => handleFilterChange('isHot', e.target.checked || undefined)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">🔥 Горячие предложения</span>
+                </label>
+              </div>
+            </div>
+
             {/* Parks and Infrastructure */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -303,25 +310,16 @@ const SearchBar = () => {
             </div>
           </div>
 
-            {/* Apply Filters Button */}
-            <div className="flex justify-end mt-6">
-              <button
-                onClick={() => setShowFilters(false)}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
-              >
-                Применить фильтры
-              </button>
-            </div>
+          {/* Apply Filters Button */}
+          <div className="flex justify-end mt-6">
+            <button
+              onClick={() => setShowFilters(false)}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            >
+              Применить фильтры
+            </button>
           </div>
         </div>
-      )}
-      
-      {/* Backdrop */}
-      {showFilters && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-25 z-40"
-          onClick={() => setShowFilters(false)}
-        />
       )}
     </div>
   );

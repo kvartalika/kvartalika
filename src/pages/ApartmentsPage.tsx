@@ -31,6 +31,12 @@ const ApartmentsPage = () => {
       sortOrder: 'asc' as const
     };
     
+    // If there are no URL parameters, just reset to base filters and return
+    if (searchParams.toString() === '') {
+      setSearchFilters(baseFilters);
+      return;
+    }
+    
     const urlFilters: any = { ...baseFilters };
     
     // Handle hot deals
@@ -76,7 +82,7 @@ const ApartmentsPage = () => {
       }
     }
     
-    // Always apply filters (even if empty) to ensure clean state
+    // Apply the URL-based filters
     setSearchFilters(urlFilters);
   }, [searchParams, setSearchFilters]);
 
