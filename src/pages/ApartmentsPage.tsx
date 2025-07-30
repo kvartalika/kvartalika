@@ -5,7 +5,7 @@ import ApartmentCard from '../components/ApartmentCard';
 import SearchBar from '../components/SearchBar';
 
 const ApartmentsPage = () => {
-  const { filteredApartments, setSelectedApartment, setShowBookingModal } = useAppStore();
+  const { filteredApartments, setSelectedApartment, setShowBookingModal, setSearchFilters } = useAppStore();
   const [searchParams] = useSearchParams();
   
   // Scroll to top on page load
@@ -13,11 +13,72 @@ const ApartmentsPage = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Get initial filter from URL params
+  // Apply URL parameters to search filters
   useEffect(() => {
-    // These URL params could be used to pre-filter results
-    // For now, we'll just use the filteredApartments from the store
-  }, [searchParams]);
+    // Reset filters first to avoid conflicts
+    const baseFilters = {
+      query: '',
+      rooms: [],
+      bathrooms: [],
+      finishing: [],
+      minPrice: undefined,
+      maxPrice: undefined,
+      complex: '',
+      hasParks: undefined,
+      hasInfrastructure: undefined,
+      isHot: undefined,
+      sortBy: 'price' as const,
+      sortOrder: 'asc' as const
+    };
+    
+    const urlFilters: any = { ...baseFilters };
+    
+    // Handle hot deals
+    if (searchParams.get('hot') === 'true') {
+      urlFilters.isHot = true;
+    }
+    
+    // Handle rooms filter
+    const roomsParam = searchParams.get('rooms');
+    if (roomsParam) {
+      const roomsArray = roomsParam.split(',').map(r => parseInt(r.trim())).filter(r => !isNaN(r));
+      if (roomsArray.length > 0) {
+        urlFilters.rooms = roomsArray;
+      }
+    }
+    
+    // Handle complex filter
+    const complexParam = searchParams.get('complex');
+    if (complexParam) {
+      urlFilters.complex = decodeURIComponent(complexParam);
+    }
+    
+    // Handle finishing filter
+    const finishingParam = searchParams.get('finishing');
+    if (finishingParam) {
+      const finishingArray = finishingParam.split(',').map(f => decodeURIComponent(f.trim()));
+      urlFilters.finishing = finishingArray;
+    }
+    
+    // Handle price filters
+    const minPriceParam = searchParams.get('minPrice');
+    const maxPriceParam = searchParams.get('maxPrice');
+    if (minPriceParam) {
+      const minPrice = parseInt(minPriceParam);
+      if (!isNaN(minPrice)) {
+        urlFilters.minPrice = minPrice;
+      }
+    }
+    if (maxPriceParam) {
+      const maxPrice = parseInt(maxPriceParam);
+      if (!isNaN(maxPrice)) {
+        urlFilters.maxPrice = maxPrice;
+      }
+    }
+    
+    // Always apply filters (even if empty) to ensure clean state
+    setSearchFilters(urlFilters);
+  }, [searchParams, setSearchFilters]);
 
   const handleBookingClick = (apartment: any) => {
     setSelectedApartment(apartment);
@@ -27,6 +88,7 @@ const ApartmentsPage = () => {
   const getPageTitle = () => {
     const hot = searchParams.get('hot');
     const rooms = searchParams.get('rooms');
+    const complex = searchParams.get('complex');
     
     if (hot === 'true') {
       return '🔥 Горячие предложения';
@@ -34,18 +96,25 @@ const ApartmentsPage = () => {
     if (rooms) {
       return `${rooms}-комнатные квартиры`;
     }
+    if (complex) {
+      return `Квартиры в ${decodeURIComponent(complex)}`;
+    }
     return 'Все квартиры';
   };
 
   const getPageDescription = () => {
     const hot = searchParams.get('hot');
     const rooms = searchParams.get('rooms');
+    const complex = searchParams.get('complex');
     
     if (hot === 'true') {
       return 'Лучшие квартиры по специальным ценам с ограниченным предложением';
     }
     if (rooms) {
       return `Подберите идеальную ${rooms}-комнатную квартиру из нашего каталога`;
+    }
+    if (complex) {
+      return `Большой выбор квартир в жилом комплексе ${decodeURIComponent(complex)}`;
     }
     return 'Большой выбор квартир в лучших жилых комплексах города';
   };
@@ -123,17 +192,17 @@ const ApartmentsPage = () => {
         )}
 
         {/* Additional Info Section */}
-        <section className="mt-16 bg-gray-50 rounded-2xl p-8">
+        <section className="mt-16 bg-blue-600 rounded-2xl p-8">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold text-white mb-4">
               Не нашли подходящую квартиру?
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-blue-100 mb-6">
               Наши специалисты помогут подобрать идеальный вариант под ваши требования и бюджет
             </p>
             <button
               onClick={() => setShowBookingModal(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors"
+              className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-medium transition-colors"
             >
               Получить персональную подборку
             </button>

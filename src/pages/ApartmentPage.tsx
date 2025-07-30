@@ -161,6 +161,22 @@ const ApartmentPage = () => {
               )}
             </div>
 
+            {/* Apartment Layout */}
+            {apartment.layout && (
+              <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  Планировка квартиры
+                </h2>
+                <div className="flex justify-center">
+                  <img
+                    src={apartment.layout}
+                    alt="Планировка квартиры"
+                    className="max-w-full h-auto rounded-lg border border-gray-200"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Apartment Details */}
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
@@ -184,6 +200,10 @@ const ApartmentPage = () => {
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Санузел:</span>
                     <span className="font-medium">{apartment.bathroom}</span>
+                  </div>
+                  <div className="flex justify-between py-3 border-b border-gray-200">
+                    <span className="text-gray-600">Количество санузлов:</span>
+                    <span className="font-medium">{apartment.bathrooms}</span>
                   </div>
                 </div>
 
@@ -295,14 +315,7 @@ const ApartmentPage = () => {
                   Записаться на осмотр
                 </button>
 
-                <div className="text-center">
-                  <a
-                    href="tel:+74951234567"
-                    className="text-blue-600 hover:text-blue-700 font-medium"
-                  >
-                    📞 +7 (495) 123-45-67
-                  </a>
-                </div>
+
               </div>
 
 

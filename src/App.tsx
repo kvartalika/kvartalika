@@ -69,7 +69,8 @@ function App() {
             description: "Уютная двухкомнатная квартира с современным ремонтом",
             hasParks: true,
             hasInfrastructure: true,
-            distanceFromCenter: 5.2
+            distanceFromCenter: 5.2,
+            layout: "/images/layout-2room.jpg"
           },
           {
             id: 2,
@@ -88,7 +89,8 @@ function App() {
             description: "Просторная трёхкомнатная квартира с панорамными окнами",
             hasParks: true,
             hasInfrastructure: true,
-            distanceFromCenter: 5.2
+            distanceFromCenter: 5.2,
+            layout: "/images/layout-3room.jpg"
           },
           {
             id: 3,
@@ -107,7 +109,8 @@ function App() {
             description: "Компактная однокомнатная квартира в новом доме",
             hasParks: false,
             hasInfrastructure: true,
-            distanceFromCenter: 12.8
+            distanceFromCenter: 12.8,
+            layout: "/images/layout-1room.jpg"
           },
           {
             id: 4,
@@ -126,7 +129,8 @@ function App() {
             description: "Стильная двухкомнатная квартира с дизайнерским ремонтом",
             hasParks: false,
             hasInfrastructure: true,
-            distanceFromCenter: 12.8
+            distanceFromCenter: 12.8,
+            layout: "/images/layout-2room-designer.jpg"
           },
           {
             id: 5,
@@ -145,7 +149,8 @@ function App() {
             description: "Элитная трёхкомнатная квартира в престижном районе",
             hasParks: true,
             hasInfrastructure: true,
-            distanceFromCenter: 2.1
+            distanceFromCenter: 2.1,
+            layout: "/images/layout-3room-elite.jpg"
           }
         ];
 
@@ -156,8 +161,22 @@ function App() {
             address: "ул. Примерная, 10",
             description: "Современный жилой комплекс в центре города с развитой инфраструктурой",
             image: "/images/complex1.jpg",
+            images: ["/images/complex1.jpg", "/images/complex1-2.jpg", "/images/complex1-3.jpg", "/images/complex1-4.jpg"],
             apartments: mockApartments.filter(apt => apt.complexId === 1),
-            amenities: ["Подземная парковка", "Детская площадка", "Фитнес-центр", "Консьерж-сервис"]
+            amenities: ["Подземная парковка", "Детская площадка", "Фитнес-центр", "Консьерж-сервис"],
+            features: ["Монолитно-кирпичная конструкция", "Высокие потолки 3.2м", "Панорамное остекление", "Индивидуальное отопление", "Приточно-вытяжная вентиляция", "Оптоволоконный интернет"],
+            constructionHistory: {
+              startDate: "2021-03-01",
+              endDate: "2024-12-01",
+              phases: [
+                { name: "Начало строительства", date: "2021-03-01", description: "Получение разрешений и начало земляных работ" },
+                { name: "Фундамент", date: "2021-06-01", description: "Завершение работ по устройству фундамента" },
+                { name: "Возведение каркаса", date: "2022-12-01", description: "Завершение монолитных работ и возведение стен" },
+                { name: "Инженерные системы", date: "2023-08-01", description: "Монтаж всех инженерных коммуникаций" },
+                { name: "Отделочные работы", date: "2024-06-01", description: "Завершение внутренних отделочных работ" },
+                { name: "Сдача в эксплуатацию", date: "2024-12-01", description: "Получение разрешения на ввод в эксплуатацию" }
+              ]
+            }
           },
           {
             id: 2,
@@ -165,8 +184,20 @@ function App() {
             address: "ул. Речная, 25",
             description: "Жилой комплекс бизнес-класса на берегу реки с панорамными видами",
             image: "/images/complex2.jpg",
+            images: ["/images/complex2.jpg", "/images/complex2-2.jpg", "/images/complex2-3.jpg"],
             apartments: mockApartments.filter(apt => apt.complexId === 2),
-            amenities: ["Видеонаблюдение", "Закрытая территория", "Спа-центр", "Кафе"]
+            amenities: ["Видеонаблюдение", "Закрытая территория", "Спа-центр", "Кафе"],
+            features: ["Кирпично-монолитная конструкция", "Французские балконы", "Видеодомофон", "Центральное кондиционирование", "Система умный дом"],
+            constructionHistory: {
+              startDate: "2020-01-15",
+              endDate: "2023-09-01",
+              phases: [
+                { name: "Проектирование", date: "2020-01-15", description: "Разработка архитектурного проекта" },
+                { name: "Строительство", date: "2020-08-01", description: "Начало строительных работ" },
+                { name: "Завершение строительства", date: "2023-06-01", description: "Окончание всех строительных работ" },
+                { name: "Ввод в эксплуатацию", date: "2023-09-01", description: "Получение всех необходимых разрешений" }
+              ]
+            }
           },
           {
             id: 3,
@@ -174,8 +205,22 @@ function App() {
             address: "пр. Солнечный, 14",
             description: "Элитный жилой комплекс с премиальными квартирами и услугами",
             image: "/images/complex3.jpg",
+            images: ["/images/complex3.jpg", "/images/complex3-2.jpg", "/images/complex3-3.jpg", "/images/complex3-4.jpg", "/images/complex3-5.jpg"],
             apartments: mockApartments.filter(apt => apt.complexId === 3),
-            amenities: ["Консьерж 24/7", "Подземный паркинг", "Бассейн", "Детский сад"]
+            amenities: ["Консьерж 24/7", "Подземный паркинг", "Бассейн", "Детский сад"],
+            features: ["Премиальная отделка", "Потолки 3.5м", "Панорамные окна", "Климат-контроль", "Система безопасности", "Лифты OTIS"],
+            constructionHistory: {
+              startDate: "2019-05-01",
+              endDate: "2022-12-01",
+              phases: [
+                { name: "Начало проекта", date: "2019-05-01", description: "Получение земельного участка и разрешений" },
+                { name: "Фундаментные работы", date: "2019-10-01", description: "Устройство фундамента и подземных уровней" },
+                { name: "Строительство корпуса", date: "2021-03-01", description: "Возведение основного здания" },
+                { name: "Инженерия и отделка", date: "2022-06-01", description: "Монтаж инженерных систем и отделочные работы" },
+                { name: "Благоустройство", date: "2022-10-01", description: "Благоустройство территории и ландшафтный дизайн" },
+                { name: "Ввод в эксплуатацию", date: "2022-12-01", description: "Получение разрешения на ввод в эксплуатацию" }
+              ]
+            }
           }
         ];
 

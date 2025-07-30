@@ -19,6 +19,7 @@ export interface Apartment {
   hasParks?: boolean;
   hasInfrastructure?: boolean;
   distanceFromCenter?: number; // For location sorting
+  layout?: string; // Layout image URL
 }
 
 export interface Complex {
@@ -30,6 +31,12 @@ export interface Complex {
   images?: string[];
   apartments: Apartment[];
   amenities?: string[];
+  features?: string[];
+  constructionHistory?: {
+    startDate: string;
+    endDate: string;
+    phases: { name: string; date: string; description: string }[];
+  };
 }
 
 export interface SearchFilters {
@@ -42,6 +49,7 @@ export interface SearchFilters {
   complex?: string;
   hasParks?: boolean;
   hasInfrastructure?: boolean;
+  isHot?: boolean;
   sortBy?: 'price' | 'rooms' | 'area' | 'location';
   sortOrder?: 'asc' | 'desc';
 }
@@ -135,7 +143,7 @@ const defaultHomepageSections: HomepageSection[] = [
     order: 2,
     backgroundColor: 'gray',
     linkText: 'Смотреть все',
-    linkUrl: '/apartments?complex=ЖК%20Янтарный',
+    linkUrl: '/apartments?complex=' + encodeURIComponent('ЖК Янтарный'),
   },
   {
     id: 'by_complex_nizhniy',
@@ -147,7 +155,7 @@ const defaultHomepageSections: HomepageSection[] = [
     order: 3,
     backgroundColor: 'white',
     linkText: 'Смотреть все',
-    linkUrl: '/apartments?complex=ЖК%20Нижний',
+    linkUrl: '/apartments?complex=' + encodeURIComponent('ЖК Нижний'),
   },
   {
     id: 'by_finishing_ready',
@@ -159,7 +167,7 @@ const defaultHomepageSections: HomepageSection[] = [
     order: 4,
     backgroundColor: 'gray',
     linkText: 'Смотреть все',
-    linkUrl: '/apartments?finishing=Чистовая,Под%20ключ',
+    linkUrl: '/apartments?finishing=' + encodeURIComponent('Чистовая') + ',' + encodeURIComponent('Под ключ'),
   },
   {
     id: 'three_rooms',
@@ -261,6 +269,11 @@ export const useAppStore = create<AppState>((set, get) => ({
     // Infrastructure filter
     if (searchFilters.hasInfrastructure !== undefined) {
       filtered = filtered.filter(apt => apt.hasInfrastructure === searchFilters.hasInfrastructure);
+    }
+
+    // Hot deals filter
+    if (searchFilters.isHot !== undefined) {
+      filtered = filtered.filter(apt => apt.isHot === searchFilters.isHot);
     }
 
     // Sorting

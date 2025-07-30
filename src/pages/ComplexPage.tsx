@@ -13,6 +13,7 @@ const ComplexPage = () => {
   } = useAppStore();
   
   const [activeTab, setActiveTab] = useState<'apartments' | 'about' | 'location'>('apartments');
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   // Find the complex by name
   const complex = complexes.find(c => c.name === decodeURIComponent(complexName || ''));
@@ -48,47 +49,105 @@ const ComplexPage = () => {
     setShowBookingModal(true);
   };
 
+  const images = complex?.images || [complex?.image || '/images/complex-placeholder.jpg'];
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
   return (
     <div className="min-h-screen pt-20">
-      {/* Hero Section */}
-      <section className="relative h-96 gradient-secondary">
-        <div className="absolute inset-0">
-          <img
-            src={complex.image || '/images/complex-placeholder.jpg'}
-            alt={complex.name}
-            className="w-full h-full object-cover opacity-30"
-          />
+      {/* Breadcrumbs */}
+      <section className="bg-gray-50 py-4">
+        <div className="container mx-auto px-4">
+          <nav className="text-sm">
+            <Link to="/" className="text-blue-600 hover:text-blue-700">
+              Главная
+            </Link>
+            <span className="mx-2 text-gray-400">›</span>
+            <span className="text-gray-600">{complex.name}</span>
+          </nav>
         </div>
-        
-        <div className="relative z-10 container mx-auto px-4 h-full flex items-center">
-          <div className="text-white">
-            {/* Breadcrumbs */}
-            <nav className="mb-4">
-              <Link to="/" className="text-blue-200 hover:text-white">
-                Главная
-              </Link>
-              <span className="mx-2 text-blue-200">›</span>
-              <span className="text-white">{complex.name}</span>
-            </nav>
-            
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              {complex.name}
-            </h1>
-            <p className="text-xl text-blue-100 mb-6 max-w-2xl">
-              {complex.description}
-            </p>
-            <p className="text-lg text-blue-200 mb-8">
-              📍 {complex.address}
-            </p>
-            
-            <button
-              onClick={() => handleBookingClick()}
-              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-            >
-              Записаться на осмотр
-            </button>
+      </section>
+
+      {/* Photo Slider */}
+      <section className="relative h-96 md:h-[500px]">
+        <div className="relative h-full overflow-hidden">
+          <img
+            src={images[currentImageIndex]}
+            alt={`${complex.name} - фото ${currentImageIndex + 1}`}
+            className="w-full h-full object-cover"
+          />
+          
+          {/* Navigation Arrows */}
+          {images.length > 1 && (
+            <>
+              <button
+                onClick={prevImage}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                onClick={nextImage}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </>
+          )}
+
+          {/* Image Counter */}
+          <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-lg text-sm">
+            {currentImageIndex + 1} / {images.length}
+          </div>
+
+          {/* Overlay Info */}
+          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+            <div className="text-center text-white max-w-4xl px-4">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4">
+                {complex.name}
+              </h1>
+              <p className="text-xl md:text-2xl mb-6 text-gray-200">
+                {complex.description}
+              </p>
+              <p className="text-lg mb-8 text-gray-300">
+                📍 {complex.address}
+              </p>
+              <button
+                onClick={() => handleBookingClick()}
+                className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors"
+              >
+                Записаться на осмотр
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Thumbnail Gallery */}
+        {images.length > 1 && (
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentImageIndex(index)}
+                className={`w-3 h-3 rounded-full transition-all ${
+                  index === currentImageIndex
+                    ? 'bg-white'
+                    : 'bg-white bg-opacity-50 hover:bg-opacity-75'
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Navigation Tabs */}
@@ -181,41 +240,93 @@ const ComplexPage = () => {
 
           {/* About Tab */}
           {activeTab === 'about' && (
-            <div className="max-w-4xl">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
                 О жилом комплексе
               </h2>
               
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Описание
+              {/* Description */}
+              <div className="text-center mb-16">
+                <p className="text-lg text-gray-600 leading-relaxed max-w-4xl mx-auto">
+                  {complex.description}
+                </p>
+              </div>
+
+              {/* Features of LCD */}
+              {complex.features && complex.features.length > 0 && (
+                <div className="mb-16">
+                  <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center">
+                    Особенности ЖК
                   </h3>
-                  <p className="text-gray-600 mb-6 leading-relaxed">
-                    {complex.description}
-                  </p>
-                  
-                  {complex.amenities && complex.amenities.length > 0 && (
-                    <>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                        Удобства и инфраструктура
-                      </h3>
-                      <ul className="space-y-2">
-                        {complex.amenities.map((amenity, index) => (
-                          <li key={index} className="flex items-center text-gray-600">
-                            <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            {amenity}
-                          </li>
-                        ))}
-                      </ul>
-                    </>
-                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {complex.features.map((feature, index) => (
+                      <div key={index} className="bg-white rounded-xl p-6 shadow-lg text-center">
+                        <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                        <p className="text-gray-700 font-medium">{feature}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+              )}
+
+              {/* Construction History */}
+              {complex.constructionHistory && (
+                <div className="mb-16">
+                  <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center">
+                    История строительства
+                  </h3>
+                  <div className="bg-white rounded-xl p-8 shadow-lg">
+                    <div className="text-center mb-8">
+                      <p className="text-gray-600">
+                        Строительство: {new Date(complex.constructionHistory.startDate).toLocaleDateString('ru-RU')} - {new Date(complex.constructionHistory.endDate).toLocaleDateString('ru-RU')}
+                      </p>
+                    </div>
+                    <div className="space-y-6">
+                      {complex.constructionHistory.phases.map((phase, index) => (
+                        <div key={index} className="flex items-start">
+                          <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-4">
+                            {index + 1}
+                          </div>
+                          <div className="flex-grow">
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-semibold text-gray-900">{phase.name}</h4>
+                              <span className="text-sm text-gray-500">{new Date(phase.date).toLocaleDateString('ru-RU')}</span>
+                            </div>
+                            <p className="text-gray-600">{phase.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Amenities and Key Characteristics */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                {complex.amenities && complex.amenities.length > 0 && (
+                  <div className="text-center">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-6">
+                      Удобства и инфраструктура
+                    </h3>
+                    <div className="space-y-3">
+                      {complex.amenities.map((amenity, index) => (
+                        <div key={index} className="flex items-center justify-center text-gray-600">
+                          <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          {amenity}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                <div className="text-center">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-6">
                     Ключевые характеристики
                   </h3>
                   <div className="space-y-4">
@@ -242,33 +353,13 @@ const ComplexPage = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Gallery */}
-              {complex.images && complex.images.length > 0 && (
-                <div className="mt-12">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-6">
-                    Фотогалерея
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {complex.images.map((image, index) => (
-                      <div key={index} className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden">
-                        <img
-                          src={image}
-                          alt={`${complex.name} - фото ${index + 1}`}
-                          className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           )}
 
           {/* Location Tab */}
           {activeTab === 'location' && (
-            <div className="max-w-4xl">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8">
+            <div className="max-w-6xl mx-auto">
+              <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
                 Расположение и транспорт
               </h2>
               
@@ -349,17 +440,17 @@ const ComplexPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-blue-600 py-16">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Заинтересовались {complex.name}?
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Заинтересовались ЖК?
           </h2>
-          <p className="text-xl text-gray-600 mb-8">
-            Запишитесь на персональную экскурсию по жилому комплексу
+          <p className="text-xl text-blue-100 mb-8">
+            Запишитесь на персональную экскурсию по жилому комплексу {complex.name}
           </p>
           <button
             onClick={() => handleBookingClick()}
-            className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors"
+            className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors"
           >
             Записаться на осмотр
           </button>
