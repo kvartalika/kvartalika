@@ -21,7 +21,7 @@ import ApartmentPage from './pages/ApartmentPage';
 
 // Component to handle scroll to top on route change
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const {pathname} = useLocation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -63,7 +63,7 @@ function App() {
             bathrooms: 1,
             finishing: "Чистовая",
             isHot: true,
-            image: "https://via.placeholder.com/400x300/3b82f6/ffffff?text=Квартира+1",
+            image: "/images/test.png",
             price: 5500000,
             area: 65.5,
             description: "Уютная двухкомнатная квартира с современным ремонтом",
@@ -71,8 +71,8 @@ function App() {
             hasSchools: true,
             hasShops: false,
             distanceFromCenter: 5.2,
-            layout: "https://via.placeholder.com/600x400/e5e7eb/6b7280?text=Планировка+2к",
-            images: ["https://via.placeholder.com/400x300/3b82f6/ffffff?text=Квартира+1-1", "https://via.placeholder.com/400x300/1d4ed8/ffffff?text=Квартира+1-2", "https://via.placeholder.com/400x300/2563eb/ffffff?text=Квартира+1-3"]
+            layout: "/images/test.png",
+            images: ["/images/test.png", "/images/test.png", "/images/test.png"]
           },
           {
             id: 2,
@@ -85,7 +85,7 @@ function App() {
             bathrooms: 2,
             finishing: "Под ключ",
             isHot: false,
-            image: "https://via.placeholder.com/400x300/1d4ed8/ffffff?text=Квартира+2",
+            image: "/images/test.png",
             price: 7800000,
             area: 85.2,
             description: "Просторная трёхкомнатная квартира с панорамными окнами",
@@ -93,8 +93,8 @@ function App() {
             hasSchools: true,
             hasShops: true,
             distanceFromCenter: 5.2,
-            layout: "https://via.placeholder.com/600x400/e5e7eb/6b7280?text=Планировка+3к",
-            images: ["https://via.placeholder.com/400x300/1d4ed8/ffffff?text=Квартира+2-1", "https://via.placeholder.com/400x300/2563eb/ffffff?text=Квартира+2-2", "https://via.placeholder.com/400x300/1e40af/ffffff?text=Квартира+2-3"]
+            layout: "/images/test.png",
+            images: ["/images/test.png", "/images/test.png", "/images/test.png"]
           },
           {
             id: 3,
@@ -107,7 +107,7 @@ function App() {
             bathrooms: 1,
             finishing: "Черновая",
             isHot: true,
-            image: "https://via.placeholder.com/400x300/10b981/ffffff?text=Квартира+3",
+            image: "/images/test.png",
             price: 3200000,
             area: 42.1,
             description: "Компактная однокомнатная квартира в новом доме",
@@ -115,8 +115,8 @@ function App() {
             hasSchools: false,
             hasShops: true,
             distanceFromCenter: 12.8,
-            layout: "https://via.placeholder.com/600x400/e5e7eb/6b7280?text=Планировка+1к",
-            images: ["https://via.placeholder.com/400x300/10b981/ffffff?text=Квартира+3-1", "https://via.placeholder.com/400x300/059669/ffffff?text=Квартира+3-2", "https://via.placeholder.com/400x300/047857/ffffff?text=Квартира+3-3"]
+            layout: "/images/test.png",
+            images: ["/images/test.png", "/images/test.png", "/images/test.png"]
           },
           {
             id: 4,
@@ -129,7 +129,7 @@ function App() {
             bathrooms: 1,
             finishing: "Дизайнерская",
             isHot: false,
-            image: "https://via.placeholder.com/400x300/059669/ffffff?text=Квартира+4",
+            image: "/images/test.png",
             price: 6200000,
             area: 68.7,
             description: "Стильная двухкомнатная квартира с дизайнерским ремонтом",
@@ -137,8 +137,8 @@ function App() {
             hasSchools: true,
             hasShops: false,
             distanceFromCenter: 12.8,
-            layout: "https://via.placeholder.com/600x400/e5e7eb/6b7280?text=Планировка+2к+Дизайн",
-            images: ["https://via.placeholder.com/400x300/059669/ffffff?text=Квартира+4-1", "https://via.placeholder.com/400x300/047857/ffffff?text=Квартира+4-2", "https://via.placeholder.com/400x300/065f46/ffffff?text=Квартира+4-3"]
+            layout: "/images/test.png",
+            images: ["/images/test.png", "/images/test.png", "/images/test.png"]
           },
           {
             id: 5,
@@ -151,7 +151,7 @@ function App() {
             bathrooms: 2,
             finishing: "Чистовая",
             isHot: true,
-            image: "https://via.placeholder.com/400x300/f59e0b/ffffff?text=Квартира+5",
+            image: "/images/test.png",
             price: 8900000,
             area: 95.4,
             description: "Элитная трёхкомнатная квартира в престижном районе",
@@ -159,8 +159,8 @@ function App() {
             hasSchools: true,
             hasShops: true,
             distanceFromCenter: 2.1,
-            layout: "https://via.placeholder.com/600x400/e5e7eb/6b7280?text=Планировка+3к+Элит",
-            images: ["https://via.placeholder.com/400x300/f59e0b/ffffff?text=Квартира+5-1", "https://via.placeholder.com/400x300/d97706/ffffff?text=Квартира+5-2", "https://via.placeholder.com/400x300/b45309/ffffff?text=Квартира+5-3"]
+            layout: "/images/test.png",
+            images: ["/images/test.png", "/images/test.png", "/images/test.png"]
           }
         ];
 
@@ -170,12 +170,12 @@ function App() {
             name: "ЖК Янтарный",
             address: "ул. Примерная, 10",
             description: "Современный жилой комплекс в центре города с развитой инфраструктурой",
-            image: "https://via.placeholder.com/800x500/3b82f6/ffffff?text=ЖК+Янтарный",
+            image: "/images/test.png",
             images: [
-              "https://via.placeholder.com/800x500/3b82f6/ffffff?text=ЖК+Янтарный+1",
-              "https://via.placeholder.com/800x500/1d4ed8/ffffff?text=ЖК+Янтарный+2", 
-              "https://via.placeholder.com/800x500/2563eb/ffffff?text=ЖК+Янтарный+3",
-              "https://via.placeholder.com/800x500/1e40af/ffffff?text=ЖК+Янтарный+4"
+              "/images/test.png",
+              "/images/test.png",
+              "/images/test.png",
+              "/images/test.png",
             ],
             apartments: mockApartments.filter(apt => apt.complexId === 1),
             amenities: ["Подземная парковка", "Детская площадка", "Фитнес-центр", "Консьерж-сервис"],
@@ -184,12 +184,36 @@ function App() {
               startDate: "2021-03-01",
               endDate: "2024-12-01",
               phases: [
-                { name: "Начало строительства", date: "2021-03-01", description: "Получение разрешений и начало земляных работ" },
-                { name: "Фундамент", date: "2021-06-01", description: "Завершение работ по устройству фундамента" },
-                { name: "Возведение каркаса", date: "2022-12-01", description: "Завершение монолитных работ и возведение стен" },
-                { name: "Инженерные системы", date: "2023-08-01", description: "Монтаж всех инженерных коммуникаций" },
-                { name: "Отделочные работы", date: "2024-06-01", description: "Завершение внутренних отделочных работ" },
-                { name: "Сдача в эксплуатацию", date: "2024-12-01", description: "Получение разрешения на ввод в эксплуатацию" }
+                {
+                  name: "Начало строительства",
+                  date: "2021-03-01",
+                  description: "Получение разрешений и начало земляных работ"
+                },
+                {
+                  name: "Фундамент",
+                  date: "2021-06-01",
+                  description: "Завершение работ по устройству фундамента"
+                },
+                {
+                  name: "Возведение каркаса",
+                  date: "2022-12-01",
+                  description: "Завершение монолитных работ и возведение стен"
+                },
+                {
+                  name: "Инженерные системы",
+                  date: "2023-08-01",
+                  description: "Монтаж всех инженерных коммуникаций"
+                },
+                {
+                  name: "Отделочные работы",
+                  date: "2024-06-01",
+                  description: "Завершение внутренних отделочных работ"
+                },
+                {
+                  name: "Сдача в эксплуатацию",
+                  date: "2024-12-01",
+                  description: "Получение разрешения на ввод в эксплуатацию"
+                }
               ]
             }
           },
@@ -198,11 +222,11 @@ function App() {
             name: "ЖК Нижний",
             address: "ул. Речная, 25",
             description: "Жилой комплекс бизнес-класса на берегу реки с панорамными видами",
-            image: "https://via.placeholder.com/800x500/10b981/ffffff?text=ЖК+Нижний",
+            image: "/images/test.png",
             images: [
-              "https://via.placeholder.com/800x500/10b981/ffffff?text=ЖК+Нижний+1",
-              "https://via.placeholder.com/800x500/059669/ffffff?text=ЖК+Нижний+2",
-              "https://via.placeholder.com/800x500/047857/ffffff?text=ЖК+Нижний+3"
+              "/images/test.png",
+              "/images/test.png",
+              "/images/test.png",
             ],
             apartments: mockApartments.filter(apt => apt.complexId === 2),
             amenities: ["Видеонаблюдение", "Закрытая территория", "Спа-центр", "Кафе"],
@@ -211,10 +235,26 @@ function App() {
               startDate: "2020-01-15",
               endDate: "2023-09-01",
               phases: [
-                { name: "Проектирование", date: "2020-01-15", description: "Разработка архитектурного проекта" },
-                { name: "Строительство", date: "2020-08-01", description: "Начало строительных работ" },
-                { name: "Завершение строительства", date: "2023-06-01", description: "Окончание всех строительных работ" },
-                { name: "Ввод в эксплуатацию", date: "2023-09-01", description: "Получение всех необходимых разрешений" }
+                {
+                  name: "Проектирование",
+                  date: "2020-01-15",
+                  description: "Разработка архитектурного проекта"
+                },
+                {
+                  name: "Строительство",
+                  date: "2020-08-01",
+                  description: "Начало строительных работ"
+                },
+                {
+                  name: "Завершение строительства",
+                  date: "2023-06-01",
+                  description: "Окончание всех строительных работ"
+                },
+                {
+                  name: "Ввод в эксплуатацию",
+                  date: "2023-09-01",
+                  description: "Получение всех необходимых разрешений"
+                }
               ]
             }
           },
@@ -223,13 +263,13 @@ function App() {
             name: "ЖК Солнечный",
             address: "пр. Солнечный, 14",
             description: "Элитный жилой комплекс с премиальными квартирами и услугами",
-            image: "https://via.placeholder.com/800x500/f59e0b/ffffff?text=ЖК+Солнечный",
+            image: "/images/test.png",
             images: [
-              "https://via.placeholder.com/800x500/f59e0b/ffffff?text=ЖК+Солнечный+1",
-              "https://via.placeholder.com/800x500/d97706/ffffff?text=ЖК+Солнечный+2",
-              "https://via.placeholder.com/800x500/b45309/ffffff?text=ЖК+Солнечный+3",
-              "https://via.placeholder.com/800x500/92400e/ffffff?text=ЖК+Солнечный+4",
-              "https://via.placeholder.com/800x500/78350f/ffffff?text=ЖК+Солнечный+5"
+              "/images/test.png",
+              "/images/test.png",
+              "/images/test.png",
+              "/images/test.png",
+              "/images/test.png",
             ],
             apartments: mockApartments.filter(apt => apt.complexId === 3),
             amenities: ["Консьерж 24/7", "Подземный паркинг", "Бассейн", "Детский сад"],
@@ -238,12 +278,36 @@ function App() {
               startDate: "2019-05-01",
               endDate: "2022-12-01",
               phases: [
-                { name: "Начало проекта", date: "2019-05-01", description: "Получение земельного участка и разрешений" },
-                { name: "Фундаментные работы", date: "2019-10-01", description: "Устройство фундамента и подземных уровней" },
-                { name: "Строительство корпуса", date: "2021-03-01", description: "Возведение основного здания" },
-                { name: "Инженерия и отделка", date: "2022-06-01", description: "Монтаж инженерных систем и отделочные работы" },
-                { name: "Благоустройство", date: "2022-10-01", description: "Благоустройство территории и ландшафтный дизайн" },
-                { name: "Ввод в эксплуатацию", date: "2022-12-01", description: "Получение разрешения на ввод в эксплуатацию" }
+                {
+                  name: "Начало проекта",
+                  date: "2019-05-01",
+                  description: "Получение земельного участка и разрешений"
+                },
+                {
+                  name: "Фундаментные работы",
+                  date: "2019-10-01",
+                  description: "Устройство фундамента и подземных уровней"
+                },
+                {
+                  name: "Строительство корпуса",
+                  date: "2021-03-01",
+                  description: "Возведение основного здания"
+                },
+                {
+                  name: "Инженерия и отделка",
+                  date: "2022-06-01",
+                  description: "Монтаж инженерных систем и отделочные работы"
+                },
+                {
+                  name: "Благоустройство",
+                  date: "2022-10-01",
+                  description: "Благоустройство территории и ландшафтный дизайн"
+                },
+                {
+                  name: "Ввод в эксплуатацию",
+                  date: "2022-12-01",
+                  description: "Получение разрешения на ввод в эксплуатацию"
+                }
               ]
             }
           }

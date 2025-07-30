@@ -1,6 +1,10 @@
 import {Link} from 'react-router-dom';
 import {useEffect} from 'react';
-import {type Apartment, type HomepageSection, useAppStore} from '../store/useAppStore';
+import {
+  type Apartment,
+  type HomepageSection,
+  useAppStore
+} from '../store/useAppStore';
 import SearchBar from '../components/SearchBar';
 import ApartmentCard from '../components/ApartmentCard';
 import BackgroundPattern from "../components/BackgroundPattern.tsx";
@@ -14,7 +18,6 @@ const HomePage = () => {
     setSearchFilters
   } = useAppStore();
 
-  // Reset filters when returning to homepage
   useEffect(() => {
     setSearchFilters({
       query: '',
@@ -39,7 +42,7 @@ const HomePage = () => {
 
   const getApartmentsForSection = (section: HomepageSection): Apartment[] => {
     let apartments: Apartment[] = [];
-    
+
     if (section.type === 'hot_deals') {
       apartments = filteredApartments.filter(apt => apt.isHot);
     } else if (section.type === 'rooms' && section.rooms) {
@@ -47,7 +50,7 @@ const HomePage = () => {
     } else if (section.type === 'custom' && section.customFilter) {
       apartments = section.customFilter(filteredApartments);
     }
-    
+
     return apartments.slice(0, 5);
   };
 
@@ -55,7 +58,10 @@ const HomePage = () => {
     if (!section.isVisible || apartments.length === 0) return null;
 
     return (
-      <section key={section.id} className={`py-16 ${section.backgroundColor === 'gray' ? 'bg-gray-50' : 'bg-white'}`}>
+      <section
+        key={section.id}
+        className={`py-16 ${section.backgroundColor === 'gray' ? 'bg-gray-50' : 'bg-white'}`}
+      >
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-12">
             <div>
@@ -92,9 +98,7 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center gradient-primary overflow-hidden">
-        {/* Background Pattern */}
+      <section className="relative min-h-screen flex pt-24 pb-6 justify-center gradient-primary overflow-hidden">
         <BackgroundPattern />
         <div className="container mx-auto px-4 text-center text-white relative z-10">
           <h1 className="heading-xl mb-6">
@@ -105,12 +109,10 @@ const HomePage = () => {
             Современные жилые комплексы с лучшими условиями для комфортной жизни
           </p>
 
-          {/* Search Bar */}
           <div className="max-w-4xl mx-auto">
             <SearchBar />
           </div>
 
-          {/* Quick Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 max-w-4xl mx-auto">
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-200 mb-2">50+</div>
@@ -131,7 +133,6 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
           <svg
             className="w-6 h-6 text-white"
@@ -149,7 +150,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Dynamic Sections */}
       {homepageSections
         .filter(section => section.isVisible)
         .sort((a, b) => a.order - b.order)
@@ -158,8 +158,10 @@ const HomePage = () => {
           return renderSection(section, apartments);
         })}
 
-      {/* About Section */}
-      <section id="about" className="py-16 bg-white">
+      <section
+        id="about"
+        className="py-16 bg-white"
+      >
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
@@ -234,7 +236,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Submit Request Section */}
       <section className="py-16 bg-blue-600">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">

@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import {create} from 'zustand';
 
 export interface Apartment {
   id: number;
@@ -61,8 +61,6 @@ export interface BookingForm {
   email: string;
   apartmentId?: number;
   complexId?: number;
-  preferredDate?: string;
-  message?: string;
 }
 
 export interface HomepageSection {
@@ -83,23 +81,23 @@ interface AppState {
   // Data
   apartments: Apartment[];
   complexes: Complex[];
-  
+
   // Search & Filters
   searchFilters: SearchFilters;
   filteredApartments: Apartment[];
-  
+
   // UI State
   isLoading: boolean;
   selectedApartment: Apartment | null;
   selectedComplex: Complex | null;
-  
+
   // Homepage
   homepageSections: HomepageSection[];
-  
+
   // Booking
   bookingForm: BookingForm;
   showBookingModal: boolean;
-  
+
   // Actions
   setApartments: (apartments: Apartment[]) => void;
   setComplexes: (complexes: Complex[]) => void;
@@ -119,7 +117,6 @@ const initialBookingForm: BookingForm = {
   name: '',
   phone: '',
   email: '',
-  message: '',
 };
 
 const defaultHomepageSections: HomepageSection[] = [
@@ -194,7 +191,6 @@ const initialSearchFilters: SearchFilters = {
 };
 
 export const useAppStore = create<AppState>((set, get) => ({
-  // Initial state
   apartments: [],
   complexes: [],
   searchFilters: initialSearchFilters,
@@ -208,27 +204,27 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // Actions
   setApartments: (apartments) => {
-    set({ apartments });
+    set({apartments});
     get().filterApartments();
   },
 
-  setComplexes: (complexes) => set({ complexes }),
+  setComplexes: (complexes) => set({complexes}),
 
   setSearchFilters: (filters) => {
     set((state) => ({
-      searchFilters: { ...state.searchFilters, ...filters }
+      searchFilters: {...state.searchFilters, ...filters}
     }));
     get().filterApartments();
   },
 
   filterApartments: () => {
-    const { apartments, searchFilters } = get();
+    const {apartments, searchFilters} = get();
     let filtered = [...apartments];
 
     // Text search
     if (searchFilters.query) {
       const query = searchFilters.query.toLowerCase();
-      filtered = filtered.filter(apt => 
+      filtered = filtered.filter(apt =>
         apt.complex.toLowerCase().includes(query) ||
         apt.address.toLowerCase().includes(query)
       );
@@ -281,7 +277,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (searchFilters.sortBy) {
       filtered.sort((a, b) => {
         let aVal: number, bVal: number;
-        
+
         switch (searchFilters.sortBy) {
           case 'price':
             aVal = a.price;
@@ -307,28 +303,28 @@ export const useAppStore = create<AppState>((set, get) => ({
       });
     }
 
-    set({ filteredApartments: filtered });
+    set({filteredApartments: filtered});
   },
 
-  setSelectedApartment: (apartment) => set({ selectedApartment: apartment }),
-  setSelectedComplex: (complex) => set({ selectedComplex: complex }),
-  setIsLoading: (loading) => set({ isLoading: loading }),
-  setShowBookingModal: (show) => set({ showBookingModal: show }),
+  setSelectedApartment: (apartment) => set({selectedApartment: apartment}),
+  setSelectedComplex: (complex) => set({selectedComplex: complex}),
+  setIsLoading: (loading) => set({isLoading: loading}),
+  setShowBookingModal: (show) => set({showBookingModal: show}),
 
   setBookingForm: (form) => {
     set((state) => ({
-      bookingForm: { ...state.bookingForm, ...form }
+      bookingForm: {...state.bookingForm, ...form}
     }));
   },
 
-  resetBookingForm: () => set({ bookingForm: initialBookingForm }),
-  
-  setHomepageSections: (sections) => set({ homepageSections: sections }),
-  
+  resetBookingForm: () => set({bookingForm: initialBookingForm}),
+
+  setHomepageSections: (sections) => set({homepageSections: sections}),
+
   updateHomepageSection: (id, updates) => {
     set((state) => ({
       homepageSections: state.homepageSections.map(section =>
-        section.id === id ? { ...section, ...updates } : section
+        section.id === id ? {...section, ...updates} : section
       )
     }));
   },
