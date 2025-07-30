@@ -118,14 +118,14 @@ const SearchBar = () => {
                   placeholder="От"
                   value={searchFilters.minPrice || ''}
                   onChange={(e) => handleFilterChange('minPrice', e.target.value ? Number(e.target.value) : undefined)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
                 />
                 <input
                   type="number"
                   placeholder="До"
                   value={searchFilters.maxPrice || ''}
                   onChange={(e) => handleFilterChange('maxPrice', e.target.value ? Number(e.target.value) : undefined)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
                 />
               </div>
             </div>
@@ -182,7 +182,7 @@ const SearchBar = () => {
                 <select
                   value={searchFilters.sortBy || 'price'}
                   onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
                 >
                   <option value="price">По цене</option>
                   <option value="rooms">По количеству комнат</option>
@@ -191,7 +191,7 @@ const SearchBar = () => {
                 <select
                   value={searchFilters.sortOrder || 'asc'}
                   onChange={(e) => handleFilterChange('sortOrder', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
                 >
                   <option value="asc">По возрастанию</option>
                   <option value="desc">По убыванию</option>

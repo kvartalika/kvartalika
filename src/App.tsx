@@ -10,6 +10,7 @@ import BookingModal from './components/BookingModal';
 
 // Pages
 import HomePage from './pages/HomePage';
+import ApartmentsPage from './pages/ApartmentsPage';
 import ComplexesPage from './pages/ComplexesPage';
 import ComplexPage from './pages/ComplexPage';
 import ApartmentPage from './pages/ApartmentPage';
@@ -184,6 +185,10 @@ function App() {
             <Route
               path="/"
               element={<HomePage />}
+            />
+            <Route
+              path="/apartments"
+              element={<ApartmentsPage />}
             />
             <Route
               path="/complexes"
