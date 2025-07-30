@@ -117,7 +117,7 @@ const Header = () => {
             </button>
             
             {/* Authentication Buttons */}
-            {isAuthenticated ? (
+            {isAuthenticated && (
               <div className="flex items-center space-x-4">
                 <span className={`text-sm ${
                   isScrolled || !isHomePage ? 'text-gray-700' : 'text-white'
@@ -146,15 +146,6 @@ const Header = () => {
                   Выйти
                 </button>
               </div>
-            ) : (
-              <Link
-                to="/auth"
-                className={`text-sm font-medium transition-colors hover:text-blue-600 ${
-                  isScrolled || !isHomePage ? 'text-gray-700' : 'text-white'
-                }`}
-              >
-                Войти
-              </Link>
             )}
           </div>
 
@@ -234,7 +225,7 @@ const Header = () => {
                 </button>
                 
                 {/* Mobile Authentication */}
-                {isAuthenticated ? (
+                {isAuthenticated && (
                   <div className="mt-4 space-y-2">
                     <div className="text-sm text-gray-600 px-4 py-2">
                       {user?.name} {user?.surname}
@@ -259,14 +250,6 @@ const Header = () => {
                       Выйти
                     </button>
                   </div>
-                ) : (
-                  <Link
-                    to="/auth"
-                    className="block text-gray-700 hover:text-blue-600 font-medium px-4 py-2 mt-4"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Войти
-                  </Link>
                 )}
               </div>
             </nav>

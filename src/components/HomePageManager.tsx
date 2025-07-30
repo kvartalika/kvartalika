@@ -50,7 +50,32 @@ const HomePageManager = ({
     if (!isAuthenticated || user?.role !== 'CM') {
       return;
     }
-  }, [isAuthenticated, user]);
+
+    // Load initial data if not provided
+    const loadInitialData = async () => {
+      if (!initialContactData) {
+        try {
+          const { mockApi } = await import('../services/mockApi');
+          const contactInfo = await mockApi.getContactInfo();
+          setContactData(contactInfo);
+        } catch (error) {
+          console.error('Failed to load contact info:', error);
+        }
+      }
+
+      if (!initialSocialMediaData) {
+        try {
+          const { mockApi } = await import('../services/mockApi');
+          const socialMediaData = await mockApi.getSocialMedia();
+          setSocialMedia(socialMediaData);
+        } catch (error) {
+          console.error('Failed to load social media:', error);
+        }
+      }
+    };
+
+    loadInitialData();
+  }, [isAuthenticated, user, initialContactData, initialSocialMediaData]);
 
   const handleContactChange = (field: keyof ContactInfo, value: any) => {
     setContactData(prev => ({
@@ -154,7 +179,6 @@ const HomePageManager = ({
                   value={contactData.phone}
                   onChange={(e) => handleContactChange('phone', e.target.value)}
                   className="w-full border rounded px-3 py-2"
-                  required
                 />
               </div>
               <div>
@@ -166,7 +190,6 @@ const HomePageManager = ({
                   value={contactData.email}
                   onChange={(e) => handleContactChange('email', e.target.value)}
                   className="w-full border rounded px-3 py-2"
-                  required
                 />
               </div>
             </div>
@@ -180,7 +203,6 @@ const HomePageManager = ({
                 value={contactData.title}
                 onChange={(e) => handleContactChange('title', e.target.value)}
                 className="w-full border rounded px-3 py-2"
-                required
               />
             </div>
 
@@ -193,7 +215,6 @@ const HomePageManager = ({
                 value={contactData.address}
                 onChange={(e) => handleContactChange('address', e.target.value)}
                 className="w-full border rounded px-3 py-2"
-                required
               />
             </div>
 
@@ -205,7 +226,6 @@ const HomePageManager = ({
                 value={contactData.footerDescription}
                 onChange={(e) => handleContactChange('footerDescription', e.target.value)}
                 className="w-full border rounded px-3 py-2 h-24"
-                required
               />
             </div>
 
@@ -217,7 +237,6 @@ const HomePageManager = ({
                 value={contactData.description}
                 onChange={(e) => handleContactChange('description', e.target.value)}
                 className="w-full border rounded px-3 py-2 h-24"
-                required
               />
             </div>
 
@@ -267,27 +286,25 @@ const HomePageManager = ({
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       URL изображения
                     </label>
-                    <input
-                      type="url"
-                      value={item.image}
-                      onChange={(e) => handleSocialMediaChange(index, 'image', e.target.value)}
-                      className="w-full border rounded px-3 py-2"
-                      placeholder="https://example.com/icon.png"
-                      required
-                    />
+                                         <input
+                       type="url"
+                       value={item.image}
+                       onChange={(e) => handleSocialMediaChange(index, 'image', e.target.value)}
+                       className="w-full border rounded px-3 py-2"
+                       placeholder="https://example.com/icon.png"
+                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Ссылка
                     </label>
-                    <input
-                      type="url"
-                      value={item.link}
-                      onChange={(e) => handleSocialMediaChange(index, 'link', e.target.value)}
-                      className="w-full border rounded px-3 py-2"
-                      placeholder="https://example.com"
-                      required
-                    />
+                                         <input
+                       type="url"
+                       value={item.link}
+                       onChange={(e) => handleSocialMediaChange(index, 'link', e.target.value)}
+                       className="w-full border rounded px-3 py-2"
+                       placeholder="https://example.com"
+                     />
                   </div>
                 </div>
               </div>

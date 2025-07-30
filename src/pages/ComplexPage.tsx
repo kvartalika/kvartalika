@@ -418,7 +418,7 @@ const ComplexPage = () => {
           {isAuthenticated && user?.role === 'CM' && (
             <button
               onClick={() => setShowContentManager(true)}
-              className="mt-4 bg-gray-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-700 transition-colors"
+              className="mb-4 bg-gray-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-700 transition-colors"
             >
               ✏️ Редактировать контент
             </button>

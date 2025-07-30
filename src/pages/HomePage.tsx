@@ -155,7 +155,7 @@ const HomePage = () => {
 
         {/* Content Manager Edit Button */}
         {isAuthenticated && user?.role === 'CM' && (
-          <div className="absolute top-8 right-8">
+          <div className="absolute top-8 left-8">
             <button
               onClick={() => setShowHomePageManager(true)}
               className="bg-white bg-opacity-20 backdrop-blur-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-opacity-30 transition-all"

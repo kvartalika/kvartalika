@@ -106,25 +106,23 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Name
               </label>
-              <input
-                type="text"
-                value={formData.name || ''}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                className="w-full border rounded px-3 py-2"
-                required
-              />
+                              <input
+                  type="text"
+                  value={formData.name || ''}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  className="w-full border rounded px-3 py-2"
+                />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Address
               </label>
-              <input
-                type="text"
-                value={formData.address || ''}
-                onChange={(e) => handleInputChange('address', e.target.value)}
-                className="w-full border rounded px-3 py-2"
-                required
-              />
+                              <input
+                  type="text"
+                  value={formData.address || ''}
+                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  className="w-full border rounded px-3 py-2"
+                />
             </div>
           </div>
 
@@ -136,7 +134,6 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
               value={formData.description || ''}
               onChange={(e) => handleInputChange('description', e.target.value)}
               className="w-full border rounded px-3 py-2 h-24"
-              required
             />
           </div>
 
@@ -212,37 +209,34 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Number of Rooms
                   </label>
-                  <input
-                    type="number"
-                    value={formData.numberOfRooms || ''}
-                    onChange={(e) => handleInputChange('numberOfRooms', parseInt(e.target.value))}
-                    className="w-full border rounded px-3 py-2"
-                    required
-                  />
+                                     <input
+                     type="number"
+                     value={formData.numberOfRooms || ''}
+                     onChange={(e) => handleInputChange('numberOfRooms', parseInt(e.target.value))}
+                     className="w-full border rounded px-3 py-2"
+                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Number of Bathrooms
                   </label>
-                  <input
-                    type="number"
-                    value={formData.numberOfBathrooms || ''}
-                    onChange={(e) => handleInputChange('numberOfBathrooms', parseInt(e.target.value))}
-                    className="w-full border rounded px-3 py-2"
-                    required
-                  />
+                                     <input
+                     type="number"
+                     value={formData.numberOfBathrooms || ''}
+                     onChange={(e) => handleInputChange('numberOfBathrooms', parseInt(e.target.value))}
+                     className="w-full border rounded px-3 py-2"
+                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Floor
                   </label>
-                  <input
-                    type="number"
-                    value={formData.floor || ''}
-                    onChange={(e) => handleInputChange('floor', parseInt(e.target.value))}
-                    className="w-full border rounded px-3 py-2"
-                    required
-                  />
+                                     <input
+                     type="number"
+                     value={formData.floor || ''}
+                     onChange={(e) => handleInputChange('floor', parseInt(e.target.value))}
+                     className="w-full border rounded px-3 py-2"
+                   />
                 </div>
               </div>
 
@@ -251,26 +245,24 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Price
                   </label>
-                  <input
-                    type="number"
-                    value={formData.price || ''}
-                    onChange={(e) => handleInputChange('price', parseInt(e.target.value))}
-                    className="w-full border rounded px-3 py-2"
-                    required
-                  />
+                                     <input
+                     type="number"
+                     value={formData.price || ''}
+                     onChange={(e) => handleInputChange('price', parseInt(e.target.value))}
+                     className="w-full border rounded px-3 py-2"
+                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Area (sq.m)
                   </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    value={formData.area || ''}
-                    onChange={(e) => handleInputChange('area', parseFloat(e.target.value))}
-                    className="w-full border rounded px-3 py-2"
-                    required
-                  />
+                                     <input
+                     type="number"
+                     step="0.1"
+                     value={formData.area || ''}
+                     onChange={(e) => handleInputChange('area', parseFloat(e.target.value))}
+                     className="w-full border rounded px-3 py-2"
+                   />
                 </div>
               </div>
 
@@ -296,25 +288,23 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Year Built
                   </label>
-                  <input
-                    type="number"
-                    value={formData.yearBuilt || ''}
-                    onChange={(e) => handleInputChange('yearBuilt', parseInt(e.target.value))}
-                    className="w-full border rounded px-3 py-2"
-                    required
-                  />
+                                     <input
+                     type="number"
+                     value={formData.yearBuilt || ''}
+                     onChange={(e) => handleInputChange('yearBuilt', parseInt(e.target.value))}
+                     className="w-full border rounded px-3 py-2"
+                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Number of Floors
                   </label>
-                  <input
-                    type="number"
-                    value={formData.numberOfFloors || ''}
-                    onChange={(e) => handleInputChange('numberOfFloors', parseInt(e.target.value))}
-                    className="w-full border rounded px-3 py-2"
-                    required
-                  />
+                                     <input
+                     type="number"
+                     value={formData.numberOfFloors || ''}
+                     onChange={(e) => handleInputChange('numberOfFloors', parseInt(e.target.value))}
+                     className="w-full border rounded px-3 py-2"
+                   />
                 </div>
               </div>
 
@@ -365,27 +355,25 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Latitude
               </label>
-              <input
-                type="number"
-                step="any"
-                value={formData.latitude || ''}
-                onChange={(e) => handleInputChange('latitude', parseFloat(e.target.value))}
-                className="w-full border rounded px-3 py-2"
-                required
-              />
+                             <input
+                 type="number"
+                 step="any"
+                 value={formData.latitude || ''}
+                 onChange={(e) => handleInputChange('latitude', parseFloat(e.target.value))}
+                 className="w-full border rounded px-3 py-2"
+               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Longitude
               </label>
-              <input
-                type="number"
-                step="any"
-                value={formData.longitude || ''}
-                onChange={(e) => handleInputChange('longitude', parseFloat(e.target.value))}
-                className="w-full border rounded px-3 py-2"
-                required
-              />
+                             <input
+                 type="number"
+                 step="any"
+                 value={formData.longitude || ''}
+                 onChange={(e) => handleInputChange('longitude', parseFloat(e.target.value))}
+                 className="w-full border rounded px-3 py-2"
+               />
             </div>
           </div>
 
