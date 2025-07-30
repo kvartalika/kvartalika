@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useAppStore } from '../store/useAppStore';
 import Logo from './Logo';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { setShowBookingModal } = useAppStore();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -79,23 +81,13 @@ const Header = () => {
             </a>
           </nav>
 
-          {/* Contact Info */}
-          <div className="hidden lg:flex items-center space-x-4">
-            <a
-              href="tel:+74951234567"
-              className={`font-semibold transition-colors hover:text-blue-600 ${
-                isScrolled || !isHomePage
-                  ? 'text-gray-900'
-                  : 'text-white hover:text-blue-200'
-              }`}
-            >
-              +7 (495) 123-45-67
-            </a>
+          {/* Make Appointment Button */}
+          <div className="hidden lg:flex items-center">
             <button
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-              onClick={() => {/* TODO: Open callback modal */}}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              onClick={() => setShowBookingModal(true)}
             >
-              Обратный звонок
+              Записаться на просмотр
             </button>
           </div>
 
@@ -163,14 +155,14 @@ const Header = () => {
                 О нас
               </a>
               <div className="px-4 py-2 border-t border-gray-200">
-                <a
-                  href="tel:+74951234567"
-                  className="text-gray-900 font-semibold block mb-2"
+                <button 
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full"
+                  onClick={() => {
+                    setShowBookingModal(true);
+                    setIsMobileMenuOpen(false);
+                  }}
                 >
-                  +7 (495) 123-45-67
-                </a>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full">
-                  Обратный звонок
+                  Записаться на просмотр
                 </button>
               </div>
             </nav>
