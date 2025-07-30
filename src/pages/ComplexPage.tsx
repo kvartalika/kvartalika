@@ -4,6 +4,8 @@ import {useAppStore} from '../store/useAppStore';
 import ApartmentCard from '../components/ApartmentCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Apartment } from '../store/useAppStore';
+import { useAuthStore } from '../store/useAuthStore';
+import ContentManager from '../components/ContentManager';
 
 const ComplexPage = () => {
   const {complexName} = useParams<{ complexName: string }>();
@@ -14,8 +16,10 @@ const ComplexPage = () => {
     setSelectedComplex
   } = useAppStore();
 
+  const { user, isAuthenticated } = useAuthStore();
   const [activeTab, setActiveTab] = useState<'apartments' | 'about' | 'location'>('apartments');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showContentManager, setShowContentManager] = useState(false);
 
   // Find the complex by name
   const complex = complexes.find(c => c.name === decodeURIComponent(complexName || ''));
@@ -409,8 +413,35 @@ const ComplexPage = () => {
           >
             Записаться на осмотр
           </button>
+          
+          {/* Content Manager Edit Button */}
+          {isAuthenticated && user?.role === 'CM' && (
+            <button
+              onClick={() => setShowContentManager(true)}
+              className="mt-4 bg-gray-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-700 transition-colors"
+            >
+              ✏️ Редактировать контент
+            </button>
+          )}
         </div>
       </section>
+
+      {/* Content Manager Modal */}
+      {showContentManager && (
+        <ContentManager
+          contentType="complex"
+          contentId={complex.id}
+          initialData={complex}
+          onSave={(updatedData) => {
+            // Update the complex data in the store
+            // This would typically update the store state
+            setShowContentManager(false);
+            // Reload the page or update the data
+            window.location.reload();
+          }}
+          onCancel={() => setShowContentManager(false)}
+        />
+      )}
     </div>
   );
 };

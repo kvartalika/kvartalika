@@ -1,262 +1,260 @@
-# Кварталика - Real Estate Platform
+# Кварталика - Система управления недвижимостью
 
-A modern real estate platform built with React, TypeScript, and Tailwind CSS for browsing apartments and residential complexes.
+Полнофункциональное веб-приложение для управления контентом недвижимости с системой аутентификации, админ-панелью и возможностями редактирования контента.
 
-## 🚀 Features
+## 🚀 Основные возможности
 
-- **Modern UI/UX**: Clean, responsive design built with Tailwind CSS
-- **Advanced Search**: Powerful search functionality with filters for price, rooms, finishing, etc.
-- **Property Listings**: Browse apartments by categories (1-room, 2-room, 3-room, hot deals)
-- **Complex Details**: Detailed pages for residential complexes with amenities and location info
-- **Apartment Details**: Comprehensive apartment pages with image galleries and specifications
-- **Booking System**: Integrated booking modal for property inspections
-- **State Management**: Centralized state management with Zustand
-- **API Ready**: Prepared for integration with existing OpenAPI-generated client
+### 1. Аутентификация (`/auth`)
+- **Логин**: Вход по email и паролю
+- **Роли**: Поддержка ролей ADMIN и CM (Content Manager)
+- **Перенаправление**: 
+  - ADMIN → `/admin` (админ-панель)
+  - CM → `/` (главная страница)
+- **Безопасность**: Сохранение refresh и access токенов
 
-## 🛠️ Tech Stack
+### 2. Админ-панель (`/admin`)
+**Доступно только для пользователей с ролью ADMIN**
 
-- **Frontend**: React 19, TypeScript
-- **Styling**: Tailwind CSS 4.x
-- **Routing**: React Router DOM 7.x
-- **State Management**: Zustand 5.x
-- **HTTP Client**: Axios 1.x
-- **Build Tool**: Vite 7.x
-- **API**: OpenAPI-generated client (existing)
+#### Управление пользователями:
+- Просмотр списка всех пользователей (ADMIN + CM)
+- Создание новых пользователей
+- Удаление пользователей
+- CRUD операции
 
-## 📁 Project Structure
+#### Управление файлами:
+- Загрузка файлов
+- Удаление файлов
+- Просмотр файлов по папкам
+- Создание и удаление директорий
+
+### 3. Управление контентом
+**Доступно для пользователей с ролью CM**
+
+#### Редактирование квартир:
+- Название и описание
+- Изображения (массив URL)
+- Особенности (массив строк)
+- Технические характеристики (комнаты, ванные, этаж)
+- Цена и площадь
+- Координаты (широта/долгота)
+- Дополнительная информация
+
+#### Редактирование жилых комплексов:
+- Название и описание
+- Изображения и история строительства
+- Особенности и удобства
+- Инфраструктура (магазины, школы, больницы)
+- Технические характеристики
+- Координаты
+
+### 4. API интеграция
+- Полная поддержка CRUD операций
+- Работа с базой данных
+- Безопасная аутентификация
+- Управление файлами
+
+## 🛠 Технологии
+
+- **Frontend**: React 19, TypeScript, Tailwind CSS
+- **Состояние**: Zustand
+- **Маршрутизация**: React Router DOM
+- **Аутентификация**: JWT токены
+- **UI**: Современный адаптивный дизайн
+
+## 📁 Структура проекта
 
 ```
 src/
-├── components/          # Reusable UI components
-│   ├── Header.tsx      # Navigation header
-│   ├── Footer.tsx      # Site footer
-│   ├── SearchBar.tsx   # Advanced search with filters
-│   ├── ApartmentCard.tsx # Apartment listing card
-│   ├── BookingModal.tsx # Inspection booking form
-│   ├── PageLoader.tsx  # Loading screen
-│   └── Logo.tsx        # Company logo component
-├── pages/              # Page components
-│   ├── HomePage.tsx    # Main landing page
-│   ├── ComplexPage.tsx # Residential complex details
-│   └── ApartmentPage.tsx # Individual apartment details
-├── store/              # State management
-│   └── useAppStore.ts  # Zustand store with types
-├── services/           # API services
-│   └── apiService.ts   # API wrapper for backend integration
-├── api/                # Generated API client (existing)
-└── App.tsx             # Main app component
+├── components/
+│   ├── Header.tsx          # Навигация с аутентификацией
+│   ├── ContentManager.tsx  # Модальное окно редактирования
+│   ├── ProtectedRoute.tsx  # Защищенные маршруты
+│   └── ...
+├── pages/
+│   ├── AuthPage.tsx        # Страница входа
+│   ├── AdminPage.tsx       # Админ-панель
+│   ├── ApartmentPage.tsx   # Страница квартиры (с CRUD)
+│   ├── ComplexPage.tsx     # Страница ЖК (с CRUD)
+│   └── ...
+├── store/
+│   ├── useAuthStore.ts     # Состояние аутентификации
+│   └── useAppStore.ts      # Основное состояние приложения
+├── services/
+│   ├── contentApi.ts       # API для контента
+│   └── mockApi.ts          # Mock API для тестирования
+└── ...
 ```
 
-## 🎨 Design System
+## 🗄 База данных
 
-### Tailwind v4 Configuration
-This project uses **Tailwind CSS v4** with CSS-based configuration using the `@theme` directive in `index.css`:
+### Схема таблиц:
 
-```css
-@theme {
-  --font-family-sans: Montserrat, system-ui, ...;
-  --color-primary-600: #2563eb;
-  --spacing-18: 4.5rem;
-  /* ... more custom properties */
-}
+#### Пользователи (users)
+```sql
+- id: integer
+- name: varchar
+- surname: varchar
+- patronymic: varchar
+- email: varchar
+- phone: varchar
+- role: CM/ADMIN
+- password: varchar
+- createdAt: timestamp
+- updatedAt: timestamp
 ```
 
-**Important**: In Tailwind v4, use CSS variables directly (`var(--color-primary-600)`) instead of the `theme()` function when referencing theme values in custom CSS.
+#### Квартиры (apartments)
+```sql
+- id: integer
+- name: varchar
+- description: varchar
+- images: text (listOf<str>)
+- layout: varchar
+- address: varchar
+- price: integer
+- latitude: decimal
+- longitude: decimal
+- features: text (listOf<str>)
+- numberOfRooms: integer
+- area: decimal
+- about: varchar
+- floor: integer
+- categoryId: integer
+- homeId: integer
+- numberOfBathrooms: integer
+- hasDecoration: boolean
+- numberForSale: integer
+```
 
-### Color Palette
-- **Primary**: Blue (#2563EB - primary-600)
-- **Secondary**: Gray (#6B7280 - secondary-500)
-- **Success**: Green (#10B981 - emerald-500)
-- **Warning**: Red (#EF4444 - red-500)
-- **Background**: Gray (#F9FAFB - gray-50)
+#### Жилые комплексы (complexes)
+```sql
+- id: integer
+- name: varchar
+- description: varchar
+- image: varchar
+- address: varchar
+- latitude: decimal
+- longitude: decimal
+- yearBuilt: integer
+- history: text (listOf<str>)
+- historyImages: text (listOf<str>)
+- features: text (listOf<str>)
+- about: varchar
+- numberOfFloors: integer
+- storesNearby: boolean
+- schoolsNearby: boolean
+- hospitalsNearby: boolean
+- hasYards: boolean
+- yardsImages: text (listOf<str>)
+```
 
-### Typography
-- **Font Family**: Montserrat (Google Fonts)
-- **Headings**: Font weight 700 (bold)
-- **Body**: Font weight 400 (normal)
-- **Accent**: Font weight 600 (semibold)
+#### Контактная информация (contact)
+```sql
+- id: integer
+- phone: varchar
+- email: varchar
+- footerDescription: text
+- title: text
+- address: varchar
+- description: text
+```
 
-## 🚦 Getting Started
+#### Главная страница (main_page)
+```sql
+- id: integer
+- name: varchar
+- isOnMainPage: boolean
+```
 
-### Prerequisites
-- Node.js 18+ 
-- npm or yarn
+## 🚀 Запуск проекта
 
-### Installation
+### Установка зависимостей
+```bash
+npm install
+```
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd kvartalika
-   ```
+### Запуск в режиме разработки
+```bash
+npm run dev
+```
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start development server**
-   ```bash
-   npm run dev
-   ```
-
-4. **Open in browser**
-   Navigate to `http://localhost:5173`
-
-### Build for Production
-
+### Сборка для продакшена
 ```bash
 npm run build
 ```
 
-## 🔧 Configuration
+## 🔐 Тестовые аккаунты
 
-### Environment Variables
-Create a `.env` file in the root directory:
+### Администратор
+- **Email**: admin@example.com
+- **Пароль**: password
+- **Роль**: ADMIN
+- **Доступ**: Админ-панель + редактирование контента
 
-```env
-REACT_APP_API_BASE_URL=http://localhost:3000/api
-```
+### Контент-менеджер
+- **Email**: cm@example.com
+- **Пароль**: password
+- **Роль**: CM
+- **Доступ**: Только редактирование контента
 
-### API Integration
+## 📋 Использование
 
-The project is prepared for integration with the existing OpenAPI-generated client. To integrate:
+### 1. Вход в систему
+1. Перейдите на `/auth`
+2. Введите email и пароль
+3. Система автоматически перенаправит вас в зависимости от роли
 
-1. **Uncomment API imports** in `src/services/apiService.ts`
-2. **Configure the API client** with your base URL
-3. **Replace mock implementations** with actual API calls
-4. **Update types** if needed to match your API schema
+### 2. Админ-панель
+1. Войдите как администратор
+2. Перейдите в админ-панель через меню или `/admin`
+3. Управляйте пользователями, файлами и директориями
 
-Example integration:
-```typescript
-// In src/services/apiService.ts
-import { DefaultApi, Configuration } from '../api';
+### 3. Редактирование контента
+1. Войдите как контент-менеджер
+2. Перейдите на страницу квартиры или жилого комплекса
+3. Нажмите "Редактировать контент"
+4. Внесите изменения и сохраните
 
-const apiConfiguration = new Configuration({
-  basePath: process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000/api',
-});
-const apiClient = new DefaultApi(apiConfiguration);
+## 🔧 API Endpoints
 
-// Replace mock implementation
-static async getApartments(): Promise<Apartment[]> {
-  const response = await apiClient.getApartments();
-  return response.data;
-}
-```
+### Аутентификация
+- `POST /api/auth/login` - Вход в систему
+- `POST /api/auth/refresh` - Обновление токена
 
-## 📱 Pages Overview
+### Админ-панель
+- `GET /api/admin/users` - Список пользователей
+- `POST /api/admin/users` - Создание пользователя
+- `DELETE /api/admin/users/:id` - Удаление пользователя
+- `GET /api/admin/files` - Список файлов
+- `POST /api/admin/files/upload` - Загрузка файла
+- `DELETE /api/admin/files/:id` - Удаление файла
+- `POST /api/admin/directories` - Создание директории
+- `DELETE /api/admin/directories/:id` - Удаление директории
 
-### 1. Home Page (`/`)
-- Hero section with search bar
-- Category-based apartment listings (hot deals, 1-room, 2-room, 3-room)
-- Company statistics and features
-- Call-to-action sections
+### Контент
+- `GET /api/content/apartments` - Список квартир
+- `PUT /api/content/apartments/:id` - Обновление квартиры
+- `GET /api/content/complexes` - Список ЖК
+- `PUT /api/content/complexes/:id` - Обновление ЖК
+- `GET /api/content/contact` - Контактная информация
+- `PUT /api/content/contact` - Обновление контактов
 
-### 2. Complex Page (`/complex/:complexName`)
-- Complex hero with details and booking CTA
-- Tabbed interface (Apartments, About, Location)
-- Apartment grid with filtering
-- Complex amenities and characteristics
+## 🎨 Особенности UI/UX
 
-### 3. Apartment Page (`/apartment/:apartmentId`)
-- Image gallery with navigation
-- Detailed specifications and features
-- Sticky pricing card with booking CTA
-- Mortgage calculator
-- Similar apartments section
+- **Адаптивный дизайн**: Работает на всех устройствах
+- **Современный интерфейс**: Использует Tailwind CSS
+- **Интуитивная навигация**: Понятная структура меню
+- **Модальные окна**: Удобное редактирование контента
+- **Уведомления**: Информативные сообщения об ошибках
+- **Загрузка**: Индикаторы загрузки для всех операций
 
-## 🎯 Key Features
+## 🔒 Безопасность
 
-### Advanced Search & Filtering
-- Text search by complex name or address
-- Price range filtering
-- Room count selection
-- Finishing type filtering
-- Sorting by price, rooms, or area
+- **JWT токены**: Безопасная аутентификация
+- **Роли**: Разграничение доступа по ролям
+- **Защищенные маршруты**: Автоматические редиректы
+- **Валидация**: Проверка данных на клиенте и сервере
 
-### Booking System
-- Modal-based booking form
-- Form validation
-- Success/error states
-- Integration ready for backend API
+## 📝 Лицензия
 
-### State Management
-The Zustand store manages:
-- Apartment and complex data
-- Search filters and results
-- Selected apartment/complex
-- Booking form state
-- UI state (modals, loading)
-
-### Responsive Design
-- Mobile-first approach
-- Breakpoint system: `sm` (640px), `md` (768px), `lg` (1024px), `xl` (1280px)
-- Touch-friendly interfaces
-- Optimized for all screen sizes
-
-## 🔄 Data Flow
-
-1. **App initialization**: Load apartments and complexes data
-2. **Search/Filter**: Update store filters → automatic re-filtering
-3. **Navigation**: Update selected apartment/complex in store
-4. **Booking**: Form submission → API call → success/error handling
-
-## 🧪 Development
-
-### Code Style
-- TypeScript for type safety
-- Functional components with hooks
-- Tailwind CSS for styling
-- ESLint for code quality
-
-### Component Patterns
-- Props interfaces for type safety
-- Custom hooks for complex logic
-- Compound components for complex UI
-- Error boundaries for error handling
-
-## 🚀 Deployment
-
-### Build Optimization
-- Tree shaking for smaller bundles
-- Code splitting by routes
-- Image optimization
-- CSS purging
-
-### Deployment Platforms
-- **Vercel**: Zero-config deployment
-- **Netlify**: Static site hosting
-- **AWS S3 + CloudFront**: Enterprise hosting
-
-## 📈 Performance
-
-### Optimization Techniques
-- Lazy loading of images
-- Virtual scrolling for large lists
-- Memoization of expensive calculations
-- Debounced search inputs
-
-### Core Web Vitals
-- **LCP**: < 2.5s (optimized images and fonts)
-- **FID**: < 100ms (minimal JavaScript)
-- **CLS**: < 0.1 (stable layouts)
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-For support, email support@kvartalika.ru or create an issue in the repository.
-
----
-
-**Built with ❤️ by the Kvartalika Team**
+MIT License

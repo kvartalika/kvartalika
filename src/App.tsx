@@ -1,6 +1,7 @@
 import {BrowserRouter, Routes, Route, useLocation} from 'react-router-dom';
 import {useEffect} from 'react';
 import {useAppStore} from './store/useAppStore';
+import {useAuthStore} from './store/useAuthStore';
 
 // Components
 import Header from './components/Header';
@@ -8,6 +9,7 @@ import Footer from './components/Footer';
 import PageLoader from './components/PageLoader';
 import BookingModal from './components/BookingModal';
 import ScrollToAnchor from './components/ScrollToAnchor';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -15,6 +17,8 @@ import ApartmentsPage from './pages/ApartmentsPage';
 import ComplexesPage from './pages/ComplexesPage';
 import ComplexPage from './pages/ComplexPage';
 import ApartmentPage from './pages/ApartmentPage';
+import AuthPage from './pages/AuthPage';
+import AdminPage from './pages/AdminPage';
 
 // API (placeholder - will integrate with existing API)
 // import { apartmentsApi, complexesApi } from './api';
@@ -341,6 +345,18 @@ function App() {
             <Route
               path="/"
               element={<HomePage />}
+            />
+            <Route
+              path="/auth"
+              element={<AuthPage />}
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute requiredRole="ADMIN">
+                  <AdminPage />
+                </ProtectedRoute>
+              }
             />
             <Route
               path="/apartments"

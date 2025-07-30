@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
+import { useAuthStore } from '../store/useAuthStore';
+import ContentManager from '../components/ContentManager';
 
 const ApartmentPage = () => {
   const { apartmentId } = useParams<{ apartmentId: string }>();
@@ -9,8 +11,10 @@ const ApartmentPage = () => {
     setSelectedApartment, 
     setShowBookingModal
   } = useAppStore();
+  const { user, isAuthenticated } = useAuthStore();
   
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showContentManager, setShowContentManager] = useState(false);
   
   // Find the apartment by ID
   const apartment = apartments.find(apt => apt.id === Number(apartmentId));
@@ -380,6 +384,16 @@ const ApartmentPage = () => {
                   Записаться на осмотр
                 </button>
 
+                {/* Content Manager Edit Button */}
+                {isAuthenticated && user?.role === 'CM' && (
+                  <button
+                    onClick={() => setShowContentManager(true)}
+                    className="w-full bg-gray-600 text-white py-3 rounded-lg font-semibold text-base hover:bg-gray-700 transition-colors"
+                  >
+                    ✏️ Редактировать контент
+                  </button>
+                )}
+
 
               </div>
 
@@ -390,6 +404,23 @@ const ApartmentPage = () => {
 
 
       </div>
+
+      {/* Content Manager Modal */}
+      {showContentManager && (
+        <ContentManager
+          contentType="apartment"
+          contentId={apartment.id}
+          initialData={apartment}
+          onSave={(updatedData) => {
+            // Update the apartment data in the store
+            // This would typically update the store state
+            setShowContentManager(false);
+            // Reload the page or update the data
+            window.location.reload();
+          }}
+          onCancel={() => setShowContentManager(false)}
+        />
+      )}
     </div>
   );
 };
