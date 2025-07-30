@@ -3,6 +3,7 @@ import {useParams, Link} from 'react-router-dom';
 import {useAppStore} from '../store/useAppStore';
 import ApartmentCard from '../components/ApartmentCard';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { Apartment } from '../store/useAppStore';
 
 const ComplexPage = () => {
   const {complexName} = useParams<{ complexName: string }>();
@@ -43,7 +44,7 @@ const ComplexPage = () => {
     );
   }
 
-  const handleBookingClick = (apartment?: any) => {
+  const handleBookingClick = (apartment?: Apartment) => {
     if (apartment) {
       setSelectedApartment(apartment);
     }
