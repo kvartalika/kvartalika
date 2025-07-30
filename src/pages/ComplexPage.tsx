@@ -49,7 +49,7 @@ const ComplexPage = () => {
     setShowBookingModal(true);
   };
 
-  const images = complex?.images || [complex?.image || '/images/complex-placeholder.jpg'];
+  const images = complex?.images || [complex?.image || 'https://via.placeholder.com/800x500/e5e7eb/6b7280?text=Фото+ЖК'];
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -76,11 +76,15 @@ const ComplexPage = () => {
 
       {/* Photo Slider */}
       <section className="relative h-96 md:h-[500px]">
-        <div className="relative h-full overflow-hidden">
+        <div className="relative h-full overflow-hidden bg-gray-200">
           <img
             src={images[currentImageIndex]}
             alt={`${complex.name} - фото ${currentImageIndex + 1}`}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = 'https://via.placeholder.com/800x500/e5e7eb/6b7280?text=Фото+ЖК';
+            }}
           />
           
           {/* Navigation Arrows */}
@@ -88,7 +92,7 @@ const ComplexPage = () => {
             <>
               <button
                 onClick={prevImage}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all z-20"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -96,7 +100,7 @@ const ComplexPage = () => {
               </button>
               <button
                 onClick={nextImage}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all z-20"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -106,25 +110,25 @@ const ComplexPage = () => {
           )}
 
           {/* Image Counter */}
-          <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-lg text-sm">
+          <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-lg text-sm z-20">
             {currentImageIndex + 1} / {images.length}
           </div>
 
           {/* Overlay Info */}
-          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
             <div className="text-center text-white max-w-4xl px-4">
-              <h1 className="text-4xl md:text-6xl font-bold mb-4">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
                 {complex.name}
               </h1>
-              <p className="text-xl md:text-2xl mb-6 text-gray-200">
+              <p className="text-xl md:text-2xl mb-6 text-gray-100 drop-shadow-md">
                 {complex.description}
               </p>
-              <p className="text-lg mb-8 text-gray-300">
+              <p className="text-lg mb-8 text-gray-200 drop-shadow-md">
                 📍 {complex.address}
               </p>
               <button
                 onClick={() => handleBookingClick()}
-                className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors"
+                className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors shadow-lg"
               >
                 Записаться на осмотр
               </button>
@@ -134,12 +138,12 @@ const ComplexPage = () => {
 
         {/* Thumbnail Gallery */}
         {images.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
             {images.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentImageIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all ${
+                className={`w-3 h-3 rounded-full transition-all shadow-lg ${
                   index === currentImageIndex
                     ? 'bg-white'
                     : 'bg-white bg-opacity-50 hover:bg-opacity-75'
