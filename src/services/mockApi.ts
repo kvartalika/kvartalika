@@ -101,8 +101,27 @@ const mockContactInfo = {
   footerDescription: "Ваш надежный партнер в сфере недвижимости",
   title: "Кварталика - недвижимость",
   address: "г. Москва, ул. Примерная, 1",
-  description: "Профессиональные услуги в сфере недвижимости"
+  description: "Профессиональные услуги в сфере недвижимости",
+  published: true
 };
+
+const mockSocialMedia = [
+  {
+    id: 1,
+    image: "/images/telegram-icon.png",
+    link: "https://t.me/kvartalika"
+  },
+  {
+    id: 2,
+    image: "/images/vk-icon.png",
+    link: "https://vk.com/kvartalika"
+  },
+  {
+    id: 3,
+    image: "/images/whatsapp-icon.png",
+    link: "https://wa.me/79991234567"
+  }
+];
 
 const mockMainPageContent = {
   id: 1,
