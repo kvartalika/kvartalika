@@ -1,4 +1,3 @@
-import { Apartment, Complex, BookingForm } from '../store/useAppStore';
 // Import the existing API client
 // import { DefaultApi, Configuration } from '../api';
 
@@ -7,6 +6,8 @@ import { Apartment, Complex, BookingForm } from '../store/useAppStore';
 //   basePath: process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000/api',
 // });
 // const apiClient = new DefaultApi(apiConfiguration);
+
+import type {Apartment, BookingForm, Complex} from "../store/useAppStore.ts";
 
 export class ApiService {
   // Apartments

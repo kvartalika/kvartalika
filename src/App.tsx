@@ -1,6 +1,6 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useEffect } from 'react';
-import { useAppStore } from './store/useAppStore';
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import {useEffect} from 'react';
+import {useAppStore} from './store/useAppStore';
 
 // Components
 import Header from './components/Header';
@@ -17,7 +17,13 @@ import ApartmentPage from './pages/ApartmentPage';
 // import { apartmentsApi, complexesApi } from './api';
 
 function App() {
-  const { isLoading, showBookingModal, setApartments, setComplexes, setIsLoading } = useAppStore();
+  const {
+    isLoading,
+    showBookingModal,
+    setApartments,
+    setComplexes,
+    setIsLoading
+  } = useAppStore();
 
   useEffect(() => {
     // Initialize data loading
@@ -29,7 +35,7 @@ function App() {
         //   apartmentsApi.getApartments(),
         //   complexesApi.getComplexes()
         // ]);
-        
+
         // Mock data for now - will be replaced with API integration
         const mockApartments = [
           {
@@ -108,7 +114,7 @@ function App() {
             description: "Элитная трёхкомнатная квартира в престижном районе"
           }
         ];
-        
+
         const mockComplexes = [
           {
             id: 1,
@@ -138,13 +144,13 @@ function App() {
             amenities: ["Консьерж 24/7", "Подземный паркинг", "Бассейн", "Детский сад"]
           }
         ];
-        
+
         setApartments(mockApartments);
         setComplexes(mockComplexes);
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
-        setIsLoading(false);
+        setTimeout(() => setIsLoading(false), 1000);
       }
     };
 
@@ -159,25 +165,37 @@ function App() {
     <BrowserRouter>
       <div className="min-h-screen flex flex-col bg-gray-50">
         <Header />
-        
+
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/complex/:complexName" element={<ComplexPage />} />
-            <Route path="/apartment/:apartmentId" element={<ApartmentPage />} />
-            <Route path="*" element={
-              <div className="flex items-center justify-center min-h-[400px]">
-                <div className="text-center">
-                  <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
-                  <p className="text-gray-600">Страница не найдена</p>
+            <Route
+              path="/"
+              element={<HomePage />}
+            />
+            <Route
+              path="/complex/:complexName"
+              element={<ComplexPage />}
+            />
+            <Route
+              path="/apartment/:apartmentId"
+              element={<ApartmentPage />}
+            />
+            <Route
+              path="*"
+              element={
+                <div className="flex items-center justify-center min-h-[400px]">
+                  <div className="text-center">
+                    <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
+                    <p className="text-gray-600">Страница не найдена</p>
+                  </div>
                 </div>
-              </div>
-            } />
+              }
+            />
           </Routes>
         </main>
 
         <Footer />
-        
+
         {showBookingModal && <BookingModal />}
       </div>
     </BrowserRouter>

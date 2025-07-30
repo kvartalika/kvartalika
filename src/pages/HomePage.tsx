@@ -1,16 +1,17 @@
-import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useAppStore } from '../store/useAppStore';
+import {useEffect} from 'react';
+import {Link} from 'react-router-dom';
+import {type Apartment, useAppStore} from '../store/useAppStore';
 import SearchBar from '../components/SearchBar';
 import ApartmentCard from '../components/ApartmentCard';
+import BackgroundPattern from "../components/BackgroundPattern.tsx";
 
 const HomePage = () => {
-  const { 
-    filteredApartments, 
-    searchFilters, 
-    setSearchFilters, 
-    setSelectedApartment, 
-    setShowBookingModal 
+  const {
+    filteredApartments,
+    searchFilters,
+    setSearchFilters,
+    setSelectedApartment,
+    setShowBookingModal
   } = useAppStore();
 
   // Get apartments by category
@@ -19,7 +20,7 @@ const HomePage = () => {
   const twoRoomApts = filteredApartments.filter(apt => apt.rooms === 2).slice(0, 5);
   const oneRoomApts = filteredApartments.filter(apt => apt.rooms === 1).slice(0, 5);
 
-  const handleBookingClick = (apartment: any) => {
+  const handleBookingClick = (apartment: Apartment) => {
     setSelectedApartment(apartment);
     setShowBookingModal(true);
   };
@@ -29,10 +30,7 @@ const HomePage = () => {
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center gradient-primary overflow-hidden">
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Ccircle cx="7" cy="7" r="7"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
-        </div>
-
+        <BackgroundPattern />
         <div className="container mx-auto px-4 text-center text-white relative z-10">
           <h1 className="heading-xl mb-6">
             Найдите квартиру<br />
@@ -70,8 +68,18 @@ const HomePage = () => {
 
         {/* Scroll Indicator */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          <svg
+            className="w-6 h-6 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 14l-7 7m0 0l-7-7m7 7V3"
+            />
           </svg>
         </div>
       </section>
@@ -85,18 +93,18 @@ const HomePage = () => {
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">🔥 Горячие предложения</h2>
                 <p className="text-gray-600">Лучшие квартиры по специальным ценам</p>
               </div>
-              <Link 
-                to="/apartments?hot=true" 
+              <Link
+                to="/apartments?hot=true"
                 className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
               >
                 Смотреть все
               </Link>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
               {hotDeals.map(apartment => (
-                <ApartmentCard 
-                  key={apartment.id} 
+                <ApartmentCard
+                  key={apartment.id}
                   apartment={apartment}
                   onBookingClick={() => handleBookingClick(apartment)}
                 />
@@ -115,18 +123,18 @@ const HomePage = () => {
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">3-комнатные квартиры</h2>
                 <p className="text-gray-600">Просторные квартиры для больших семей</p>
               </div>
-              <Link 
-                to="/apartments?rooms=3" 
+              <Link
+                to="/apartments?rooms=3"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
               >
                 Смотреть все
               </Link>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
               {threeRoomApts.map(apartment => (
-                <ApartmentCard 
-                  key={apartment.id} 
+                <ApartmentCard
+                  key={apartment.id}
                   apartment={apartment}
                   onBookingClick={() => handleBookingClick(apartment)}
                 />
@@ -145,18 +153,18 @@ const HomePage = () => {
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">2-комнатные квартиры</h2>
                 <p className="text-gray-600">Оптимальный выбор для молодых семей</p>
               </div>
-              <Link 
-                to="/apartments?rooms=2" 
+              <Link
+                to="/apartments?rooms=2"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
               >
                 Смотреть все
               </Link>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
               {twoRoomApts.map(apartment => (
-                <ApartmentCard 
-                  key={apartment.id} 
+                <ApartmentCard
+                  key={apartment.id}
                   apartment={apartment}
                   onBookingClick={() => handleBookingClick(apartment)}
                 />
@@ -175,18 +183,18 @@ const HomePage = () => {
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">1-комнатные квартиры</h2>
                 <p className="text-gray-600">Идеальное решение для молодых профессионалов</p>
               </div>
-              <Link 
-                to="/apartments?rooms=1" 
+              <Link
+                to="/apartments?rooms=1"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
               >
                 Смотреть все
               </Link>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
               {oneRoomApts.map(apartment => (
-                <ApartmentCard 
-                  key={apartment.id} 
+                <ApartmentCard
+                  key={apartment.id}
                   apartment={apartment}
                   onBookingClick={() => handleBookingClick(apartment)}
                 />
@@ -206,32 +214,62 @@ const HomePage = () => {
             <p className="text-lg text-gray-600 mb-12">
               Мы предлагаем только проверенные объекты недвижимости от надежных застройщиков
             </p>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-8 h-8 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Проверенные объекты</h3>
                 <p className="text-gray-600">Все квартиры проходят тщательную проверку на юридическую чистоту</p>
               </div>
-              
+
               <div className="text-center">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  <svg
+                    className="w-8 h-8 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Быстрый поиск</h3>
                 <p className="text-gray-600">Удобные фильтры помогут найти идеальную квартиру за минуты</p>
               </div>
-              
+
               <div className="text-center">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-8 h-8 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Поддержка 24/7</h3>
