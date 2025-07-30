@@ -268,22 +268,28 @@ const ComplexPage = () => {
             )}
             {/* Construction History */}
             {complex.constructionHistory && (
-              <div className="mb-16">
-                <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center">История строительства</h3>
-                <div className="bg-white rounded-xl p-8 shadow-lg flex flex-col md:flex-row gap-8 items-center">
-                  {/* Photo slider */}
-                  <div className="relative w-full md:w-1/2 h-64 md:h-80 flex-shrink-0">
+              <div className="mb-16 w-full bg-white shadow-lg">
+                <div className="max-w-full flex flex-col md:flex-row items-stretch gap-0">
+                  {/* Text block - 60% */}
+                  <div className="md:w-3/5 w-full p-8 flex flex-col justify-center">
+                    <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center md:text-left">История строительства</h3>
+                    <div className="text-gray-700 text-lg">
+                      {`Строительство: ${new Date(complex.constructionHistory.startDate).toLocaleDateString('ru-RU')} - ${new Date(complex.constructionHistory.endDate).toLocaleDateString('ru-RU')}. `}
+                      {complex.constructionHistory.phases.map(phase => phase.description).join(' ')}
+                    </div>
+                  </div>
+                  {/* Photo slider - 40% */}
+                  <div className="md:w-2/5 w-full flex items-center justify-center p-8 relative min-h-[16rem] md:min-h-[20rem]">
                     <AnimatePresence initial={false}>
                       <motion.img
                         key={currentImageIndex}
                         src={complex.images && complex.images.length > 0 ? complex.images[currentImageIndex % complex.images.length] : '/images/test.png'}
                         alt={`Фото строительства ${currentImageIndex + 1}`}
-                        className="w-full h-full object-cover rounded-xl absolute inset-0"
+                        className="w-full h-64 md:h-80 object-cover rounded-xl"
                         initial={{ opacity: 0, x: 50 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -50 }}
                         transition={{ duration: 0.5 }}
-                        style={{ position: 'absolute' }}
                       />
                     </AnimatePresence>
                     {complex.images && complex.images.length > 1 && (
@@ -318,11 +324,6 @@ const ComplexPage = () => {
                         ))}
                       </div>
                     )}
-                  </div>
-                  {/* Solid text block */}
-                  <div className="w-full md:w-1/2 text-gray-700 text-lg">
-                    {`Строительство: ${new Date(complex.constructionHistory.startDate).toLocaleDateString('ru-RU')} - ${new Date(complex.constructionHistory.endDate).toLocaleDateString('ru-RU')}. `}
-                    {complex.constructionHistory.phases.map(phase => phase.description).join(' ')}
                   </div>
                 </div>
               </div>
