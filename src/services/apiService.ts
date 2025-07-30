@@ -29,12 +29,16 @@ export class ApiService {
               rooms: 2,
               floor: 5,
               bathroom: "Совмещенный",
+              bathrooms: 1,
               finishing: "Чистовая",
               isHot: true,
               image: "/images/apt1.jpg",
               price: 5500000,
               area: 65.5,
-              description: "Уютная двухкомнатная квартира с современным ремонтом"
+              description: "Уютная двухкомнатная квартира с современным ремонтом",
+              hasParks: true,
+              hasInfrastructure: true,
+              distanceFromCenter: 5.2
             }
           ]);
         }, 500);

@@ -8,7 +8,7 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { setShowBookingModal } = useAppStore();
+  const { setShowBookingModal, setSelectedApartment } = useAppStore();
 
   const handleAboutClick = () => {
     if (location.pathname === '/') {
@@ -106,7 +106,10 @@ const Header = () => {
           <div className="hidden lg:flex items-center">
             <button
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-              onClick={() => setShowBookingModal(true)}
+              onClick={() => {
+                setSelectedApartment(null);
+                setShowBookingModal(true);
+              }}
             >
               Записаться на просмотр
             </button>
@@ -181,6 +184,7 @@ const Header = () => {
                 <button 
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full"
                   onClick={() => {
+                    setSelectedApartment(null);
                     setShowBookingModal(true);
                     setIsMobileMenuOpen(false);
                   }}

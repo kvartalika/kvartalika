@@ -60,12 +60,16 @@ function App() {
             rooms: 2,
             floor: 5,
             bathroom: "Совмещенный",
+            bathrooms: 1,
             finishing: "Чистовая",
             isHot: true,
             image: "/images/apt1.jpg",
             price: 5500000,
             area: 65.5,
-            description: "Уютная двухкомнатная квартира с современным ремонтом"
+            description: "Уютная двухкомнатная квартира с современным ремонтом",
+            hasParks: true,
+            hasInfrastructure: true,
+            distanceFromCenter: 5.2
           },
           {
             id: 2,
@@ -75,12 +79,16 @@ function App() {
             rooms: 3,
             floor: 8,
             bathroom: "Раздельный",
+            bathrooms: 2,
             finishing: "Под ключ",
             isHot: false,
             image: "/images/apt2.jpg",
             price: 7800000,
             area: 85.2,
-            description: "Просторная трёхкомнатная квартира с панорамными окнами"
+            description: "Просторная трёхкомнатная квартира с панорамными окнами",
+            hasParks: true,
+            hasInfrastructure: true,
+            distanceFromCenter: 5.2
           },
           {
             id: 3,
@@ -90,12 +98,16 @@ function App() {
             rooms: 1,
             floor: 12,
             bathroom: "Совмещенный",
+            bathrooms: 1,
             finishing: "Черновая",
             isHot: true,
             image: "/images/apt3.jpg",
             price: 3200000,
             area: 42.1,
-            description: "Компактная однокомнатная квартира в новом доме"
+            description: "Компактная однокомнатная квартира в новом доме",
+            hasParks: false,
+            hasInfrastructure: true,
+            distanceFromCenter: 12.8
           },
           {
             id: 4,
@@ -105,12 +117,16 @@ function App() {
             rooms: 2,
             floor: 15,
             bathroom: "Раздельный",
+            bathrooms: 1,
             finishing: "Дизайнерская",
             isHot: false,
             image: "/images/apt4.jpg",
             price: 6200000,
             area: 68.7,
-            description: "Стильная двухкомнатная квартира с дизайнерским ремонтом"
+            description: "Стильная двухкомнатная квартира с дизайнерским ремонтом",
+            hasParks: false,
+            hasInfrastructure: true,
+            distanceFromCenter: 12.8
           },
           {
             id: 5,
@@ -120,12 +136,16 @@ function App() {
             rooms: 3,
             floor: 6,
             bathroom: "Раздельный",
+            bathrooms: 2,
             finishing: "Чистовая",
             isHot: true,
             image: "/images/apt5.jpg",
             price: 8900000,
             area: 95.4,
-            description: "Элитная трёхкомнатная квартира в престижном районе"
+            description: "Элитная трёхкомнатная квартира в престижном районе",
+            hasParks: true,
+            hasInfrastructure: true,
+            distanceFromCenter: 2.1
           }
         ];
 

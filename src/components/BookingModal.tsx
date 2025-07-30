@@ -87,20 +87,7 @@ const BookingModal = () => {
           </button>
         </div>
 
-        {/* Selected Property Info */}
-        {(selectedApartment || selectedComplex) && (
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h3 className="font-medium text-gray-900 mb-1">
-              {selectedApartment ? 'Квартира' : 'Жилой комплекс'}
-            </h3>
-            <p className="text-sm text-gray-600">
-              {selectedApartment 
-                ? `${selectedApartment.rooms}-комн. в ${selectedApartment.complex}`
-                : selectedComplex?.name
-              }
-            </p>
-          </div>
-        )}
+
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
