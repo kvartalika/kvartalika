@@ -16,7 +16,6 @@ export interface User {
 export interface AuthState {
   user: User | null;
   accessToken: string | null;
-  refreshToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -27,7 +26,7 @@ export interface AuthActions {
   logout: () => void;
   refreshAccessToken: () => Promise<void>;
   setUser: (user: User) => void;
-  setTokens: (accessToken: string, refreshToken: string) => void;
+  setAccessToken: (accessToken: string) => void;
   clearAuth: () => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -39,7 +38,6 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       // State
       user: null,
       accessToken: null,
-      refreshToken: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
@@ -51,12 +49,11 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           // For testing, use mock API
           const { mockApi } = await import('../services/mockApi');
           const data = await mockApi.login(email, password);
-          const { user, accessToken, refreshToken } = data;
+          const { user, accessToken } = data;
 
           set({
             user,
             accessToken,
-            refreshToken,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -70,30 +67,31 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         }
       },
 
-      logout: () => {
-        set({
-          user: null,
-          accessToken: null,
-          refreshToken: null,
-          isAuthenticated: false,
-          error: null,
-        });
-      },
-
-      refreshAccessToken: async () => {
-        const { refreshToken } = get();
-        if (!refreshToken) {
-          throw new Error('No refresh token available');
-        }
-
+      logout: async () => {
         try {
           // For testing, use mock API
           const { mockApi } = await import('../services/mockApi');
-          const { accessToken, refreshToken: newRefreshToken } = await mockApi.refreshToken(refreshToken);
+          await mockApi.logout();
+        } catch (error) {
+          console.error('Logout error:', error);
+        } finally {
+          set({
+            user: null,
+            accessToken: null,
+            isAuthenticated: false,
+            error: null,
+          });
+        }
+      },
+
+      refreshAccessToken: async () => {
+        try {
+          // For testing, use mock API
+          const { mockApi } = await import('../services/mockApi');
+          const { accessToken } = await mockApi.refreshToken();
 
           set({
             accessToken,
-            refreshToken: newRefreshToken,
           });
         } catch (error) {
           get().logout();
@@ -105,15 +103,14 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         set({ user });
       },
 
-      setTokens: (accessToken: string, refreshToken: string) => {
-        set({ accessToken, refreshToken, isAuthenticated: true });
+      setAccessToken: (accessToken: string) => {
+        set({ accessToken, isAuthenticated: true });
       },
 
       clearAuth: () => {
         set({
           user: null,
           accessToken: null,
-          refreshToken: null,
           isAuthenticated: false,
           error: null,
         });
@@ -132,7 +129,6 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       partialize: (state) => ({
         user: state.user,
         accessToken: state.accessToken,
-        refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
       }),
     }

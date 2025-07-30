@@ -89,8 +89,20 @@ const HomePageManager = ({
       // Update contact info
       await mockApi.updateContactInfo(contactData);
       
-      // Update social media (this would be a separate endpoint in real API)
-      // For now, we'll simulate updating social media data
+      // Update social media - in a real app, you'd batch these operations
+      // For now, we'll simulate updating each social media item
+      for (const socialMediaItem of socialMedia) {
+        if (socialMediaItem.id > 0) {
+          // Update existing
+          await mockApi.updateSocialMedia(socialMediaItem.id, socialMediaItem);
+        } else {
+          // Add new
+          await mockApi.addSocialMedia({
+            image: socialMediaItem.image,
+            link: socialMediaItem.link
+          });
+        }
+      }
       
       onSave(contactData, socialMedia);
     } catch (err) {

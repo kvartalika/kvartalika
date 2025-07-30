@@ -265,5 +265,75 @@ export const contentApi = {
       console.error('Error updating main page content:', error);
       throw error;
     }
+  },
+
+  // Social Media endpoints
+  getSocialMedia: async () => {
+    try {
+      const response = await fetch('/api/content/social-media');
+      if (!response.ok) {
+        throw new Error('Failed to fetch social media');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching social media:', error);
+      throw error;
+    }
+  },
+
+  addSocialMedia: async (data: { image: string; link: string }) => {
+    try {
+      const response = await fetch('/api/content/social-media', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to add social media');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error adding social media:', error);
+      throw error;
+    }
+  },
+
+  updateSocialMedia: async (id: number, data: Partial<{ image: string; link: string }>) => {
+    try {
+      const response = await fetch(`/api/content/social-media/${id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update social media');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error updating social media:', error);
+      throw error;
+    }
+  },
+
+  deleteSocialMedia: async (id: number) => {
+    try {
+      const response = await fetch(`/api/content/social-media/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete social media');
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error deleting social media:', error);
+      throw error;
+    }
   }
 };

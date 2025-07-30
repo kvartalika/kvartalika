@@ -1,13 +1,15 @@
 import {Link} from 'react-router-dom';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {
   type Apartment,
   type HomepageSection,
   useAppStore
 } from '../store/useAppStore';
+import {useAuthStore} from '../store/useAuthStore';
 import SearchBar from '../components/SearchBar';
 import ApartmentCard from '../components/ApartmentCard';
 import BackgroundPattern from "../components/BackgroundPattern.tsx";
+import HomePageManager from '../components/HomePageManager';
 
 const HomePage = () => {
   const {
@@ -17,6 +19,8 @@ const HomePage = () => {
     setShowBookingModal,
     setSearchFilters
   } = useAppStore();
+  const {user, isAuthenticated} = useAuthStore();
+  const [showHomePageManager, setShowHomePageManager] = useState(false);
 
   useEffect(() => {
     setSearchFilters({
@@ -148,6 +152,18 @@ const HomePage = () => {
             />
           </svg>
         </div>
+
+        {/* Content Manager Edit Button */}
+        {isAuthenticated && user?.role === 'CM' && (
+          <div className="absolute top-8 right-8">
+            <button
+              onClick={() => setShowHomePageManager(true)}
+              className="bg-white bg-opacity-20 backdrop-blur-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-opacity-30 transition-all"
+            >
+              ✏️ Редактировать главную
+            </button>
+          </div>
+        )}
       </section>
 
       {homepageSections
@@ -252,6 +268,19 @@ const HomePage = () => {
           </button>
         </div>
       </section>
+
+      {/* Home Page Manager Modal */}
+      {showHomePageManager && (
+        <HomePageManager
+          onSave={(contactData, socialMediaData) => {
+            // Update the home page data
+            setShowHomePageManager(false);
+            // Reload the page or update the data
+            window.location.reload();
+          }}
+          onCancel={() => setShowHomePageManager(false)}
+        />
+      )}
     </div>
   );
 };

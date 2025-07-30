@@ -135,8 +135,8 @@ const Header = () => {
                   </Link>
                 )}
                 <button
-                  onClick={() => {
-                    logout();
+                  onClick={async () => {
+                    await logout();
                     navigate('/');
                   }}
                   className={`text-sm font-medium transition-colors hover:text-blue-600 ${
@@ -249,8 +249,8 @@ const Header = () => {
                       </Link>
                     )}
                     <button
-                      onClick={() => {
-                        logout();
+                      onClick={async () => {
+                        await logout();
                         navigate('/');
                         setIsMobileMenuOpen(false);
                       }}

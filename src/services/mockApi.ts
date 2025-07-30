@@ -1,6 +1,12 @@
 // Mock API for testing purposes
 // In a real application, this would be replaced with actual API calls
 
+interface SocialMedia {
+  id: number;
+  image: string;
+  link: string;
+}
+
 const mockUsers = [
   {
     id: 1,
@@ -142,16 +148,31 @@ export const mockApi = {
       throw new Error('Invalid credentials');
     }
 
+    // In a real application, the server would set the refresh token as an HTTP-only cookie
+    // For mock purposes, we'll simulate this behavior
+    const accessToken = 'mock-access-token-' + user.id;
+    
+    // Simulate setting HTTP-only cookie (in real app, server would do this)
+    document.cookie = `refreshToken=mock-refresh-token-${user.id}; path=/; secure; samesite=strict`;
+
     return {
       user,
-      accessToken: 'mock-access-token-' + user.id,
-      refreshToken: 'mock-refresh-token-' + user.id
+      accessToken
     };
   },
 
-  refreshToken: async (refreshToken: string) => {
+  refreshToken: async () => {
     await delay(500);
     
+    // Get refresh token from HTTP-only cookie
+    const cookies = document.cookie.split(';');
+    const refreshTokenCookie = cookies.find(cookie => cookie.trim().startsWith('refreshToken='));
+    
+    if (!refreshTokenCookie) {
+      throw new Error('No refresh token available');
+    }
+    
+    const refreshToken = refreshTokenCookie.split('=')[1];
     const userId = refreshToken.split('-').pop();
     const user = mockUsers.find(u => u.id === parseInt(userId || '0'));
     
@@ -159,10 +180,24 @@ export const mockApi = {
       throw new Error('Invalid refresh token');
     }
 
+    // Generate new access token
+    const newAccessToken = 'mock-access-token-' + user.id + '-' + Date.now();
+    
+    // In a real application, the server would set a new refresh token as an HTTP-only cookie
+    document.cookie = `refreshToken=mock-refresh-token-${user.id}-${Date.now()}; path=/; secure; samesite=strict`;
+
     return {
-      accessToken: 'mock-access-token-' + user.id,
-      refreshToken: 'mock-refresh-token-' + user.id
+      accessToken: newAccessToken
     };
+  },
+
+  logout: async () => {
+    await delay(300);
+    
+    // Clear the refresh token cookie
+    document.cookie = 'refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    
+    return true;
   },
 
   // Admin endpoints
@@ -297,5 +332,42 @@ export const mockApi = {
     await delay(1000);
     Object.assign(mockMainPageContent, data);
     return mockMainPageContent;
+  },
+
+  // Social Media endpoints
+  getSocialMedia: async () => {
+    await delay(500);
+    return mockSocialMedia;
+  },
+
+  addSocialMedia: async (data: Omit<SocialMedia, 'id'>) => {
+    await delay(1000);
+    const newSocialMedia = {
+      id: Date.now(),
+      ...data
+    };
+    mockSocialMedia.push(newSocialMedia);
+    return newSocialMedia;
+  },
+
+  updateSocialMedia: async (id: number, data: Partial<SocialMedia>) => {
+    await delay(1000);
+    const index = mockSocialMedia.findIndex(sm => sm.id === id);
+    if (index === -1) {
+      throw new Error('Social media item not found');
+    }
+    mockSocialMedia[index] = { ...mockSocialMedia[index], ...data };
+    return mockSocialMedia[index];
+  },
+
+  deleteSocialMedia: async (id: number) => {
+    await delay(500);
+    const index = mockSocialMedia.findIndex(sm => sm.id === id);
+    if (index === -1) {
+      throw new Error('Social media item not found');
+    }
+    mockSocialMedia.splice(index, 1);
+    return true;
   }
+};
 };
