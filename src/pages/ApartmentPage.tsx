@@ -411,7 +411,7 @@ const ApartmentPage = () => {
           contentType="apartment"
           contentId={apartment.id}
           initialData={apartment}
-          onSave={(updatedData) => {
+          onSave={() => {
             // Update the apartment data in the store
             // This would typically update the store state
             setShowContentManager(false);

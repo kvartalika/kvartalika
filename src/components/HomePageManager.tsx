@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
+import ContactForm from './forms/ContactForm';
+import SocialMediaForm from './forms/SocialMediaForm';
 
 interface ContactInfo {
   id: number;
@@ -165,156 +167,20 @@ const HomePageManager = ({
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Contact Information */}
           <div className="bg-gray-50 p-6 rounded-lg">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Контактная информация
-            </h3>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Телефон
-                </label>
-                <input
-                  type="tel"
-                  value={contactData.phone}
-                  onChange={(e) => handleContactChange('phone', e.target.value)}
-                  className="w-full border rounded px-3 py-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={contactData.email}
-                  onChange={(e) => handleContactChange('email', e.target.value)}
-                  className="w-full border rounded px-3 py-2"
-                />
-              </div>
-            </div>
-
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Заголовок сайта
-              </label>
-              <input
-                type="text"
-                value={contactData.title}
-                onChange={(e) => handleContactChange('title', e.target.value)}
-                className="w-full border rounded px-3 py-2"
-              />
-            </div>
-
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Адрес
-              </label>
-              <input
-                type="text"
-                value={contactData.address}
-                onChange={(e) => handleContactChange('address', e.target.value)}
-                className="w-full border rounded px-3 py-2"
-              />
-            </div>
-
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Описание в футере
-              </label>
-              <textarea
-                value={contactData.footerDescription}
-                onChange={(e) => handleContactChange('footerDescription', e.target.value)}
-                className="w-full border rounded px-3 py-2 h-24"
-              />
-            </div>
-
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Основное описание
-              </label>
-              <textarea
-                value={contactData.description}
-                onChange={(e) => handleContactChange('description', e.target.value)}
-                className="w-full border rounded px-3 py-2 h-24"
-              />
-            </div>
-
-            <div className="mt-4">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={contactData.published}
-                  onChange={(e) => handleContactChange('published', e.target.checked)}
-                  className="mr-2"
-                />
-                Опубликовано
-              </label>
-            </div>
+            <ContactForm
+              contactData={contactData}
+              onContactChange={handleContactChange}
+            />
           </div>
 
           {/* Social Media */}
           <div className="bg-gray-50 p-6 rounded-lg">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Социальные сети
-              </h3>
-              <button
-                type="button"
-                onClick={addSocialMedia}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-              >
-                + Добавить соц. сеть
-              </button>
-            </div>
-
-            {socialMedia.map((item, index) => (
-              <div key={item.id} className="border rounded p-4 mb-4">
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="font-medium">Социальная сеть {index + 1}</h4>
-                  <button
-                    type="button"
-                    onClick={() => removeSocialMedia(index)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    Удалить
-                  </button>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      URL изображения
-                    </label>
-                                         <input
-                       type="url"
-                       value={item.image}
-                       onChange={(e) => handleSocialMediaChange(index, 'image', e.target.value)}
-                       className="w-full border rounded px-3 py-2"
-                       placeholder="https://example.com/icon.png"
-                     />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Ссылка
-                    </label>
-                                         <input
-                       type="url"
-                       value={item.link}
-                       onChange={(e) => handleSocialMediaChange(index, 'link', e.target.value)}
-                       className="w-full border rounded px-3 py-2"
-                       placeholder="https://example.com"
-                     />
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {socialMedia.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                Нет добавленных социальных сетей
-              </div>
-            )}
+            <SocialMediaForm
+              socialMedia={socialMedia}
+              onSocialMediaChange={handleSocialMediaChange}
+              onAddSocialMedia={addSocialMedia}
+              onRemoveSocialMedia={removeSocialMedia}
+            />
           </div>
 
           {/* Action Buttons */}

@@ -1,4 +1,4 @@
-import { useAuthStore } from '../store/useAuthStore';
+
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('auth-storage') ? 

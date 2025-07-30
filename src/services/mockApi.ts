@@ -229,7 +229,7 @@ export const mockApi = {
   },
 
   // File management
-  getFiles: async (path: string = '/') => {
+  getFiles: async () => {
     await delay(500);
     return {
       files: [
@@ -248,7 +248,7 @@ export const mockApi = {
     return { id: Date.now(), name: file.name, path, size: file.size, type: file.type, createdAt: new Date().toISOString() };
   },
 
-  deleteFile: async (fileId: number) => {
+  deleteFile: async () => {
     await delay(500);
     return true;
   },
@@ -258,7 +258,7 @@ export const mockApi = {
     return { id: Date.now(), name, path, createdAt: new Date().toISOString() };
   },
 
-  deleteDirectory: async (dirId: number) => {
+  deleteDirectory: async () => {
     await delay(500);
     return true;
   },
@@ -369,5 +369,4 @@ export const mockApi = {
     mockSocialMedia.splice(index, 1);
     return true;
   }
-};
 };

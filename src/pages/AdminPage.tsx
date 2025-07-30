@@ -37,7 +37,7 @@ const AdminPage = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [files, setFiles] = useState<FileItem[]>([]);
   const [directories, setDirectories] = useState<Directory[]>([]);
-  const [currentDirectory, setCurrentDirectory] = useState('/');
+  const [currentDirectory] = useState('/');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -73,7 +73,7 @@ const AdminPage = () => {
         const data = await mockApi.getUsers();
         setUsers(data);
       } else if (activeTab === 'files') {
-        const data = await mockApi.getFiles(currentDirectory);
+        const data = await mockApi.getFiles();
         setFiles(data.files);
         setDirectories(data.directories);
       }
@@ -133,13 +133,13 @@ const AdminPage = () => {
     }
   };
 
-  const handleDeleteDirectory = async (dirId: number) => {
+  const handleDeleteDirectory = async () => {
     if (!confirm('Are you sure you want to delete this directory?')) return;
     
     try {
       // For testing, use mock API
       const { mockApi } = await import('../services/mockApi');
-      await mockApi.deleteDirectory(dirId);
+      await mockApi.deleteDirectory();
       loadData();
     } catch (err) {
       setError('Failed to delete directory');
@@ -162,13 +162,13 @@ const AdminPage = () => {
     }
   };
 
-  const handleDeleteFile = async (fileId: number) => {
+  const handleDeleteFile = async () => {
     if (!confirm('Are you sure you want to delete this file?')) return;
     
     try {
       // For testing, use mock API
       const { mockApi } = await import('../services/mockApi');
-      await mockApi.deleteFile(fileId);
+      await mockApi.deleteFile();
       loadData();
     } catch (err) {
       setError('Failed to delete file');
@@ -420,7 +420,7 @@ const AdminPage = () => {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                               <button
-                                onClick={() => handleDeleteFile(file.id)}
+                                onClick={() => handleDeleteFile()}
                                 className="text-red-600 hover:text-red-900"
                               >
                                 Delete
@@ -488,7 +488,7 @@ const AdminPage = () => {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                               <button
-                                onClick={() => handleDeleteDirectory(dir.id)}
+                                onClick={() => handleDeleteDirectory()}
                                 className="text-red-600 hover:text-red-900"
                               >
                                 Delete

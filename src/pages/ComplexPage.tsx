@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {useAppStore} from '../store/useAppStore';
 import ApartmentCard from '../components/ApartmentCard';
-import { motion, AnimatePresence } from 'framer-motion';
+
 import type { Apartment } from '../store/useAppStore';
 import { useAuthStore } from '../store/useAuthStore';
 import ContentManager from '../components/ContentManager';
@@ -17,7 +17,7 @@ const ComplexPage = () => {
   } = useAppStore();
 
   const { user, isAuthenticated } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<'apartments' | 'about' | 'location'>('apartments');
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showContentManager, setShowContentManager] = useState(false);
 
@@ -86,8 +86,8 @@ const ComplexPage = () => {
       {/* Photo Slider */}
       <section className="relative h-96 md:h-[500px]">
         <div className="relative h-full overflow-hidden bg-gray-200">
-          <AnimatePresence initial={false} custom={currentImageIndex}>
-            <motion.img
+          
+            <img
               key={currentImageIndex}
               src={images[currentImageIndex]}
               alt={`${complex.name} - фото ${currentImageIndex + 1}`}
@@ -96,13 +96,9 @@ const ComplexPage = () => {
                 const target = e.target as HTMLImageElement;
                 target.src = '/images/test.png';
               }}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.5 }}
               style={{ position: 'absolute' }}
             />
-          </AnimatePresence>
+          
 
           {/* Navigation Arrows */}
           {images.length > 1 && (
@@ -432,7 +428,7 @@ const ComplexPage = () => {
           contentType="complex"
           contentId={complex.id}
           initialData={complex}
-          onSave={(updatedData) => {
+          onSave={() => {
             // Update the complex data in the store
             // This would typically update the store state
             setShowContentManager(false);

@@ -272,7 +272,7 @@ const HomePage = () => {
       {/* Home Page Manager Modal */}
       {showHomePageManager && (
         <HomePageManager
-          onSave={(contactData, socialMediaData) => {
+          onSave={() => {
             // Update the home page data
             setShowHomePageManager(false);
             // Reload the page or update the data

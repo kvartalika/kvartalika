@@ -1,7 +1,7 @@
 import {BrowserRouter, Routes, Route, useLocation} from 'react-router-dom';
 import {useEffect} from 'react';
 import {useAppStore} from './store/useAppStore';
-import {useAuthStore} from './store/useAuthStore';
+
 
 // Components
 import Header from './components/Header';

@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
+import type { FormData, ContentType } from '../types';
 
 interface ContentManagerProps {
-  contentType: 'apartment' | 'complex';
+  contentType: ContentType;
   contentId: number;
-  onSave: (data: any) => void;
+  onSave: (data: FormData) => void;
   onCancel: () => void;
   initialData?: any;
 }
 
 const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData }: ContentManagerProps) => {
   const { user, isAuthenticated } = useAuthStore();
-  const [formData, setFormData] = useState<any>(initialData || {});
+  const [formData, setFormData] = useState<FormData>(initialData || {} as FormData);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -21,33 +22,33 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
     }
   }, [isAuthenticated, user]);
 
-  const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
+  const handleInputChange = (field: keyof FormData, value: string | number | boolean) => {
+    setFormData((prev: FormData) => ({
       ...prev,
       [field]: value
     }));
   };
 
   const handleArrayChange = (field: string, index: number, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev: FormData) => ({
       ...prev,
-      [field]: prev[field]?.map((item: string, i: number) => 
+      [field]: (prev[field] as string[])?.map((item: string, i: number) => 
         i === index ? value : item
       ) || []
     }));
   };
 
   const handleAddArrayItem = (field: string) => {
-    setFormData(prev => ({
+    setFormData((prev: FormData) => ({
       ...prev,
-      [field]: [...(prev[field] || []), '']
+      [field]: [...((prev[field] as string[]) || []), '']
     }));
   };
 
   const handleRemoveArrayItem = (field: string, index: number) => {
-    setFormData(prev => ({
+    setFormData((prev: FormData) => ({
       ...prev,
-      [field]: prev[field]?.filter((_: string, i: number) => i !== index) || []
+      [field]: (prev[field] as string[])?.filter((_: string, i: number) => i !== index) || []
     }));
   };
 
