@@ -49,6 +49,20 @@ export interface BookingForm {
   message?: string;
 }
 
+export interface HomepageSection {
+  id: string;
+  title: string;
+  description: string;
+  type: 'hot_deals' | 'rooms' | 'custom';
+  isVisible: boolean;
+  order: number;
+  rooms?: number; // For room-specific sections
+  customFilter?: (apartments: Apartment[]) => Apartment[];
+  backgroundColor?: 'white' | 'gray';
+  linkText?: string;
+  linkUrl?: string;
+}
+
 interface AppState {
   // Data
   apartments: Apartment[];
@@ -62,6 +76,9 @@ interface AppState {
   isLoading: boolean;
   selectedApartment: Apartment | null;
   selectedComplex: Complex | null;
+  
+  // Homepage
+  homepageSections: HomepageSection[];
   
   // Booking
   bookingForm: BookingForm;
@@ -78,6 +95,8 @@ interface AppState {
   setShowBookingModal: (show: boolean) => void;
   setIsLoading: (loading: boolean) => void;
   resetBookingForm: () => void;
+  setHomepageSections: (sections: HomepageSection[]) => void;
+  updateHomepageSection: (id: string, updates: Partial<HomepageSection>) => void;
 }
 
 const initialBookingForm: BookingForm = {
@@ -86,6 +105,56 @@ const initialBookingForm: BookingForm = {
   email: '',
   message: '',
 };
+
+const defaultHomepageSections: HomepageSection[] = [
+  {
+    id: 'hot_deals',
+    title: '🔥 Горячие предложения',
+    description: 'Лучшие квартиры по специальным ценам',
+    type: 'hot_deals',
+    isVisible: true,
+    order: 1,
+    backgroundColor: 'white',
+    linkText: 'Смотреть все',
+    linkUrl: '/apartments?hot=true',
+  },
+  {
+    id: 'three_rooms',
+    title: '3-комнатные квартиры',
+    description: 'Просторные квартиры для больших семей',
+    type: 'rooms',
+    rooms: 3,
+    isVisible: true,
+    order: 2,
+    backgroundColor: 'gray',
+    linkText: 'Смотреть все',
+    linkUrl: '/apartments?rooms=3',
+  },
+  {
+    id: 'two_rooms',
+    title: '2-комнатные квартиры',
+    description: 'Оптимальный выбор для молодых семей',
+    type: 'rooms',
+    rooms: 2,
+    isVisible: true,
+    order: 3,
+    backgroundColor: 'white',
+    linkText: 'Смотреть все',
+    linkUrl: '/apartments?rooms=2',
+  },
+  {
+    id: 'one_room',
+    title: '1-комнатные квартиры',
+    description: 'Идеальное решение для молодых профессионалов',
+    type: 'rooms',
+    rooms: 1,
+    isVisible: true,
+    order: 4,
+    backgroundColor: 'gray',
+    linkText: 'Смотреть все',
+    linkUrl: '/apartments?rooms=1',
+  },
+];
 
 const initialSearchFilters: SearchFilters = {
   query: '',
@@ -104,6 +173,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   isLoading: false,
   selectedApartment: null,
   selectedComplex: null,
+  homepageSections: defaultHomepageSections,
   bookingForm: initialBookingForm,
   showBookingModal: false,
 
@@ -199,4 +269,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   resetBookingForm: () => set({ bookingForm: initialBookingForm }),
+  
+  setHomepageSections: (sections) => set({ homepageSections: sections }),
+  
+  updateHomepageSection: (id, updates) => {
+    set((state) => ({
+      homepageSections: state.homepageSections.map(section =>
+        section.id === id ? { ...section, ...updates } : section
+      )
+    }));
+  },
 }));

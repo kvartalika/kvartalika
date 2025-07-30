@@ -1,5 +1,5 @@
 import {Link} from 'react-router-dom';
-import {type Apartment, useAppStore} from '../store/useAppStore';
+import {type Apartment, type HomepageSection, useAppStore} from '../store/useAppStore';
 import SearchBar from '../components/SearchBar';
 import ApartmentCard from '../components/ApartmentCard';
 import BackgroundPattern from "../components/BackgroundPattern.tsx";
@@ -7,19 +7,67 @@ import BackgroundPattern from "../components/BackgroundPattern.tsx";
 const HomePage = () => {
   const {
     filteredApartments,
+    homepageSections,
     setSelectedApartment,
     setShowBookingModal
   } = useAppStore();
 
-  // Get apartments by category
-  const hotDeals = filteredApartments.filter(apt => apt.isHot).slice(0, 5);
-  const threeRoomApts = filteredApartments.filter(apt => apt.rooms === 3).slice(0, 5);
-  const twoRoomApts = filteredApartments.filter(apt => apt.rooms === 2).slice(0, 5);
-  const oneRoomApts = filteredApartments.filter(apt => apt.rooms === 1).slice(0, 5);
-
   const handleBookingClick = (apartment: Apartment) => {
     setSelectedApartment(apartment);
     setShowBookingModal(true);
+  };
+
+  const getApartmentsForSection = (section: HomepageSection): Apartment[] => {
+    let apartments: Apartment[] = [];
+    
+    if (section.type === 'hot_deals') {
+      apartments = filteredApartments.filter(apt => apt.isHot);
+    } else if (section.type === 'rooms' && section.rooms) {
+      apartments = filteredApartments.filter(apt => apt.rooms === section.rooms);
+    } else if (section.type === 'custom' && section.customFilter) {
+      apartments = section.customFilter(filteredApartments);
+    }
+    
+    return apartments.slice(0, 5);
+  };
+
+  const renderSection = (section: HomepageSection, apartments: Apartment[]) => {
+    if (!section.isVisible || apartments.length === 0) return null;
+
+    return (
+      <section key={section.id} className={`py-16 ${section.backgroundColor === 'gray' ? 'bg-gray-50' : 'bg-white'}`}>
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between mb-12">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">{section.title}</h2>
+              <p className="text-gray-600">{section.description}</p>
+            </div>
+            {section.linkText && section.linkUrl && (
+              <Link
+                to={section.linkUrl}
+                className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+                  section.type === 'hot_deals'
+                    ? 'bg-red-600 hover:bg-red-700 text-white'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                }`}
+              >
+                {section.linkText}
+              </Link>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+            {apartments.map(apartment => (
+              <ApartmentCard
+                key={apartment.id}
+                apartment={apartment}
+                onBookingClick={() => handleBookingClick(apartment)}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
   };
 
   return (
@@ -81,125 +129,14 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Hot Deals Section */}
-      {hotDeals.length > 0 && (
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-12">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">🔥 Горячие предложения</h2>
-                <p className="text-gray-600">Лучшие квартиры по специальным ценам</p>
-              </div>
-              <Link
-                to="/apartments?hot=true"
-                className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-              >
-                Смотреть все
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-              {hotDeals.map(apartment => (
-                <ApartmentCard
-                  key={apartment.id}
-                  apartment={apartment}
-                  onBookingClick={() => handleBookingClick(apartment)}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 3-Room Apartments */}
-      {threeRoomApts.length > 0 && (
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-12">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">3-комнатные квартиры</h2>
-                <p className="text-gray-600">Просторные квартиры для больших семей</p>
-              </div>
-              <Link
-                to="/apartments?rooms=3"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-              >
-                Смотреть все
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-              {threeRoomApts.map(apartment => (
-                <ApartmentCard
-                  key={apartment.id}
-                  apartment={apartment}
-                  onBookingClick={() => handleBookingClick(apartment)}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 2-Room Apartments */}
-      {twoRoomApts.length > 0 && (
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-12">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">2-комнатные квартиры</h2>
-                <p className="text-gray-600">Оптимальный выбор для молодых семей</p>
-              </div>
-              <Link
-                to="/apartments?rooms=2"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-              >
-                Смотреть все
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-              {twoRoomApts.map(apartment => (
-                <ApartmentCard
-                  key={apartment.id}
-                  apartment={apartment}
-                  onBookingClick={() => handleBookingClick(apartment)}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 1-Room Apartments */}
-      {oneRoomApts.length > 0 && (
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-12">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">1-комнатные квартиры</h2>
-                <p className="text-gray-600">Идеальное решение для молодых профессионалов</p>
-              </div>
-              <Link
-                to="/apartments?rooms=1"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-              >
-                Смотреть все
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-              {oneRoomApts.map(apartment => (
-                <ApartmentCard
-                  key={apartment.id}
-                  apartment={apartment}
-                  onBookingClick={() => handleBookingClick(apartment)}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+      {/* Dynamic Sections */}
+      {homepageSections
+        .filter(section => section.isVisible)
+        .sort((a, b) => a.order - b.order)
+        .map(section => {
+          const apartments = getApartmentsForSection(section);
+          return renderSection(section, apartments);
+        })}
 
       {/* About Section */}
       <section id="about" className="py-16 bg-white">
