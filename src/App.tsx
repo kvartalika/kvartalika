@@ -6,6 +6,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import PageLoader from './components/PageLoader';
 import BookingModal from './components/BookingModal';
+import ProtectedRoute from './components/ProtectedRoute';
 
 import HomePage from './pages/HomePage';
 import ComplexPage from './pages/ComplexPage';
@@ -15,6 +16,8 @@ import ApartmentsPage from './pages/ApartmentsPage';
 import AdminSetupPage from './pages/admin/AdminSetupPage';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminRegisterPage from './pages/admin/AdminRegisterPage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import ManagerDashboardPage from './pages/manager/ManagerDashboardPage';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -215,9 +218,29 @@ function App() {
             <Route path="/apartments" element={<ApartmentsPage />} />
             <Route path="/complex/:complexName" element={<ComplexPage />} />
             <Route path="/apartment/:apartmentId" element={<ApartmentPage />} />
+            
             <Route path="/admin/setup" element={<AdminSetupPage />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin/register" element={<AdminRegisterPage />} />
+            
+            <Route 
+              path="/admin/dashboard" 
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminDashboardPage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/manager/dashboard" 
+              element={
+                <ProtectedRoute requiredRole="manager">
+                  <ManagerDashboardPage />
+                </ProtectedRoute>
+              } 
+            />
+            
             <Route
               path="*"
               element={

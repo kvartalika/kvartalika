@@ -1,7 +1,12 @@
 import {useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate, useLocation} from 'react-router-dom';
+import {useAppStore} from '../../store/useAppStore';
 
 const AdminLoginPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAppStore();
+  
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -9,16 +14,23 @@ const AdminLoginPage = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
 
+  const from = location.state?.from?.pathname || '/admin/dashboard';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
     setIsLoading(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      alert('Вход выполнен успешно!');
+      const success = await login(formData.email, formData.password);
+      
+      if (success) {
+        navigate(from, { replace: true });
+      } else {
+        setErrors({general: 'Неверный email или пароль'});
+      }
     } catch (error) {
-      setErrors({general: 'Неверный email или пароль'});
+      setErrors({general: 'Произошла ошибка при входе'});
     } finally {
       setIsLoading(false);
     }
@@ -89,12 +101,19 @@ const AdminLoginPage = () => {
             </button>
           </div>
 
-          <div className="text-center">
+          <div className="text-center space-y-2">
             <Link
               to="/admin/register"
               className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 text-sm"
             >
               Нет аккаунта? Зарегистрироваться
+            </Link>
+            <br />
+            <Link
+              to="/admin/setup"
+              className="text-gray-600 hover:text-gray-500 dark:text-gray-400 dark:hover:text-gray-300 text-sm"
+            >
+              Первоначальная настройка
             </Link>
           </div>
         </form>

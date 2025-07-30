@@ -1,8 +1,10 @@
 import {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {useAppStore} from '../../store/useAppStore';
 
 const AdminSetupPage = () => {
-  const {admins, setAdmins} = useAppStore();
+  const navigate = useNavigate();
+  const {admins, setAdmins, login} = useAppStore();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -39,14 +41,14 @@ const AdminSetupPage = () => {
 
       setAdmins([...admins, newAdmin]);
       
-      setFormData({
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-      });
-
-      alert('Администратор успешно создан!');
+      const loginSuccess = await login(formData.email, formData.password);
+      
+      if (loginSuccess) {
+        navigate('/admin/dashboard');
+      } else {
+        alert('Администратор создан! Теперь вы можете войти в систему.');
+        navigate('/admin/login');
+      }
     } catch (error) {
       setErrors({general: 'Произошла ошибка при создании администратора'});
     } finally {

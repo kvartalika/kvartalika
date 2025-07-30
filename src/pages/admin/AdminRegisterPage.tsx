@@ -1,9 +1,11 @@
 import {useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {useAppStore} from '../../store/useAppStore';
 
 const AdminRegisterPage = () => {
-  const {admins, setAdmins} = useAppStore();
+  const navigate = useNavigate();
+  const { register } = useAppStore();
+  
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -31,25 +33,19 @@ const AdminRegisterPage = () => {
     setIsLoading(true);
 
     try {
-      const newAdmin = {
-        id: Date.now(),
+      const success = await register({
         username: formData.username,
         email: formData.email,
-        role: formData.role,
-        createdAt: new Date().toISOString()
-      };
-
-      setAdmins([...admins, newAdmin]);
-      
-      setFormData({
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        role: 'manager'
+        password: formData.password,
+        role: formData.role
       });
 
-      alert('Регистрация прошла успешно!');
+      if (success) {
+        alert('Регистрация прошла успешно! Теперь вы можете войти в систему.');
+        navigate('/admin/login');
+      } else {
+        setErrors({general: 'Пользователь с таким email уже существует'});
+      }
     } catch (error) {
       setErrors({general: 'Произошла ошибка при регистрации'});
     } finally {
