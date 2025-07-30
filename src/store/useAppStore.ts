@@ -7,6 +7,7 @@ export interface Apartment {
   address: string;
   rooms: number;
   floor: number;
+  bathrooms: number;
   bathroom: string;
   finishing: string;
   isHot: boolean;
@@ -15,6 +16,14 @@ export interface Apartment {
   area: number;
   description?: string;
   images?: string[];
+  floorPlan?: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+  viewers?: number;
+  hasParks?: boolean;
+  hasInfrastructure?: boolean;
 }
 
 export interface Complex {
@@ -26,6 +35,12 @@ export interface Complex {
   images?: string[];
   apartments: Apartment[];
   amenities?: string[];
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
+  hasParks?: boolean;
+  hasInfrastructure?: boolean;
 }
 
 export interface SearchFilters {
@@ -33,10 +48,17 @@ export interface SearchFilters {
   minPrice?: number;
   maxPrice?: number;
   rooms?: number[];
+  bathrooms?: number[];
   finishing?: string[];
   complex?: string;
-  sortBy?: 'price' | 'rooms' | 'area';
+  hasParks?: boolean;
+  hasInfrastructure?: boolean;
+  sortBy?: 'price' | 'rooms' | 'area' | 'distance';
   sortOrder?: 'asc' | 'desc';
+  sortLocation?: {
+    lat: number;
+    lng: number;
+  };
 }
 
 export interface BookingForm {
@@ -49,25 +71,39 @@ export interface BookingForm {
   message?: string;
 }
 
+export interface Admin {
+  id: number;
+  username: string;
+  email: string;
+  role: 'admin' | 'manager';
+  createdAt: string;
+}
+
+export interface Inquiry {
+  id: number;
+  name: string;
+  phone: string;
+  email: string;
+  message?: string;
+  apartmentId?: number;
+  complexId?: number;
+  createdAt: string;
+  status: 'new' | 'contacted' | 'closed';
+}
+
 interface AppState {
-  // Data
   apartments: Apartment[];
   complexes: Complex[];
-  
-  // Search & Filters
   searchFilters: SearchFilters;
   filteredApartments: Apartment[];
-  
-  // UI State
   isLoading: boolean;
   selectedApartment: Apartment | null;
   selectedComplex: Complex | null;
-  
-  // Booking
   bookingForm: BookingForm;
   showBookingModal: boolean;
+  admins: Admin[];
+  inquiries: Inquiry[];
   
-  // Actions
   setApartments: (apartments: Apartment[]) => void;
   setComplexes: (complexes: Complex[]) => void;
   setSearchFilters: (filters: Partial<SearchFilters>) => void;
@@ -78,6 +114,9 @@ interface AppState {
   setShowBookingModal: (show: boolean) => void;
   setIsLoading: (loading: boolean) => void;
   resetBookingForm: () => void;
+  setAdmins: (admins: Admin[]) => void;
+  setInquiries: (inquiries: Inquiry[]) => void;
+  addInquiry: (inquiry: Omit<Inquiry, 'id' | 'createdAt'>) => void;
 }
 
 const initialBookingForm: BookingForm = {
@@ -90,13 +129,24 @@ const initialBookingForm: BookingForm = {
 const initialSearchFilters: SearchFilters = {
   query: '',
   rooms: [],
+  bathrooms: [],
   finishing: [],
   sortBy: 'price',
   sortOrder: 'asc',
 };
 
+const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng/2) * Math.sin(dLng/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+};
+
 export const useAppStore = create<AppState>((set, get) => ({
-  // Initial state
   apartments: [],
   complexes: [],
   searchFilters: initialSearchFilters,
@@ -106,8 +156,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   selectedComplex: null,
   bookingForm: initialBookingForm,
   showBookingModal: false,
+  admins: [],
+  inquiries: [],
 
-  // Actions
   setApartments: (apartments) => {
     set({ apartments });
     get().filterApartments();
@@ -126,7 +177,6 @@ export const useAppStore = create<AppState>((set, get) => ({
     const { apartments, searchFilters } = get();
     let filtered = [...apartments];
 
-    // Text search
     if (searchFilters.query) {
       const query = searchFilters.query.toLowerCase();
       filtered = filtered.filter(apt => 
@@ -135,7 +185,6 @@ export const useAppStore = create<AppState>((set, get) => ({
       );
     }
 
-    // Price filter
     if (searchFilters.minPrice) {
       filtered = filtered.filter(apt => apt.price >= searchFilters.minPrice!);
     }
@@ -143,22 +192,30 @@ export const useAppStore = create<AppState>((set, get) => ({
       filtered = filtered.filter(apt => apt.price <= searchFilters.maxPrice!);
     }
 
-    // Rooms filter
     if (searchFilters.rooms && searchFilters.rooms.length > 0) {
       filtered = filtered.filter(apt => searchFilters.rooms!.includes(apt.rooms));
     }
 
-    // Finishing filter
+    if (searchFilters.bathrooms && searchFilters.bathrooms.length > 0) {
+      filtered = filtered.filter(apt => searchFilters.bathrooms!.includes(apt.bathrooms));
+    }
+
     if (searchFilters.finishing && searchFilters.finishing.length > 0) {
       filtered = filtered.filter(apt => searchFilters.finishing!.includes(apt.finishing));
     }
 
-    // Complex filter
     if (searchFilters.complex) {
       filtered = filtered.filter(apt => apt.complex === searchFilters.complex);
     }
 
-    // Sorting
+    if (searchFilters.hasParks !== undefined) {
+      filtered = filtered.filter(apt => apt.hasParks === searchFilters.hasParks);
+    }
+
+    if (searchFilters.hasInfrastructure !== undefined) {
+      filtered = filtered.filter(apt => apt.hasInfrastructure === searchFilters.hasInfrastructure);
+    }
+
     if (searchFilters.sortBy) {
       filtered.sort((a, b) => {
         let aVal: number, bVal: number;
@@ -175,6 +232,24 @@ export const useAppStore = create<AppState>((set, get) => ({
           case 'area':
             aVal = a.area;
             bVal = b.area;
+            break;
+          case 'distance':
+            if (searchFilters.sortLocation && a.coordinates && b.coordinates) {
+              aVal = calculateDistance(
+                searchFilters.sortLocation.lat,
+                searchFilters.sortLocation.lng,
+                a.coordinates.lat,
+                a.coordinates.lng
+              );
+              bVal = calculateDistance(
+                searchFilters.sortLocation.lat,
+                searchFilters.sortLocation.lng,
+                b.coordinates.lat,
+                b.coordinates.lng
+              );
+            } else {
+              return 0;
+            }
             break;
           default:
             return 0;
@@ -199,4 +274,19 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   resetBookingForm: () => set({ bookingForm: initialBookingForm }),
+
+  setAdmins: (admins) => set({ admins }),
+  setInquiries: (inquiries) => set({ inquiries }),
+  
+  addInquiry: (inquiry) => {
+    const newInquiry: Inquiry = {
+      ...inquiry,
+      id: Date.now(),
+      createdAt: new Date().toISOString(),
+      status: 'new'
+    };
+    set((state) => ({
+      inquiries: [...state.inquiries, newInquiry]
+    }));
+  },
 }));
