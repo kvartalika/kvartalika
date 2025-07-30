@@ -35,18 +35,16 @@ export interface AuthActions {
 export const useAuthStore = create<AuthState & AuthActions>()(
   persist(
     (set, get) => ({
-      // State
       user: null,
       accessToken: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
 
-      // Actions
       login: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          // For testing, use mock API
+          // TODO api
           const { mockApi } = await import('../services/mockApi');
           const data = await mockApi.login(email, password);
           const { user, accessToken } = data;
@@ -69,7 +67,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
 
       logout: async () => {
         try {
-          // For testing, use mock API
+          // TODO api
           const { mockApi } = await import('../services/mockApi');
           await mockApi.logout();
         } catch (error) {
@@ -86,7 +84,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
 
       refreshAccessToken: async () => {
         try {
-          // For testing, use mock API
+          // TODO api
           const { mockApi } = await import('../services/mockApi');
           const { accessToken } = await mockApi.refreshToken();
 

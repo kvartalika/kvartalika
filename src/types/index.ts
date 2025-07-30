@@ -84,16 +84,16 @@ export interface FormData {
   description: string;
   latitude: number;
   longitude: number;
-  // Apartment specific fields
+  
   numberOfRooms?: number;
   numberOfBathrooms?: number;
   floor?: number;
   price?: number;
   area?: number;
-  // Complex specific fields
+  
   yearBuilt?: number;
   numberOfFloors?: number;
-  // Additional fields used in forms
+  
   images?: string[];
   features?: string[];
   hasDecoration?: boolean;
@@ -102,5 +102,4 @@ export interface FormData {
   hospitalsNearby?: boolean;
   hasYards?: boolean;
   about?: string;
-  [key: string]: any; // Allow additional properties
 }

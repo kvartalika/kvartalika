@@ -2,8 +2,6 @@ import {BrowserRouter, Routes, Route, useLocation} from 'react-router-dom';
 import {useEffect} from 'react';
 import {useAppStore} from './store/useAppStore';
 
-
-// Components
 import Header from './components/Header';
 import Footer from './components/Footer';
 import PageLoader from './components/PageLoader';
@@ -11,7 +9,6 @@ import BookingModal from './components/BookingModal';
 import ScrollToAnchor from './components/ScrollToAnchor';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// Pages
 import HomePage from './pages/HomePage';
 import ApartmentsPage from './pages/ApartmentsPage';
 import ComplexesPage from './pages/ComplexesPage';
@@ -20,10 +17,8 @@ import ApartmentPage from './pages/ApartmentPage';
 import AuthPage from './pages/AuthPage';
 import AdminPage from './pages/AdminPage';
 
-// API (placeholder - will integrate with existing API)
 // import { apartmentsApi, complexesApi } from './api';
 
-// Component to handle scroll to top on route change
 function ScrollToTop() {
   const {pathname} = useLocation();
 
@@ -44,7 +39,6 @@ function App() {
   } = useAppStore();
 
   useEffect(() => {
-    // Initialize data loading
     const loadData = async () => {
       setIsLoading(true);
       try {
@@ -54,7 +48,6 @@ function App() {
         //   complexesApi.getComplexes()
         // ]);
 
-        // Mock data for now - will be replaced with API integration
         const mockApartments = [
           {
             id: 1,

@@ -46,7 +46,7 @@ const SocialMediaForm: React.FC<SocialMediaFormProps> = ({
                 URL изображения
               </label>
               <input
-                type="url"
+                type="text"
                 value={item.image}
                 onChange={(e) => onSocialMediaChange(index, 'image', e.target.value)}
                 className="w-full border rounded px-3 py-2"
@@ -58,7 +58,7 @@ const SocialMediaForm: React.FC<SocialMediaFormProps> = ({
                 Ссылка
               </label>
               <input
-                type="url"
+                type="text"
                 value={item.link}
                 onChange={(e) => onSocialMediaChange(index, 'link', e.target.value)}
                 className="w-full border rounded px-3 py-2"

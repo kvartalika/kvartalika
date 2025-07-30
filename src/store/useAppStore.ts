@@ -19,8 +19,8 @@ export interface Apartment {
   hasParks?: boolean;
   hasSchools?: boolean;
   hasShops?: boolean;
-  distanceFromCenter?: number; // For location sorting
-  layout?: string; // Layout image URL
+  distanceFromCenter?: number;
+  layout?: string;
 }
 
 export interface Complex {
@@ -70,7 +70,7 @@ export interface HomepageSection {
   type: 'hot_deals' | 'rooms' | 'custom';
   isVisible: boolean;
   order: number;
-  rooms?: number; // For room-specific sections
+  rooms?: number;
   customFilter?: (apartments: Apartment[]) => Apartment[];
   backgroundColor?: 'white' | 'gray';
   linkText?: string;
@@ -78,27 +78,21 @@ export interface HomepageSection {
 }
 
 interface AppState {
-  // Data
   apartments: Apartment[];
   complexes: Complex[];
 
-  // Search & Filters
   searchFilters: SearchFilters;
   filteredApartments: Apartment[];
 
-  // UI State
   isLoading: boolean;
   selectedApartment: Apartment | null;
   selectedComplex: Complex | null;
 
-  // Homepage
   homepageSections: HomepageSection[];
 
-  // Booking
   bookingForm: BookingForm;
   showBookingModal: boolean;
 
-  // Actions
   setApartments: (apartments: Apartment[]) => void;
   setComplexes: (complexes: Complex[]) => void;
   setSearchFilters: (filters: Partial<SearchFilters>) => void;
@@ -112,6 +106,8 @@ interface AppState {
   setHomepageSections: (sections: HomepageSection[]) => void;
   updateHomepageSection: (id: string, updates: Partial<HomepageSection>) => void;
 }
+
+// TODO api
 
 const initialBookingForm: BookingForm = {
   name: '',
@@ -202,7 +198,6 @@ export const useAppStore = create<AppState>((set, get) => ({
   bookingForm: initialBookingForm,
   showBookingModal: false,
 
-  // Actions
   setApartments: (apartments) => {
     set({apartments});
     get().filterApartments();
@@ -221,7 +216,6 @@ export const useAppStore = create<AppState>((set, get) => ({
     const {apartments, searchFilters} = get();
     let filtered = [...apartments];
 
-    // Text search
     if (searchFilters.query) {
       const query = searchFilters.query.toLowerCase();
       filtered = filtered.filter(apt =>
@@ -230,7 +224,6 @@ export const useAppStore = create<AppState>((set, get) => ({
       );
     }
 
-    // Price filter
     if (searchFilters.minPrice) {
       filtered = filtered.filter(apt => apt.price >= searchFilters.minPrice!);
     }
@@ -238,42 +231,34 @@ export const useAppStore = create<AppState>((set, get) => ({
       filtered = filtered.filter(apt => apt.price <= searchFilters.maxPrice!);
     }
 
-    // Rooms filter
     if (searchFilters.rooms && searchFilters.rooms.length > 0) {
       filtered = filtered.filter(apt => searchFilters.rooms!.includes(apt.rooms));
     }
 
-    // Bathrooms filter
     if (searchFilters.bathrooms && searchFilters.bathrooms.length > 0) {
       filtered = filtered.filter(apt => searchFilters.bathrooms!.includes(apt.bathrooms));
     }
 
-    // Finishing filter
     if (searchFilters.finishing && searchFilters.finishing.length > 0) {
       filtered = filtered.filter(apt => searchFilters.finishing!.includes(apt.finishing));
     }
 
-    // Complex filter
     if (searchFilters.complex) {
       filtered = filtered.filter(apt => apt.complex === searchFilters.complex);
     }
 
-    // Parks filter
     if (searchFilters.hasParks !== undefined) {
       filtered = filtered.filter(apt => apt.hasParks === searchFilters.hasParks);
     }
 
-    // Schools filter
     if (searchFilters.hasSchools !== undefined) {
       filtered = filtered.filter(apt => apt.hasSchools === searchFilters.hasSchools);
     }
 
-    // Shops filter
     if (searchFilters.hasShops !== undefined) {
       filtered = filtered.filter(apt => apt.hasShops === searchFilters.hasShops);
     }
 
-    // Sorting
     if (searchFilters.sortBy) {
       filtered.sort((a, b) => {
         let aVal: number, bVal: number;
