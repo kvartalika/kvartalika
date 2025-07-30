@@ -268,62 +268,25 @@ const ComplexPage = () => {
             )}
             {/* Construction History */}
             {complex.constructionHistory && (
-              <div className="mb-16 w-full bg-white shadow-lg">
-                <div className="flex flex-col md:flex-row items-stretch gap-0 w-full">
-                  {/* Text block - 60% */}
-                  <div className="md:w-3/5 w-full p-8 flex flex-col justify-center">
-                    <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center md:text-left">История строительства</h3>
-                    <div className="text-gray-700 text-lg">
-                      {`Строительство: ${new Date(complex.constructionHistory.startDate).toLocaleDateString('ru-RU')} - ${new Date(complex.constructionHistory.endDate).toLocaleDateString('ru-RU')}. `}
-                      {complex.constructionHistory.phases.map(phase => phase.description).join(' ')}
-                    </div>
+              <div className="mb-16">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center">История строительства</h3>
+                <div className="bg-white rounded-xl p-8 shadow-lg">
+                  <div className="text-center mb-8">
+                    <p className="text-gray-600">Строительство: {new Date(complex.constructionHistory.startDate).toLocaleDateString('ru-RU')} - {new Date(complex.constructionHistory.endDate).toLocaleDateString('ru-RU')}</p>
                   </div>
-                  {/* Photo slider - 40% */}
-                  <div className="md:w-2/5 w-full flex items-center justify-center p-8 relative min-h-[16rem] md:min-h-[20rem]">
-                    <AnimatePresence initial={false}>
-                      <motion.img
-                        key={currentImageIndex}
-                        src={complex.images && complex.images.length > 0 ? complex.images[currentImageIndex % complex.images.length] : '/images/test.png'}
-                        alt={`Фото строительства ${currentImageIndex + 1}`}
-                        className="w-full h-64 md:h-80 object-cover rounded-xl"
-                        initial={{ opacity: 0, x: 50 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -50 }}
-                        transition={{ duration: 0.5 }}
-                      />
-                    </AnimatePresence>
-                    {complex.images && complex.images.length > 1 && (
-                      <>
-                        <button
-                          onClick={prevImage}
-                          className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 z-10"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={nextImage}
-                          className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 z-10"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button>
-                      </>
-                    )}
-                    {/* Dots */}
-                    {complex.images && complex.images.length > 1 && (
-                      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
-                        {complex.images.map((_, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => setCurrentImageIndex(idx)}
-                            className={`w-2 h-2 rounded-full ${idx === currentImageIndex ? 'bg-blue-600' : 'bg-gray-300'} transition-all`}
-                          />
-                        ))}
+                  <div className="space-y-6">
+                    {complex.constructionHistory.phases.map((phase, index) => (
+                      <div key={index} className="flex items-start">
+                        <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-4">{index + 1}</div>
+                        <div className="flex-grow">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="font-semibold text-gray-900">{phase.name}</h4>
+                            <span className="text-sm text-gray-500">{new Date(phase.date).toLocaleDateString('ru-RU')}</span>
+                          </div>
+                          <p className="text-gray-600">{phase.description}</p>
+                        </div>
                       </div>
-                    )}
+                    ))}
                   </div>
                 </div>
               </div>
