@@ -38,36 +38,35 @@ const ComplexesPage = () => {
               Выберите идеальный жилой комплекс из нашего широкого портфолио современных проектов
             </p>
           </div>
+          {/* Search Section - moved here */}
+          <div className="max-w-2xl mx-auto mt-8">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Поиск по названию, адресу или описанию..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent pl-14"
+              />
+              <svg
+                className="w-6 h-6 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+          </div>
         </div>
       </section>
 
       <div className="container mx-auto px-4 py-12">
-        {/* Search Section */}
-        <div className="max-w-2xl mx-auto mb-12">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Поиск по названию, адресу или описанию..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent pl-14"
-            />
-            <svg
-              className="w-6 h-6 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </div>
-        </div>
-
         {/* Results Count */}
         <div className="mb-8">
           <p className="text-gray-600">

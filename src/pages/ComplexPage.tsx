@@ -59,6 +59,15 @@ const ComplexPage = () => {
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
+  useEffect(() => {
+    if (images.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentImageIndex(prev => (prev + 1) % images.length);
+      }, 4000);
+      return () => clearInterval(interval);
+    }
+  }, [images]);
+
   return (
     <div className="min-h-screen pt-20">
       {/* Breadcrumbs */}
@@ -365,11 +374,11 @@ const ComplexPage = () => {
                     <h3 className="text-xl font-semibold text-gray-900 mb-6">
                       Удобства и инфраструктура
                     </h3>
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 justify-items-center">
                       {complex.amenities.map((amenity, index) => (
                         <div
                           key={index}
-                          className="flex items-center justify-center text-gray-600"
+                          className="flex items-center text-gray-600"
                         >
                           <svg
                             className="w-5 h-5 text-green-500 mr-3 flex-shrink-0"
