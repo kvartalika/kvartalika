@@ -269,7 +269,7 @@ const ComplexPage = () => {
             {/* Construction History */}
             {complex.constructionHistory && (
               <div className="mb-16 w-full bg-white shadow-lg">
-                <div className="max-w-full flex flex-col md:flex-row items-stretch gap-0">
+                <div className="flex flex-col md:flex-row items-stretch gap-0 w-full">
                   {/* Text block - 60% */}
                   <div className="md:w-3/5 w-full p-8 flex flex-col justify-center">
                     <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center md:text-left">История строительства</h3>
