@@ -1,4 +1,4 @@
-import {Link} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type {Apartment} from '../store/useAppStore';
 
 interface ApartmentCardProps {
@@ -7,12 +7,26 @@ interface ApartmentCardProps {
 }
 
 const ApartmentCard = ({apartment, onBookingClick}: ApartmentCardProps) => {
+  const navigate = useNavigate();
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ru-RU').format(price);
   };
 
+  // Handler for card click
+  const handleCardClick = () => {
+    navigate(`/apartment/${apartment.id}`);
+  };
+
+  // Prevent event bubbling from buttons
+  const stopPropagation = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
-    <div className="card card-hover">
+    <div
+      className="card card-hover cursor-pointer hover:shadow-lg transition-shadow duration-200"
+      onClick={handleCardClick}
+    >
       {/* Image */}
       <div className="relative h-48 overflow-hidden">
         <img
@@ -40,6 +54,7 @@ const ApartmentCard = ({apartment, onBookingClick}: ApartmentCardProps) => {
         <Link
           to={`/complex/${encodeURIComponent(apartment.complex)}`}
           className="text-sm text-blue-600 hover:text-blue-700 font-medium mb-1 block"
+          onClick={stopPropagation}
         >
           {apartment.complex}
         </Link>
@@ -141,13 +156,14 @@ const ApartmentCard = ({apartment, onBookingClick}: ApartmentCardProps) => {
           <Link
             to={`/apartment/${apartment.id}`}
             className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-4 rounded-lg text-center font-medium transition-colors text-sm"
+            onClick={stopPropagation}
           >
             Подробнее
           </Link>
 
           {onBookingClick && (
             <button
-              onClick={onBookingClick}
+              onClick={e => { stopPropagation(e); onBookingClick(); }}
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors text-sm"
             >
               Записаться
