@@ -1,3 +1,25 @@
+/**
+ * @deprecated This store has been replaced by the new modular store system
+ * 
+ * Please use the new stores instead:
+ * - usePropertiesStore for apartments/complexes/flats/homes
+ * - useSearchStore for search and filtering
+ * - useUIStore for UI state and modals
+ * 
+ * Migration guide:
+ * 
+ * OLD:
+ * import { useAppStore } from '@/store/useAppStore'
+ * const { apartments, setSearchFilters } = useAppStore()
+ * 
+ * NEW:
+ * import { useApartments, useSearchStore } from '@/store'
+ * const apartments = useApartments()
+ * const { setFilters } = useSearchStore()
+ * 
+ * This file will be removed in a future version.
+ */
+
 import {create} from 'zustand';
 
 export interface Apartment {
@@ -186,6 +208,9 @@ const initialSearchFilters: SearchFilters = {
   sortOrder: 'asc',
 };
 
+/**
+ * @deprecated Use the new modular store system instead
+ */
 export const useAppStore = create<AppState>((set, get) => ({
   apartments: [],
   complexes: [],
@@ -199,13 +224,18 @@ export const useAppStore = create<AppState>((set, get) => ({
   showBookingModal: false,
 
   setApartments: (apartments) => {
+    console.warn('⚠️ useAppStore is deprecated. Use usePropertiesStore instead.');
     set({apartments});
     get().filterApartments();
   },
 
-  setComplexes: (complexes) => set({complexes}),
+  setComplexes: (complexes) => {
+    console.warn('⚠️ useAppStore is deprecated. Use usePropertiesStore instead.');
+    set({complexes});
+  },
 
   setSearchFilters: (filters) => {
+    console.warn('⚠️ useAppStore is deprecated. Use useSearchStore instead.');
     set((state) => ({
       searchFilters: {...state.searchFilters, ...filters}
     }));
@@ -213,6 +243,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   filterApartments: () => {
+    console.warn('⚠️ useAppStore is deprecated. Use useSearchStore instead.');
     const {apartments, searchFilters} = get();
     let filtered = [...apartments];
 
@@ -291,22 +322,45 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({filteredApartments: filtered});
   },
 
-  setSelectedApartment: (apartment) => set({selectedApartment: apartment}),
-  setSelectedComplex: (complex) => set({selectedComplex: complex}),
-  setIsLoading: (loading) => set({isLoading: loading}),
-  setShowBookingModal: (show) => set({showBookingModal: show}),
+  setSelectedApartment: (apartment) => {
+    console.warn('⚠️ useAppStore is deprecated. Use usePropertiesStore instead.');
+    set({selectedApartment: apartment});
+  },
+  
+  setSelectedComplex: (complex) => {
+    console.warn('⚠️ useAppStore is deprecated. Use usePropertiesStore instead.');
+    set({selectedComplex: complex});
+  },
+  
+  setIsLoading: (loading) => {
+    console.warn('⚠️ useAppStore is deprecated. Use useUIStore instead.');
+    set({isLoading: loading});
+  },
+  
+  setShowBookingModal: (show) => {
+    console.warn('⚠️ useAppStore is deprecated. Use useUIStore instead.');
+    set({showBookingModal: show});
+  },
 
   setBookingForm: (form) => {
+    console.warn('⚠️ useAppStore is deprecated. Use useUIStore instead.');
     set((state) => ({
       bookingForm: {...state.bookingForm, ...form}
     }));
   },
 
-  resetBookingForm: () => set({bookingForm: initialBookingForm}),
+  resetBookingForm: () => {
+    console.warn('⚠️ useAppStore is deprecated. Use useUIStore instead.');
+    set({bookingForm: initialBookingForm});
+  },
 
-  setHomepageSections: (sections) => set({homepageSections: sections}),
+  setHomepageSections: (sections) => {
+    console.warn('⚠️ useAppStore is deprecated. Use useUIStore instead.');
+    set({homepageSections: sections});
+  },
 
   updateHomepageSection: (id, updates) => {
+    console.warn('⚠️ useAppStore is deprecated. Use useUIStore instead.');
     set((state) => ({
       homepageSections: state.homepageSections.map(section =>
         section.id === id ? {...section, ...updates} : section

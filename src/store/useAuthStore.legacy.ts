@@ -1,3 +1,23 @@
+/**
+ * @deprecated This store has been replaced by the new auth.store.ts
+ * 
+ * Please use the new auth store instead:
+ * import { useAuthStore } from '@/store'
+ * 
+ * Migration guide:
+ * 
+ * OLD:
+ * import { useAuthStore } from '@/store/useAuthStore'
+ * const { login, user } = useAuthStore()
+ * 
+ * NEW:
+ * import { useAuthStore } from '@/store'
+ * const { loginAsAdmin, loginAsContentManager, user } = useAuthStore()
+ * 
+ * The new auth store supports both admin and content manager authentication.
+ * This file will be removed in a future version.
+ */
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -32,6 +52,9 @@ export interface AuthActions {
   setError: (error: string | null) => void;
 }
 
+/**
+ * @deprecated Use the new auth store from '@/store' instead
+ */
 export const useAuthStore = create<AuthState & AuthActions>()(
   persist(
     (set, get) => ({
@@ -42,6 +65,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       error: null,
 
       login: async (email: string, password: string) => {
+        console.warn('⚠️ useAuthStore from useAuthStore.ts is deprecated. Use the new auth store instead.');
         set({ isLoading: true, error: null });
         try {
           // TODO api
@@ -66,6 +90,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       },
 
       logout: async () => {
+        console.warn('⚠️ useAuthStore from useAuthStore.ts is deprecated. Use the new auth store instead.');
         try {
           // TODO api
           const { mockApi } = await import('../services/mockApi');
@@ -83,6 +108,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       },
 
       refreshAccessToken: async () => {
+        console.warn('⚠️ useAuthStore from useAuthStore.ts is deprecated. Use the new auth store instead.');
         try {
           // TODO api
           const { mockApi } = await import('../services/mockApi');
@@ -98,14 +124,17 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       },
 
       setUser: (user: User) => {
+        console.warn('⚠️ useAuthStore from useAuthStore.ts is deprecated. Use the new auth store instead.');
         set({ user });
       },
 
       setAccessToken: (accessToken: string) => {
+        console.warn('⚠️ useAuthStore from useAuthStore.ts is deprecated. Use the new auth store instead.');
         set({ accessToken, isAuthenticated: true });
       },
 
       clearAuth: () => {
+        console.warn('⚠️ useAuthStore from useAuthStore.ts is deprecated. Use the new auth store instead.');
         set({
           user: null,
           accessToken: null,
@@ -115,15 +144,17 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       },
 
       setLoading: (isLoading: boolean) => {
+        console.warn('⚠️ useAuthStore from useAuthStore.ts is deprecated. Use the new auth store instead.');
         set({ isLoading });
       },
 
       setError: (error: string | null) => {
+        console.warn('⚠️ useAuthStore from useAuthStore.ts is deprecated. Use the new auth store instead.');
         set({ error });
       },
     }),
     {
-      name: 'auth-storage',
+      name: 'auth-storage-legacy',
       partialize: (state) => ({
         user: state.user,
         accessToken: state.accessToken,
