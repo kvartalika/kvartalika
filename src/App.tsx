@@ -1,7 +1,6 @@
 import {BrowserRouter, Routes, Route, useLocation} from 'react-router-dom';
 import {useEffect} from 'react';
 import {useAppStore} from './store/useAppStore';
-import {ThemeProvider} from './contexts/ThemeContext';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -27,7 +26,7 @@ function ScrollToTop() {
   return null;
 }
 
-function AppContent() {
+function App() {
   const {
     isLoading,
     showBookingModal,
@@ -204,48 +203,40 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
-      <Header />
-      <ScrollToTop />
+    <BrowserRouter>
+      <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
+        <Header />
+        <ScrollToTop />
 
-      <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/complexes" element={<ComplexesPage />} />
-          <Route path="/apartments" element={<ApartmentsPage />} />
-          <Route path="/complex/:complexName" element={<ComplexPage />} />
-          <Route path="/apartment/:apartmentId" element={<ApartmentPage />} />
-          <Route path="/admin/setup" element={<AdminSetupPage />} />
-          <Route path="/admin/login" element={<AdminLoginPage />} />
-          <Route path="/admin/register" element={<AdminRegisterPage />} />
-          <Route
-            path="*"
-            element={
-              <div className="flex items-center justify-center min-h-[400px]">
-                <div className="text-center">
-                  <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">404</h1>
-                  <p className="text-gray-600 dark:text-gray-400">Страница не найдена</p>
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/complexes" element={<ComplexesPage />} />
+            <Route path="/apartments" element={<ApartmentsPage />} />
+            <Route path="/complex/:complexName" element={<ComplexPage />} />
+            <Route path="/apartment/:apartmentId" element={<ApartmentPage />} />
+            <Route path="/admin/setup" element={<AdminSetupPage />} />
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin/register" element={<AdminRegisterPage />} />
+            <Route
+              path="*"
+              element={
+                <div className="flex items-center justify-center min-h-[400px]">
+                  <div className="text-center">
+                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">404</h1>
+                    <p className="text-gray-600 dark:text-gray-400">Страница не найдена</p>
+                  </div>
                 </div>
-              </div>
-            }
-          />
-        </Routes>
-      </main>
+              }
+            />
+          </Routes>
+        </main>
 
-      <Footer />
+        <Footer />
 
-      {showBookingModal && <BookingModal />}
-    </div>
-  );
-}
-
-function App() {
-  return (
-    <ThemeProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </ThemeProvider>
+        {showBookingModal && <BookingModal />}
+      </div>
+    </BrowserRouter>
   );
 }
 

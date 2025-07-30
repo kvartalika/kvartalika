@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 
+export type Theme = 'light' | 'dark';
+
 export interface Apartment {
   id: number;
   complex: string;
@@ -92,6 +94,7 @@ export interface Inquiry {
 }
 
 interface AppState {
+  theme: Theme;
   apartments: Apartment[];
   complexes: Complex[];
   searchFilters: SearchFilters;
@@ -104,6 +107,8 @@ interface AppState {
   admins: Admin[];
   inquiries: Inquiry[];
   
+  toggleTheme: () => void;
+  setTheme: (theme: Theme) => void;
   setApartments: (apartments: Apartment[]) => void;
   setComplexes: (complexes: Complex[]) => void;
   setSearchFilters: (filters: Partial<SearchFilters>) => void;
@@ -146,7 +151,18 @@ const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: numbe
   return R * c;
 };
 
+const getInitialTheme = (): Theme => {
+  const savedTheme = localStorage.getItem('theme') as Theme;
+  return savedTheme || 'light';
+};
+
+const applyTheme = (theme: Theme) => {
+  document.documentElement.classList.toggle('dark', theme === 'dark');
+  localStorage.setItem('theme', theme);
+};
+
 export const useAppStore = create<AppState>((set, get) => ({
+  theme: getInitialTheme(),
   apartments: [],
   complexes: [],
   searchFilters: initialSearchFilters,
@@ -158,6 +174,18 @@ export const useAppStore = create<AppState>((set, get) => ({
   showBookingModal: false,
   admins: [],
   inquiries: [],
+
+  toggleTheme: () => {
+    const currentTheme = get().theme;
+    const newTheme: Theme = currentTheme === 'light' ? 'dark' : 'light';
+    set({ theme: newTheme });
+    applyTheme(newTheme);
+  },
+
+  setTheme: (theme) => {
+    set({ theme });
+    applyTheme(theme);
+  },
 
   setApartments: (apartments) => {
     set({ apartments });
@@ -290,3 +318,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     }));
   },
 }));
+
+// Initialize theme on store creation
+const store = useAppStore.getState();
+applyTheme(store.theme);
