@@ -21,7 +21,7 @@ import ApartmentPage from './pages/ApartmentPage';
 
 // Component to handle scroll to top on route change
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const {pathname} = useLocation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -63,13 +63,16 @@ function App() {
             bathrooms: 1,
             finishing: "Чистовая",
             isHot: true,
-            image: "/images/apt1.jpg",
+            image: "/images/test.png",
             price: 5500000,
             area: 65.5,
             description: "Уютная двухкомнатная квартира с современным ремонтом",
             hasParks: true,
-            hasInfrastructure: true,
-            distanceFromCenter: 5.2
+            hasSchools: true,
+            hasShops: false,
+            distanceFromCenter: 5.2,
+            layout: "/images/test.png",
+            images: ["/images/test.png", "/images/test.png", "/images/test.png"]
           },
           {
             id: 2,
@@ -82,13 +85,16 @@ function App() {
             bathrooms: 2,
             finishing: "Под ключ",
             isHot: false,
-            image: "/images/apt2.jpg",
+            image: "/images/test.png",
             price: 7800000,
             area: 85.2,
             description: "Просторная трёхкомнатная квартира с панорамными окнами",
             hasParks: true,
-            hasInfrastructure: true,
-            distanceFromCenter: 5.2
+            hasSchools: true,
+            hasShops: true,
+            distanceFromCenter: 5.2,
+            layout: "/images/test.png",
+            images: ["/images/test.png", "/images/test.png", "/images/test.png"]
           },
           {
             id: 3,
@@ -101,13 +107,16 @@ function App() {
             bathrooms: 1,
             finishing: "Черновая",
             isHot: true,
-            image: "/images/apt3.jpg",
+            image: "/images/test.png",
             price: 3200000,
             area: 42.1,
             description: "Компактная однокомнатная квартира в новом доме",
             hasParks: false,
-            hasInfrastructure: true,
-            distanceFromCenter: 12.8
+            hasSchools: false,
+            hasShops: true,
+            distanceFromCenter: 12.8,
+            layout: "/images/test.png",
+            images: ["/images/test.png", "/images/test.png", "/images/test.png"]
           },
           {
             id: 4,
@@ -120,13 +129,16 @@ function App() {
             bathrooms: 1,
             finishing: "Дизайнерская",
             isHot: false,
-            image: "/images/apt4.jpg",
+            image: "/images/test.png",
             price: 6200000,
             area: 68.7,
             description: "Стильная двухкомнатная квартира с дизайнерским ремонтом",
             hasParks: false,
-            hasInfrastructure: true,
-            distanceFromCenter: 12.8
+            hasSchools: true,
+            hasShops: false,
+            distanceFromCenter: 12.8,
+            layout: "/images/test.png",
+            images: ["/images/test.png", "/images/test.png", "/images/test.png"]
           },
           {
             id: 5,
@@ -139,13 +151,16 @@ function App() {
             bathrooms: 2,
             finishing: "Чистовая",
             isHot: true,
-            image: "/images/apt5.jpg",
+            image: "/images/test.png",
             price: 8900000,
             area: 95.4,
             description: "Элитная трёхкомнатная квартира в престижном районе",
             hasParks: true,
-            hasInfrastructure: true,
-            distanceFromCenter: 2.1
+            hasSchools: true,
+            hasShops: true,
+            distanceFromCenter: 2.1,
+            layout: "/images/test.png",
+            images: ["/images/test.png", "/images/test.png", "/images/test.png"]
           }
         ];
 
@@ -155,27 +170,146 @@ function App() {
             name: "ЖК Янтарный",
             address: "ул. Примерная, 10",
             description: "Современный жилой комплекс в центре города с развитой инфраструктурой",
-            image: "/images/complex1.jpg",
+            image: "/images/test.png",
+            images: [
+              "/images/test.png",
+              "/images/test.png",
+              "/images/test.png",
+              "/images/test.png",
+            ],
             apartments: mockApartments.filter(apt => apt.complexId === 1),
-            amenities: ["Подземная парковка", "Детская площадка", "Фитнес-центр", "Консьерж-сервис"]
+            amenities: ["Подземная парковка", "Детская площадка", "Фитнес-центр", "Консьерж-сервис"],
+            features: ["Монолитно-кирпичная конструкция", "Высокие потолки 3.2м", "Панорамное остекление", "Индивидуальное отопление", "Приточно-вытяжная вентиляция", "Оптоволоконный интернет"],
+            constructionHistory: {
+              startDate: "2021-03-01",
+              endDate: "2024-12-01",
+              phases: [
+                {
+                  name: "Начало строительства",
+                  date: "2021-03-01",
+                  description: "Получение разрешений и начало земляных работ"
+                },
+                {
+                  name: "Фундамент",
+                  date: "2021-06-01",
+                  description: "Завершение работ по устройству фундамента"
+                },
+                {
+                  name: "Возведение каркаса",
+                  date: "2022-12-01",
+                  description: "Завершение монолитных работ и возведение стен"
+                },
+                {
+                  name: "Инженерные системы",
+                  date: "2023-08-01",
+                  description: "Монтаж всех инженерных коммуникаций"
+                },
+                {
+                  name: "Отделочные работы",
+                  date: "2024-06-01",
+                  description: "Завершение внутренних отделочных работ"
+                },
+                {
+                  name: "Сдача в эксплуатацию",
+                  date: "2024-12-01",
+                  description: "Получение разрешения на ввод в эксплуатацию"
+                }
+              ]
+            }
           },
           {
             id: 2,
             name: "ЖК Нижний",
             address: "ул. Речная, 25",
             description: "Жилой комплекс бизнес-класса на берегу реки с панорамными видами",
-            image: "/images/complex2.jpg",
+            image: "/images/test.png",
+            images: [
+              "/images/test.png",
+              "/images/test.png",
+              "/images/test.png",
+            ],
             apartments: mockApartments.filter(apt => apt.complexId === 2),
-            amenities: ["Видеонаблюдение", "Закрытая территория", "Спа-центр", "Кафе"]
+            amenities: ["Видеонаблюдение", "Закрытая территория", "Спа-центр", "Кафе"],
+            features: ["Кирпично-монолитная конструкция", "Французские балконы", "Видеодомофон", "Центральное кондиционирование", "Система умный дом"],
+            constructionHistory: {
+              startDate: "2020-01-15",
+              endDate: "2023-09-01",
+              phases: [
+                {
+                  name: "Проектирование",
+                  date: "2020-01-15",
+                  description: "Разработка архитектурного проекта"
+                },
+                {
+                  name: "Строительство",
+                  date: "2020-08-01",
+                  description: "Начало строительных работ"
+                },
+                {
+                  name: "Завершение строительства",
+                  date: "2023-06-01",
+                  description: "Окончание всех строительных работ"
+                },
+                {
+                  name: "Ввод в эксплуатацию",
+                  date: "2023-09-01",
+                  description: "Получение всех необходимых разрешений"
+                }
+              ]
+            }
           },
           {
             id: 3,
             name: "ЖК Солнечный",
             address: "пр. Солнечный, 14",
             description: "Элитный жилой комплекс с премиальными квартирами и услугами",
-            image: "/images/complex3.jpg",
+            image: "/images/test.png",
+            images: [
+              "/images/test.png",
+              "/images/test.png",
+              "/images/test.png",
+              "/images/test.png",
+              "/images/test.png",
+            ],
             apartments: mockApartments.filter(apt => apt.complexId === 3),
-            amenities: ["Консьерж 24/7", "Подземный паркинг", "Бассейн", "Детский сад"]
+            amenities: ["Консьерж 24/7", "Подземный паркинг", "Бассейн", "Детский сад"],
+            features: ["Премиальная отделка", "Потолки 3.5м", "Панорамные окна", "Климат-контроль", "Система безопасности", "Лифты OTIS"],
+            constructionHistory: {
+              startDate: "2019-05-01",
+              endDate: "2022-12-01",
+              phases: [
+                {
+                  name: "Начало проекта",
+                  date: "2019-05-01",
+                  description: "Получение земельного участка и разрешений"
+                },
+                {
+                  name: "Фундаментные работы",
+                  date: "2019-10-01",
+                  description: "Устройство фундамента и подземных уровней"
+                },
+                {
+                  name: "Строительство корпуса",
+                  date: "2021-03-01",
+                  description: "Возведение основного здания"
+                },
+                {
+                  name: "Инженерия и отделка",
+                  date: "2022-06-01",
+                  description: "Монтаж инженерных систем и отделочные работы"
+                },
+                {
+                  name: "Благоустройство",
+                  date: "2022-10-01",
+                  description: "Благоустройство территории и ландшафтный дизайн"
+                },
+                {
+                  name: "Ввод в эксплуатацию",
+                  date: "2022-12-01",
+                  description: "Получение разрешения на ввод в эксплуатацию"
+                }
+              ]
+            }
           }
         ];
 

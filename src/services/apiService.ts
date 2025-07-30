@@ -37,7 +37,6 @@ export class ApiService {
               area: 65.5,
               description: "Уютная двухкомнатная квартира с современным ремонтом",
               hasParks: true,
-              hasInfrastructure: true,
               distanceFromCenter: 5.2
             }
           ]);

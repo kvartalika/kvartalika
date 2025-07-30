@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAppStore } from '../store/useAppStore';
+import {useState, useEffect} from 'react';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
+import {useAppStore} from '../store/useAppStore';
 import Logo from './Logo';
 
 const Header = () => {
@@ -8,24 +8,22 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { setShowBookingModal, setSelectedApartment } = useAppStore();
+  const {setShowBookingModal, setSelectedApartment} = useAppStore();
 
   const handleAboutClick = () => {
     if (location.pathname === '/') {
-      // If we're on the homepage, just scroll to the section
       const element = document.getElementById('about');
       if (element) {
         const headerOffset = 100;
         const elementPosition = element.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-        
+
         window.scrollTo({
           top: offsetPosition,
           behavior: 'smooth'
         });
       }
     } else {
-      // If we're on another page, navigate to home with hash
       navigate('/#about');
     }
   };
@@ -51,14 +49,17 @@ const Header = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          {/* Logo */}
-          <Link to="/" className="flex-shrink-0">
-            <Logo className={`h-8 lg:h-10 ${
-              isScrolled || !isHomePage ? 'text-blue-600' : 'text-white'
-            }`} />
+          <Link
+            to="/"
+            className="flex-shrink-0"
+          >
+            <Logo
+              className={`h-8 lg:h-10 ${
+                isScrolled || !isHomePage ? 'text-blue-600' : 'text-white'
+              }`}
+            />
           </Link>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link
               to="/"
@@ -102,7 +103,6 @@ const Header = () => {
             </button>
           </nav>
 
-          {/* Make Appointment Button */}
           <div className="hidden lg:flex items-center">
             <button
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
@@ -115,7 +115,6 @@ const Header = () => {
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
           <button
             className="md:hidden p-2"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -146,7 +145,6 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden bg-white border-t border-gray-200 py-4">
             <nav className="flex flex-col space-y-4">
@@ -181,7 +179,7 @@ const Header = () => {
                 О нас
               </button>
               <div className="px-4 py-2 border-t border-gray-200">
-                <button 
+                <button
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full"
                   onClick={() => {
                     setSelectedApartment(null);

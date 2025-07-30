@@ -57,7 +57,8 @@ const SearchBar = () => {
       maxPrice: undefined,
       complex: '',
       hasParks: undefined,
-      hasInfrastructure: undefined,
+      hasSchools: undefined,
+      hasShops: undefined,
       sortBy: 'price',
       sortOrder: 'asc'
     });
@@ -91,7 +92,8 @@ const SearchBar = () => {
               (searchFilters.bathrooms && searchFilters.bathrooms.length > 0) ||
               (searchFilters.finishing && searchFilters.finishing.length > 0) ||
               searchFilters.minPrice || searchFilters.maxPrice || 
-              searchFilters.hasParks !== undefined || searchFilters.hasInfrastructure !== undefined
+              searchFilters.hasParks !== undefined || searchFilters.hasSchools !== undefined ||
+              searchFilters.hasShops !== undefined
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
@@ -117,7 +119,7 @@ const SearchBar = () => {
 
       {/* Advanced Filters */}
       {showFilters && (
-        <div className="bg-white rounded-2xl shadow-xl mt-4 p-6">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 mt-4 p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Расширенные фильтры</h3>
             <button
@@ -253,11 +255,20 @@ const SearchBar = () => {
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={searchFilters.hasInfrastructure || false}
-                    onChange={(e) => handleFilterChange('hasInfrastructure', e.target.checked || undefined)}
+                    checked={searchFilters.hasSchools || false}
+                    onChange={(e) => handleFilterChange('hasSchools', e.target.checked || undefined)}
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
-                  <span className="ml-2 text-sm text-gray-700">Развитая инфраструктура</span>
+                  <span className="ml-2 text-sm text-gray-700">Школы поблизости</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={searchFilters.hasShops || false}
+                    onChange={(e) => handleFilterChange('hasShops', e.target.checked || undefined)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">Магазины рядом</span>
                 </label>
               </div>
             </div>
