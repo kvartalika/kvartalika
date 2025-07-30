@@ -53,8 +53,8 @@ const BookingModal = () => {
 
   if (isSuccess) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -70,12 +70,12 @@ const BookingModal = () => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl p-6 max-w-sm w-full max-h-[85vh] overflow-y-auto shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">
-            Записаться на осмотр
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Записаться на просмотр
           </h2>
           <button
             onClick={handleClose}
@@ -87,20 +87,7 @@ const BookingModal = () => {
           </button>
         </div>
 
-        {/* Selected Property Info */}
-        {(selectedApartment || selectedComplex) && (
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h3 className="font-medium text-gray-900 mb-1">
-              {selectedApartment ? 'Квартира' : 'Жилой комплекс'}
-            </h3>
-            <p className="text-sm text-gray-600">
-              {selectedApartment 
-                ? `${selectedApartment.rooms}-комн. в ${selectedApartment.complex}`
-                : selectedComplex?.name
-              }
-            </p>
-          </div>
-        )}
+
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">

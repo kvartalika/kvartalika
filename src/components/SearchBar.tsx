@@ -1,14 +1,22 @@
 import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppStore } from '../store/useAppStore';
 
 const SearchBar = () => {
   const { searchFilters, setSearchFilters } = useAppStore();
   const [showFilters, setShowFilters] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Filter functionality is handled automatically by the store
     setShowFilters(false);
+    
+    // Navigate to apartments page if not already there
+    if (location.pathname !== '/apartments') {
+      navigate('/apartments');
+    }
   };
 
   const handleFilterChange = (key: string, value: any) => {
@@ -31,14 +39,25 @@ const SearchBar = () => {
     handleFilterChange('finishing', newFinishing);
   };
 
+  const toggleBathroomFilter = (bathrooms: number) => {
+    const currentBathrooms = searchFilters.bathrooms || [];
+    const newBathrooms = currentBathrooms.includes(bathrooms)
+      ? currentBathrooms.filter(b => b !== bathrooms)
+      : [...currentBathrooms, bathrooms];
+    handleFilterChange('bathrooms', newBathrooms);
+  };
+
   const clearFilters = () => {
     setSearchFilters({
       query: '',
       rooms: [],
+      bathrooms: [],
       finishing: [],
       minPrice: undefined,
       maxPrice: undefined,
       complex: '',
+      hasParks: undefined,
+      hasInfrastructure: undefined,
       sortBy: 'price',
       sortOrder: 'asc'
     });
@@ -67,9 +86,12 @@ const SearchBar = () => {
             type="button"
             onClick={() => setShowFilters(!showFilters)}
             className={`px-6 py-3 rounded-xl font-medium transition-colors ${
-              showFilters || (searchFilters.rooms && searchFilters.rooms.length > 0) || 
+              showFilters || 
+              (searchFilters.rooms && searchFilters.rooms.length > 0) || 
+              (searchFilters.bathrooms && searchFilters.bathrooms.length > 0) ||
               (searchFilters.finishing && searchFilters.finishing.length > 0) ||
-              searchFilters.minPrice || searchFilters.maxPrice
+              searchFilters.minPrice || searchFilters.maxPrice || 
+              searchFilters.hasParks !== undefined || searchFilters.hasInfrastructure !== undefined
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
@@ -106,7 +128,7 @@ const SearchBar = () => {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {/* Price Range */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -118,14 +140,14 @@ const SearchBar = () => {
                   placeholder="От"
                   value={searchFilters.minPrice || ''}
                   onChange={(e) => handleFilterChange('minPrice', e.target.value ? Number(e.target.value) : undefined)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
                 />
                 <input
                   type="number"
                   placeholder="До"
                   value={searchFilters.maxPrice || ''}
                   onChange={(e) => handleFilterChange('maxPrice', e.target.value ? Number(e.target.value) : undefined)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
                 />
               </div>
             </div>
@@ -153,6 +175,29 @@ const SearchBar = () => {
               </div>
             </div>
 
+            {/* Bathrooms */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Количество санузлов
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {[1, 2, 3].map(bathrooms => (
+                  <button
+                    key={bathrooms}
+                    type="button"
+                    onClick={() => toggleBathroomFilter(bathrooms)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      searchFilters.bathrooms?.includes(bathrooms)
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {bathrooms === 3 ? '3+' : bathrooms}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Finishing */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -173,6 +218,50 @@ const SearchBar = () => {
               </div>
             </div>
 
+            {/* Residential Complex */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Жилой комплекс
+              </label>
+              <select
+                value={searchFilters.complex || ''}
+                onChange={(e) => handleFilterChange('complex', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
+              >
+                <option value="">Любой</option>
+                <option value="ЖК Янтарный">ЖК Янтарный</option>
+                <option value="ЖК Нижний">ЖК Нижний</option>
+                <option value="ЖК Солнечный">ЖК Солнечный</option>
+              </select>
+            </div>
+
+            {/* Parks and Infrastructure */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Инфраструктура
+              </label>
+              <div className="space-y-2">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={searchFilters.hasParks || false}
+                    onChange={(e) => handleFilterChange('hasParks', e.target.checked || undefined)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">Наличие парков</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={searchFilters.hasInfrastructure || false}
+                    onChange={(e) => handleFilterChange('hasInfrastructure', e.target.checked || undefined)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">Развитая инфраструктура</span>
+                </label>
+              </div>
+            </div>
+
             {/* Sorting */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -182,16 +271,17 @@ const SearchBar = () => {
                 <select
                   value={searchFilters.sortBy || 'price'}
                   onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
                 >
                   <option value="price">По цене</option>
                   <option value="rooms">По количеству комнат</option>
                   <option value="area">По площади</option>
+                  <option value="location">По удаленности от центра</option>
                 </select>
                 <select
                   value={searchFilters.sortOrder || 'asc'}
                   onChange={(e) => handleFilterChange('sortOrder', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
                 >
                   <option value="asc">По возрастанию</option>
                   <option value="desc">По убыванию</option>

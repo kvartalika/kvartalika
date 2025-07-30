@@ -8,6 +8,7 @@ export interface Apartment {
   rooms: number;
   floor: number;
   bathroom: string;
+  bathrooms: number;
   finishing: string;
   isHot: boolean;
   image: string;
@@ -15,6 +16,9 @@ export interface Apartment {
   area: number;
   description?: string;
   images?: string[];
+  hasParks?: boolean;
+  hasInfrastructure?: boolean;
+  distanceFromCenter?: number; // For location sorting
 }
 
 export interface Complex {
@@ -33,9 +37,12 @@ export interface SearchFilters {
   minPrice?: number;
   maxPrice?: number;
   rooms?: number[];
+  bathrooms?: number[];
   finishing?: string[];
   complex?: string;
-  sortBy?: 'price' | 'rooms' | 'area';
+  hasParks?: boolean;
+  hasInfrastructure?: boolean;
+  sortBy?: 'price' | 'rooms' | 'area' | 'location';
   sortOrder?: 'asc' | 'desc';
 }
 
@@ -47,6 +54,20 @@ export interface BookingForm {
   complexId?: number;
   preferredDate?: string;
   message?: string;
+}
+
+export interface HomepageSection {
+  id: string;
+  title: string;
+  description: string;
+  type: 'hot_deals' | 'rooms' | 'custom';
+  isVisible: boolean;
+  order: number;
+  rooms?: number; // For room-specific sections
+  customFilter?: (apartments: Apartment[]) => Apartment[];
+  backgroundColor?: 'white' | 'gray';
+  linkText?: string;
+  linkUrl?: string;
 }
 
 interface AppState {
@@ -63,6 +84,9 @@ interface AppState {
   selectedApartment: Apartment | null;
   selectedComplex: Complex | null;
   
+  // Homepage
+  homepageSections: HomepageSection[];
+  
   // Booking
   bookingForm: BookingForm;
   showBookingModal: boolean;
@@ -78,6 +102,8 @@ interface AppState {
   setShowBookingModal: (show: boolean) => void;
   setIsLoading: (loading: boolean) => void;
   resetBookingForm: () => void;
+  setHomepageSections: (sections: HomepageSection[]) => void;
+  updateHomepageSection: (id: string, updates: Partial<HomepageSection>) => void;
 }
 
 const initialBookingForm: BookingForm = {
@@ -87,9 +113,72 @@ const initialBookingForm: BookingForm = {
   message: '',
 };
 
+const defaultHomepageSections: HomepageSection[] = [
+  {
+    id: 'hot_deals',
+    title: '🔥 Новинки',
+    description: 'Новые поступления и горячие предложения',
+    type: 'hot_deals',
+    isVisible: true,
+    order: 1,
+    backgroundColor: 'white',
+    linkText: 'Смотреть все',
+    linkUrl: '/apartments?hot=true',
+  },
+  {
+    id: 'by_complex_yantar',
+    title: 'ЖК Янтарный',
+    description: 'Квартиры в жилом комплексе Янтарный',
+    type: 'custom',
+    customFilter: (apartments) => apartments.filter(apt => apt.complex === 'ЖК Янтарный'),
+    isVisible: true,
+    order: 2,
+    backgroundColor: 'gray',
+    linkText: 'Смотреть все',
+    linkUrl: '/apartments?complex=ЖК%20Янтарный',
+  },
+  {
+    id: 'by_complex_nizhniy',
+    title: 'ЖК Нижний',
+    description: 'Квартиры в жилом комплексе Нижний',
+    type: 'custom',
+    customFilter: (apartments) => apartments.filter(apt => apt.complex === 'ЖК Нижний'),
+    isVisible: true,
+    order: 3,
+    backgroundColor: 'white',
+    linkText: 'Смотреть все',
+    linkUrl: '/apartments?complex=ЖК%20Нижний',
+  },
+  {
+    id: 'by_finishing_ready',
+    title: 'С готовой отделкой',
+    description: 'Квартиры с чистовой отделкой и под ключ',
+    type: 'custom',
+    customFilter: (apartments) => apartments.filter(apt => apt.finishing === 'Чистовая' || apt.finishing === 'Под ключ'),
+    isVisible: true,
+    order: 4,
+    backgroundColor: 'gray',
+    linkText: 'Смотреть все',
+    linkUrl: '/apartments?finishing=Чистовая,Под%20ключ',
+  },
+  {
+    id: 'three_rooms',
+    title: '3-комнатные квартиры',
+    description: 'Просторные квартиры для больших семей',
+    type: 'rooms',
+    rooms: 3,
+    isVisible: true,
+    order: 5,
+    backgroundColor: 'white',
+    linkText: 'Смотреть все',
+    linkUrl: '/apartments?rooms=3',
+  },
+];
+
 const initialSearchFilters: SearchFilters = {
   query: '',
   rooms: [],
+  bathrooms: [],
   finishing: [],
   sortBy: 'price',
   sortOrder: 'asc',
@@ -104,6 +193,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   isLoading: false,
   selectedApartment: null,
   selectedComplex: null,
+  homepageSections: defaultHomepageSections,
   bookingForm: initialBookingForm,
   showBookingModal: false,
 
@@ -148,6 +238,11 @@ export const useAppStore = create<AppState>((set, get) => ({
       filtered = filtered.filter(apt => searchFilters.rooms!.includes(apt.rooms));
     }
 
+    // Bathrooms filter
+    if (searchFilters.bathrooms && searchFilters.bathrooms.length > 0) {
+      filtered = filtered.filter(apt => searchFilters.bathrooms!.includes(apt.bathrooms));
+    }
+
     // Finishing filter
     if (searchFilters.finishing && searchFilters.finishing.length > 0) {
       filtered = filtered.filter(apt => searchFilters.finishing!.includes(apt.finishing));
@@ -156,6 +251,16 @@ export const useAppStore = create<AppState>((set, get) => ({
     // Complex filter
     if (searchFilters.complex) {
       filtered = filtered.filter(apt => apt.complex === searchFilters.complex);
+    }
+
+    // Parks filter
+    if (searchFilters.hasParks !== undefined) {
+      filtered = filtered.filter(apt => apt.hasParks === searchFilters.hasParks);
+    }
+
+    // Infrastructure filter
+    if (searchFilters.hasInfrastructure !== undefined) {
+      filtered = filtered.filter(apt => apt.hasInfrastructure === searchFilters.hasInfrastructure);
     }
 
     // Sorting
@@ -175,6 +280,10 @@ export const useAppStore = create<AppState>((set, get) => ({
           case 'area':
             aVal = a.area;
             bVal = b.area;
+            break;
+          case 'location':
+            aVal = a.distanceFromCenter || 0;
+            bVal = b.distanceFromCenter || 0;
             break;
           default:
             return 0;
@@ -199,4 +308,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   resetBookingForm: () => set({ bookingForm: initialBookingForm }),
+  
+  setHomepageSections: (sections) => set({ homepageSections: sections }),
+  
+  updateHomepageSection: (id, updates) => {
+    set((state) => ({
+      homepageSections: state.homepageSections.map(section =>
+        section.id === id ? { ...section, ...updates } : section
+      )
+    }));
+  },
 }));

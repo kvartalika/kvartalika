@@ -1,11 +1,34 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAppStore } from '../store/useAppStore';
 import Logo from './Logo';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { setShowBookingModal, setSelectedApartment } = useAppStore();
+
+  const handleAboutClick = () => {
+    if (location.pathname === '/') {
+      // If we're on the homepage, just scroll to the section
+      const element = document.getElementById('about');
+      if (element) {
+        const headerOffset = 100;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    } else {
+      // If we're on another page, navigate to home with hash
+      navigate('/#about');
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,8 +90,8 @@ const Header = () => {
             >
               Квартиры
             </Link>
-            <Link
-              to="/about"
+            <button
+              onClick={handleAboutClick}
               className={`font-medium transition-colors hover:text-blue-600 ${
                 isScrolled || !isHomePage
                   ? 'text-gray-700'
@@ -76,26 +99,19 @@ const Header = () => {
               }`}
             >
               О нас
-            </Link>
+            </button>
           </nav>
 
-          {/* Contact Info */}
-          <div className="hidden lg:flex items-center space-x-4">
-            <a
-              href="tel:+74951234567"
-              className={`font-semibold transition-colors hover:text-blue-600 ${
-                isScrolled || !isHomePage
-                  ? 'text-gray-900'
-                  : 'text-white hover:text-blue-200'
-              }`}
-            >
-              +7 (495) 123-45-67
-            </a>
+          {/* Make Appointment Button */}
+          <div className="hidden lg:flex items-center">
             <button
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-              onClick={() => {/* TODO: Open callback modal */}}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              onClick={() => {
+                setSelectedApartment(null);
+                setShowBookingModal(true);
+              }}
             >
-              Обратный звонок
+              Записаться на просмотр
             </button>
           </div>
 
@@ -155,22 +171,25 @@ const Header = () => {
               >
                 Квартиры
               </Link>
-              <Link
-                to="/about"
-                className="text-gray-700 hover:text-blue-600 font-medium px-4 py-2"
-                onClick={() => setIsMobileMenuOpen(false)}
+              <button
+                onClick={() => {
+                  handleAboutClick();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="text-gray-700 hover:text-blue-600 font-medium px-4 py-2 text-left w-full"
               >
                 О нас
-              </Link>
+              </button>
               <div className="px-4 py-2 border-t border-gray-200">
-                <a
-                  href="tel:+74951234567"
-                  className="text-gray-900 font-semibold block mb-2"
+                <button 
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full"
+                  onClick={() => {
+                    setSelectedApartment(null);
+                    setShowBookingModal(true);
+                    setIsMobileMenuOpen(false);
+                  }}
                 >
-                  +7 (495) 123-45-67
-                </a>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full">
-                  Обратный звонок
+                  Записаться на просмотр
                 </button>
               </div>
             </nav>
