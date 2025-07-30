@@ -1,4 +1,3 @@
-import {useEffect} from 'react';
 import {Link} from 'react-router-dom';
 import {type Apartment, useAppStore} from '../store/useAppStore';
 import SearchBar from '../components/SearchBar';
@@ -8,8 +7,6 @@ import BackgroundPattern from "../components/BackgroundPattern.tsx";
 const HomePage = () => {
   const {
     filteredApartments,
-    searchFilters,
-    setSearchFilters,
     setSelectedApartment,
     setShowBookingModal
   } = useAppStore();
@@ -205,7 +202,7 @@ const HomePage = () => {
       )}
 
       {/* About Section */}
-      <section className="py-16 bg-white">
+      <section id="about" className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
@@ -280,7 +277,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Submit Request Section */}
       <section className="py-16 bg-blue-600">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
@@ -293,7 +290,7 @@ const HomePage = () => {
             onClick={() => setShowBookingModal(true)}
             className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors"
           >
-            Получить консультацию
+            Оставить заявку
           </button>
         </div>
       </section>

@@ -47,7 +47,7 @@ const SearchBar = () => {
   const finishingOptions = ['Черновая', 'Чистовая', 'Под ключ', 'Дизайнерская'];
 
   return (
-    <div className="w-full">
+    <div className="w-full relative">
       {/* Main Search Bar */}
       <form onSubmit={handleSearch} className="bg-white rounded-2xl shadow-xl p-2">
         <div className="flex flex-col lg:flex-row gap-2">
@@ -95,7 +95,7 @@ const SearchBar = () => {
 
       {/* Advanced Filters */}
       {showFilters && (
-        <div className="bg-white rounded-2xl shadow-xl mt-4 p-6">
+        <div className="absolute top-full left-0 right-0 z-50 bg-white rounded-2xl shadow-xl mt-4 p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Расширенные фильтры</h3>
             <button

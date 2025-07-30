@@ -1,4 +1,4 @@
-import {BrowserRouter, Routes, Route} from 'react-router-dom';
+import {BrowserRouter, Routes, Route, useLocation} from 'react-router-dom';
 import {useEffect} from 'react';
 import {useAppStore} from './store/useAppStore';
 
@@ -10,11 +10,23 @@ import BookingModal from './components/BookingModal';
 
 // Pages
 import HomePage from './pages/HomePage';
+import ComplexesPage from './pages/ComplexesPage';
 import ComplexPage from './pages/ComplexPage';
 import ApartmentPage from './pages/ApartmentPage';
 
 // API (placeholder - will integrate with existing API)
 // import { apartmentsApi, complexesApi } from './api';
+
+// Component to handle scroll to top on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
 
 function App() {
   const {
@@ -163,6 +175,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <div className="min-h-screen flex flex-col bg-gray-50">
         <Header />
 
@@ -171,6 +184,10 @@ function App() {
             <Route
               path="/"
               element={<HomePage />}
+            />
+            <Route
+              path="/complexes"
+              element={<ComplexesPage />}
             />
             <Route
               path="/complex/:complexName"

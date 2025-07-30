@@ -67,8 +67,8 @@ const Header = () => {
             >
               Квартиры
             </Link>
-            <Link
-              to="/about"
+            <a
+              href="/#about"
               className={`font-medium transition-colors hover:text-blue-600 ${
                 isScrolled || !isHomePage
                   ? 'text-gray-700'
@@ -76,7 +76,7 @@ const Header = () => {
               }`}
             >
               О нас
-            </Link>
+            </a>
           </nav>
 
           {/* Contact Info */}
@@ -155,13 +155,13 @@ const Header = () => {
               >
                 Квартиры
               </Link>
-              <Link
-                to="/about"
+              <a
+                href="/#about"
                 className="text-gray-700 hover:text-blue-600 font-medium px-4 py-2"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 О нас
-              </Link>
+              </a>
               <div className="px-4 py-2 border-t border-gray-200">
                 <a
                   href="tel:+74951234567"

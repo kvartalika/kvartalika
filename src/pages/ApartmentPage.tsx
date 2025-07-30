@@ -7,8 +7,7 @@ const ApartmentPage = () => {
   const { 
     apartments, 
     setSelectedApartment, 
-    setShowBookingModal,
-    selectedApartment 
+    setShowBookingModal
   } = useAppStore();
   
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -306,88 +305,12 @@ const ApartmentPage = () => {
                 </div>
               </div>
 
-              {/* Mortgage Calculator */}
-              <div className="bg-white rounded-xl shadow-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Ипотечный калькулятор
-                </h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Первоначальный взнос
-                    </label>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="range"
-                        min="10"
-                        max="50"
-                        defaultValue="20"
-                        className="flex-1"
-                      />
-                      <span className="text-sm font-medium w-12">20%</span>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Срок кредита
-                    </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
-                      <option>10 лет</option>
-                      <option>15 лет</option>
-                      <option>20 лет</option>
-                      <option>25 лет</option>
-                      <option>30 лет</option>
-                    </select>
-                  </div>
 
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm text-gray-600">Ежемесячный платеж:</span>
-                      <span className="font-semibold text-lg">
-                        {formatPrice(Math.round(apartment.price * 0.8 * 0.008))} ₽
-                      </span>
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      Расчет приблизительный, ставка 8% годовых
-                    </div>
-                  </div>
-
-                  <button className="w-full bg-gray-100 text-gray-800 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors">
-                    Подробный расчет
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         </div>
 
-        {/* Similar Apartments */}
-        <section className="mt-16">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">
-            Похожие квартиры в {apartment.complex}
-          </h2>
-          <div className="text-center py-12 bg-gray-50 rounded-xl">
-            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Похожие квартиры
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Посмотрите другие варианты в этом жилом комплексе
-            </p>
-            <Link
-              to={`/complex/${encodeURIComponent(apartment.complex)}`}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-            >
-              Смотреть все квартиры в {apartment.complex}
-            </Link>
-          </div>
-        </section>
+
       </div>
     </div>
   );
