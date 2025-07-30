@@ -17,7 +17,8 @@ export interface Apartment {
   description?: string;
   images?: string[];
   hasParks?: boolean;
-  hasInfrastructure?: boolean;
+  hasSchools?: boolean;
+  hasShops?: boolean;
   distanceFromCenter?: number; // For location sorting
   layout?: string; // Layout image URL
 }
@@ -48,8 +49,8 @@ export interface SearchFilters {
   finishing?: string[];
   complex?: string;
   hasParks?: boolean;
-  hasInfrastructure?: boolean;
-  isHot?: boolean;
+  hasSchools?: boolean;
+  hasShops?: boolean;
   sortBy?: 'price' | 'rooms' | 'area' | 'location';
   sortOrder?: 'asc' | 'desc';
 }
@@ -266,14 +267,14 @@ export const useAppStore = create<AppState>((set, get) => ({
       filtered = filtered.filter(apt => apt.hasParks === searchFilters.hasParks);
     }
 
-    // Infrastructure filter
-    if (searchFilters.hasInfrastructure !== undefined) {
-      filtered = filtered.filter(apt => apt.hasInfrastructure === searchFilters.hasInfrastructure);
+    // Schools filter
+    if (searchFilters.hasSchools !== undefined) {
+      filtered = filtered.filter(apt => apt.hasSchools === searchFilters.hasSchools);
     }
 
-    // Hot deals filter
-    if (searchFilters.isHot !== undefined) {
-      filtered = filtered.filter(apt => apt.isHot === searchFilters.isHot);
+    // Shops filter
+    if (searchFilters.hasShops !== undefined) {
+      filtered = filtered.filter(apt => apt.hasShops === searchFilters.hasShops);
     }
 
     // Sorting

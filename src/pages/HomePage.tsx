@@ -25,8 +25,8 @@ const HomePage = () => {
       maxPrice: undefined,
       complex: '',
       hasParks: undefined,
-      hasInfrastructure: undefined,
-      isHot: undefined,
+      hasSchools: undefined,
+      hasShops: undefined,
       sortBy: 'price',
       sortOrder: 'asc'
     });

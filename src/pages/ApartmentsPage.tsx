@@ -25,8 +25,8 @@ const ApartmentsPage = () => {
       maxPrice: undefined,
       complex: '',
       hasParks: undefined,
-      hasInfrastructure: undefined,
-      isHot: undefined,
+      hasSchools: undefined,
+      hasShops: undefined,
       sortBy: 'price' as const,
       sortOrder: 'asc' as const
     };
@@ -38,11 +38,6 @@ const ApartmentsPage = () => {
     }
     
     const urlFilters: any = { ...baseFilters };
-    
-    // Handle hot deals
-    if (searchParams.get('hot') === 'true') {
-      urlFilters.isHot = true;
-    }
     
     // Handle rooms filter
     const roomsParam = searchParams.get('rooms');

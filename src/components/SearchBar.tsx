@@ -57,8 +57,8 @@ const SearchBar = () => {
       maxPrice: undefined,
       complex: '',
       hasParks: undefined,
-      hasInfrastructure: undefined,
-      isHot: undefined,
+      hasSchools: undefined,
+      hasShops: undefined,
       sortBy: 'price',
       sortOrder: 'asc'
     });
@@ -92,8 +92,8 @@ const SearchBar = () => {
               (searchFilters.bathrooms && searchFilters.bathrooms.length > 0) ||
               (searchFilters.finishing && searchFilters.finishing.length > 0) ||
               searchFilters.minPrice || searchFilters.maxPrice || 
-              searchFilters.hasParks !== undefined || searchFilters.hasInfrastructure !== undefined ||
-              searchFilters.isHot !== undefined
+              searchFilters.hasParks !== undefined || searchFilters.hasSchools !== undefined ||
+              searchFilters.hasShops !== undefined
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
@@ -131,197 +131,172 @@ const SearchBar = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {/* Basic Parameters Section */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h5 className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-3">Основные параметры</h5>
-              
-              {/* Price Range */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Цена, ₽
-                </label>
-                <div className="space-y-2">
-                  <input
-                    type="number"
-                    placeholder="От"
-                    value={searchFilters.minPrice || ''}
-                    onChange={(e) => handleFilterChange('minPrice', e.target.value ? Number(e.target.value) : undefined)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
-                  />
-                  <input
-                    type="number"
-                    placeholder="До"
-                    value={searchFilters.maxPrice || ''}
-                    onChange={(e) => handleFilterChange('maxPrice', e.target.value ? Number(e.target.value) : undefined)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
-                  />
-                </div>
+            {/* Price Range */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Цена, ₽
+              </label>
+              <div className="space-y-2">
+                <input
+                  type="number"
+                  placeholder="От"
+                  value={searchFilters.minPrice || ''}
+                  onChange={(e) => handleFilterChange('minPrice', e.target.value ? Number(e.target.value) : undefined)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
+                />
+                <input
+                  type="number"
+                  placeholder="До"
+                  value={searchFilters.maxPrice || ''}
+                  onChange={(e) => handleFilterChange('maxPrice', e.target.value ? Number(e.target.value) : undefined)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
+                />
               </div>
+            </div>
 
-              {/* Rooms */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Количество комнат
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {[1, 2, 3, 4].map(rooms => (
-                    <button
-                      key={rooms}
-                      type="button"
-                      onClick={() => toggleRoomFilter(rooms)}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        searchFilters.rooms?.includes(rooms)
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {rooms === 4 ? '4+' : rooms}
-                    </button>
-                  ))}
-                </div>
+            {/* Rooms */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Количество комнат
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {[1, 2, 3, 4].map(rooms => (
+                  <button
+                    key={rooms}
+                    type="button"
+                    onClick={() => toggleRoomFilter(rooms)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      searchFilters.rooms?.includes(rooms)
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {rooms === 4 ? '4+' : rooms}
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* Bathrooms */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h5 className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-3">Санузлы</h5>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Количество санузлов
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {[1, 2, 3].map(bathrooms => (
-                    <button
-                      key={bathrooms}
-                      type="button"
-                      onClick={() => toggleBathroomFilter(bathrooms)}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        searchFilters.bathrooms?.includes(bathrooms)
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {bathrooms === 3 ? '3+' : bathrooms}
-                    </button>
-                  ))}
-                </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Количество санузлов
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {[1, 2, 3].map(bathrooms => (
+                  <button
+                    key={bathrooms}
+                    type="button"
+                    onClick={() => toggleBathroomFilter(bathrooms)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      searchFilters.bathrooms?.includes(bathrooms)
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {bathrooms === 3 ? '3+' : bathrooms}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Property Details Section */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h5 className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-3">Характеристики</h5>
-              
-              {/* Finishing */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Отделка
-                </label>
-                <div className="space-y-1">
-                  {finishingOptions.map(finishing => (
-                    <label key={finishing} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={searchFilters.finishing?.includes(finishing) || false}
-                        onChange={() => toggleFinishingFilter(finishing)}
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">{finishing}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              {/* Residential Complex */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Жилой комплекс
-                </label>
-                <select
-                  value={searchFilters.complex || ''}
-                  onChange={(e) => handleFilterChange('complex', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
-                >
-                  <option value="">Любой</option>
-                  <option value="ЖК Янтарный">ЖК Янтарный</option>
-                  <option value="ЖК Нижний">ЖК Нижний</option>
-                  <option value="ЖК Солнечный">ЖК Солнечный</option>
-                </select>
+            {/* Finishing */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Отделка
+              </label>
+              <div className="space-y-2">
+                {finishingOptions.map(finishing => (
+                  <label key={finishing} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={searchFilters.finishing?.includes(finishing) || false}
+                      onChange={() => toggleFinishingFilter(finishing)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">{finishing}</span>
+                  </label>
+                ))}
               </div>
             </div>
 
-            {/* Special Offers & Features Section */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h5 className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-3">Дополнительно</h5>
-              
-              {/* Hot Deals */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Специальные предложения
+            {/* Residential Complex */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Жилой комплекс
+              </label>
+              <select
+                value={searchFilters.complex || ''}
+                onChange={(e) => handleFilterChange('complex', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
+              >
+                <option value="">Любой</option>
+                <option value="ЖК Янтарный">ЖК Янтарный</option>
+                <option value="ЖК Нижний">ЖК Нижний</option>
+                <option value="ЖК Солнечный">ЖК Солнечный</option>
+              </select>
+            </div>
+
+            {/* Parks and Infrastructure */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Инфраструктура
+              </label>
+              <div className="space-y-2">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={searchFilters.hasParks || false}
+                    onChange={(e) => handleFilterChange('hasParks', e.target.checked || undefined)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">Наличие парков</span>
                 </label>
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={searchFilters.isHot || false}
-                    onChange={(e) => handleFilterChange('isHot', e.target.checked || undefined)}
+                    checked={searchFilters.hasSchools || false}
+                    onChange={(e) => handleFilterChange('hasSchools', e.target.checked || undefined)}
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
-                  <span className="ml-2 text-sm text-gray-700">🔥 Горячие предложения</span>
+                  <span className="ml-2 text-sm text-gray-700">Школы поблизости</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={searchFilters.hasShops || false}
+                    onChange={(e) => handleFilterChange('hasShops', e.target.checked || undefined)}
+                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">Магазины рядом</span>
                 </label>
               </div>
+            </div>
 
-              {/* Parks and Infrastructure */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Инфраструктура
-                </label>
-                <div className="space-y-1">
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={searchFilters.hasParks || false}
-                      onChange={(e) => handleFilterChange('hasParks', e.target.checked || undefined)}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Наличие парков</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={searchFilters.hasInfrastructure || false}
-                      onChange={(e) => handleFilterChange('hasInfrastructure', e.target.checked || undefined)}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <span className="ml-2 text-sm text-gray-700">Развитая инфраструктура</span>
-                  </label>
-                </div>
-              </div>
-
-              {/* Sorting */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Сортировка
-                </label>
-                <div className="space-y-2">
-                  <select
-                    value={searchFilters.sortBy || 'price'}
-                    onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
-                  >
-                    <option value="price">По цене</option>
-                    <option value="rooms">По количеству комнат</option>
-                    <option value="area">По площади</option>
-                    <option value="location">По удаленности от центра</option>
-                  </select>
-                  <select
-                    value={searchFilters.sortOrder || 'asc'}
-                    onChange={(e) => handleFilterChange('sortOrder', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
-                  >
-                    <option value="asc">По возрастанию</option>
-                    <option value="desc">По убыванию</option>
-                  </select>
-                </div>
+            {/* Sorting */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Сортировка
+              </label>
+              <div className="space-y-2">
+                <select
+                  value={searchFilters.sortBy || 'price'}
+                  onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
+                >
+                  <option value="price">По цене</option>
+                  <option value="rooms">По количеству комнат</option>
+                  <option value="area">По площади</option>
+                  <option value="location">По удаленности от центра</option>
+                </select>
+                <select
+                  value={searchFilters.sortOrder || 'asc'}
+                  onChange={(e) => handleFilterChange('sortOrder', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900"
+                >
+                  <option value="asc">По возрастанию</option>
+                  <option value="desc">По убыванию</option>
+                </select>
               </div>
             </div>
           </div>
