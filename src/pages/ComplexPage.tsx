@@ -51,7 +51,7 @@ const ComplexPage = () => {
   return (
     <div className="min-h-screen pt-20">
       {/* Hero Section */}
-      <section className="relative h-96 bg-gradient-to-r from-blue-600 to-blue-800">
+      <section className="relative h-96 gradient-secondary">
         <div className="absolute inset-0">
           <img
             src={complex.image || '/images/complex-placeholder.jpg'}

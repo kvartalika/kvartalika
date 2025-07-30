@@ -12,7 +12,7 @@ const ApartmentCard = ({ apartment, onBookingClick }: ApartmentCardProps) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+    <div className="card card-hover">
       {/* Image */}
       <div className="relative h-48 overflow-hidden">
         <img
