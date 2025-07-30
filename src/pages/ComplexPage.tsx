@@ -2,8 +2,10 @@ import {useEffect, useState} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import {useAppStore} from '../store/useAppStore';
 import ApartmentCard from '../components/ApartmentCard';
-import { motion, AnimatePresence } from 'framer-motion';
+
 import type { Apartment } from '../store/useAppStore';
+import { useAuthStore } from '../store/useAuthStore';
+import ContentManager from '../components/ContentManager';
 
 const ComplexPage = () => {
   const {complexName} = useParams<{ complexName: string }>();
@@ -14,8 +16,10 @@ const ComplexPage = () => {
     setSelectedComplex
   } = useAppStore();
 
-  const [activeTab, setActiveTab] = useState<'apartments' | 'about' | 'location'>('apartments');
+  const { user, isAuthenticated } = useAuthStore();
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showContentManager, setShowContentManager] = useState(false);
 
   // Find the complex by name
   const complex = complexes.find(c => c.name === decodeURIComponent(complexName || ''));
@@ -82,8 +86,8 @@ const ComplexPage = () => {
       {/* Photo Slider */}
       <section className="relative h-96 md:h-[500px]">
         <div className="relative h-full overflow-hidden bg-gray-200">
-          <AnimatePresence initial={false} custom={currentImageIndex}>
-            <motion.img
+          
+            <img
               key={currentImageIndex}
               src={images[currentImageIndex]}
               alt={`${complex.name} - фото ${currentImageIndex + 1}`}
@@ -92,13 +96,9 @@ const ComplexPage = () => {
                 const target = e.target as HTMLImageElement;
                 target.src = '/images/test.png';
               }}
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.5 }}
               style={{ position: 'absolute' }}
             />
-          </AnimatePresence>
+          
 
           {/* Navigation Arrows */}
           {images.length > 1 && (
@@ -409,8 +409,35 @@ const ComplexPage = () => {
           >
             Записаться на осмотр
           </button>
+          
+          {/* Content Manager Edit Button */}
+          {isAuthenticated && user?.role === 'CM' && (
+            <button
+              onClick={() => setShowContentManager(true)}
+              className="mb-4 bg-gray-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-700 transition-colors"
+            >
+              ✏️ Редактировать контент
+            </button>
+          )}
         </div>
       </section>
+
+      {/* Content Manager Modal */}
+      {showContentManager && (
+        <ContentManager
+          contentType="complex"
+          contentId={complex.id}
+          initialData={complex}
+          onSave={() => {
+            // Update the complex data in the store
+            // This would typically update the store state
+            setShowContentManager(false);
+            // Reload the page or update the data
+            window.location.reload();
+          }}
+          onCancel={() => setShowContentManager(false)}
+        />
+      )}
     </div>
   );
 };

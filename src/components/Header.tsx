@@ -1,6 +1,7 @@
 import {useState, useEffect} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {useAppStore} from '../store/useAppStore';
+import {useAuthStore} from '../store/useAuthStore';
 import Logo from './Logo';
 
 const Header = () => {
@@ -9,6 +10,7 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const {setShowBookingModal, setSelectedApartment} = useAppStore();
+  const {user, isAuthenticated, logout} = useAuthStore();
 
   const handleAboutClick = () => {
     if (location.pathname === '/') {
@@ -103,7 +105,7 @@ const Header = () => {
             </button>
           </nav>
 
-          <div className="hidden lg:flex items-center">
+          <div className="hidden lg:flex items-center space-x-4">
             <button
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
               onClick={() => {
@@ -113,6 +115,38 @@ const Header = () => {
             >
               Записаться на просмотр
             </button>
+            
+            {/* Authentication Buttons */}
+            {isAuthenticated && (
+              <div className="flex items-center space-x-4">
+                <span className={`text-sm ${
+                  isScrolled || !isHomePage ? 'text-gray-700' : 'text-white'
+                }`}>
+                  {user?.name} {user?.surname}
+                </span>
+                {user?.role === 'ADMIN' && (
+                  <Link
+                    to="/admin"
+                    className={`text-sm font-medium transition-colors hover:text-blue-600 ${
+                      isScrolled || !isHomePage ? 'text-gray-700' : 'text-white'
+                    }`}
+                  >
+                    Админ панель
+                  </Link>
+                )}
+                <button
+                  onClick={async () => {
+                    await logout();
+                    navigate('/');
+                  }}
+                  className={`text-sm font-medium transition-colors hover:text-blue-600 ${
+                    isScrolled || !isHomePage ? 'text-gray-700' : 'text-white'
+                  }`}
+                >
+                  Выйти
+                </button>
+              </div>
+            )}
           </div>
 
           <button
@@ -189,6 +223,34 @@ const Header = () => {
                 >
                   Записаться на просмотр
                 </button>
+                
+                {/* Mobile Authentication */}
+                {isAuthenticated && (
+                  <div className="mt-4 space-y-2">
+                    <div className="text-sm text-gray-600 px-4 py-2">
+                      {user?.name} {user?.surname}
+                    </div>
+                    {user?.role === 'ADMIN' && (
+                      <Link
+                        to="/admin"
+                        className="block text-gray-700 hover:text-blue-600 font-medium px-4 py-2"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        Админ панель
+                      </Link>
+                    )}
+                    <button
+                      onClick={async () => {
+                        await logout();
+                        navigate('/');
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="block text-gray-700 hover:text-blue-600 font-medium px-4 py-2 w-full text-left"
+                    >
+                      Выйти
+                    </button>
+                  </div>
+                )}
               </div>
             </nav>
           </div>
