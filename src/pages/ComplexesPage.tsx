@@ -46,7 +46,7 @@ const ComplexesPage = () => {
                 placeholder="Поиск по названию, адресу или описанию..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent pl-14"
+                className="w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent pl-14 bg-white"
               />
               <svg
                 className="w-6 h-6 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2"
