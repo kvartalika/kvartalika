@@ -49,14 +49,27 @@ src/
 
 ## 🎨 Design System
 
+### Tailwind v4 Configuration
+This project uses **Tailwind CSS v4** with CSS-based configuration using the `@theme` directive in `index.css`:
+
+```css
+@theme {
+  --font-family-sans: Montserrat, system-ui, ...;
+  --color-primary-600: #2563eb;
+  --spacing-18: 4.5rem;
+  /* ... more custom properties */
+}
+```
+
 ### Color Palette
-- **Primary**: Blue (#2563EB - blue-600)
-- **Secondary**: Gray (#6B7280 - gray-500)
+- **Primary**: Blue (#2563EB - primary-600)
+- **Secondary**: Gray (#6B7280 - secondary-500)
 - **Success**: Green (#10B981 - emerald-500)
 - **Warning**: Red (#EF4444 - red-500)
 - **Background**: Gray (#F9FAFB - gray-50)
 
 ### Typography
+- **Font Family**: Montserrat (Google Fonts)
 - **Headings**: Font weight 700 (bold)
 - **Body**: Font weight 400 (normal)
 - **Accent**: Font weight 600 (semibold)
