@@ -1,4 +1,5 @@
 import {Link} from 'react-router-dom';
+import {useEffect} from 'react';
 import {type Apartment, type HomepageSection, useAppStore} from '../store/useAppStore';
 import SearchBar from '../components/SearchBar';
 import ApartmentCard from '../components/ApartmentCard';
@@ -9,8 +10,27 @@ const HomePage = () => {
     filteredApartments,
     homepageSections,
     setSelectedApartment,
-    setShowBookingModal
+    setShowBookingModal,
+    setSearchFilters
   } = useAppStore();
+
+  // Reset filters when returning to homepage
+  useEffect(() => {
+    setSearchFilters({
+      query: '',
+      rooms: [],
+      bathrooms: [],
+      finishing: [],
+      minPrice: undefined,
+      maxPrice: undefined,
+      complex: '',
+      hasParks: undefined,
+      hasInfrastructure: undefined,
+      isHot: undefined,
+      sortBy: 'price',
+      sortOrder: 'asc'
+    });
+  }, [setSearchFilters]);
 
   const handleBookingClick = (apartment: Apartment) => {
     setSelectedApartment(apartment);
