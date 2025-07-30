@@ -61,15 +61,6 @@ const ComplexPage = () => {
     setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
-  useEffect(() => {
-    if (images.length > 1) {
-      const interval = setInterval(() => {
-        setCurrentImageIndex(prev => (prev + 1) % images.length);
-      }, 4000);
-      return () => clearInterval(interval);
-    }
-  }, [images]);
-
   return (
     <div className="min-h-screen pt-20">
       {/* Breadcrumbs */}
