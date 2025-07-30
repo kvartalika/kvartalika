@@ -61,6 +61,8 @@ This project uses **Tailwind CSS v4** with CSS-based configuration using the `@t
 }
 ```
 
+**Important**: In Tailwind v4, use CSS variables directly (`var(--color-primary-600)`) instead of the `theme()` function when referencing theme values in custom CSS.
+
 ### Color Palette
 - **Primary**: Blue (#2563EB - primary-600)
 - **Secondary**: Gray (#6B7280 - secondary-500)
