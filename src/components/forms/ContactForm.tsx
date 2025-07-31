@@ -1,16 +1,19 @@
 import React from 'react';
-import type { ContactInfo } from '../../types';
+import type {PageInfo} from "../../store/ui.store.ts";
 
 interface ContactFormProps {
-  contactData: ContactInfo;
-  onContactChange: (field: keyof ContactInfo, value: string | boolean) => void;
+  contactData: PageInfo;
+  onContactChange: (field: keyof PageInfo, value: string | boolean) => void;
 }
 
-const ContactForm: React.FC<ContactFormProps> = ({ contactData, onContactChange }) => {
+const ContactForm: React.FC<ContactFormProps> = ({
+                                                   contactData,
+                                                   onContactChange
+                                                 }) => {
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Контактная информация</h3>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -90,7 +93,10 @@ const ContactForm: React.FC<ContactFormProps> = ({ contactData, onContactChange 
           onChange={(e) => onContactChange('published', e.target.checked)}
           className="mr-2"
         />
-        <label htmlFor="published" className="text-sm font-medium text-gray-700">
+        <label
+          htmlFor="published"
+          className="text-sm font-medium text-gray-700"
+        >
           Опубликовано
         </label>
       </div>

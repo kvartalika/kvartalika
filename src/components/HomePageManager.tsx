@@ -1,116 +1,80 @@
-import {useEffect} from 'react';
+import {type FormEvent, useState} from 'react';
 import ContactForm from './forms/ContactForm';
 import SocialMediaForm from './forms/SocialMediaForm';
 import {useAuthStore} from "../store/auth.store.ts";
-import {useUIStore} from "../store/ui.store.ts";
+import {
+  type PageInfo,
+  type SocialMedia,
+  useUIStore
+} from "../store/ui.store.ts";
 
 interface HomePageManagerProps {
-  onSave: () => void;
   onCancel: () => void;
 }
 
-const HomePageManager = ({
-                           onSave,
-                           onCancel,
-                         }: HomePageManagerProps) => {
+const HomePageManager = ({onCancel}: HomePageManagerProps) => {
   const {role, isAuthenticated} = useAuthStore();
 
   const pageInfo = useUIStore(state => state.pageInfo);
   const updatePageInfo = useUIStore(state => state.updatePageInfo);
 
   const socialMediaList = useUIStore(state => state.socialMediaList);
+  const updateSocialMediaList = useUIStore(state => state.updateSocialMediaList);
+  const addSocialMediaList = useUIStore(state => state.addSocialMediaList);
 
-  useEffect(() => {
-    if (!isAuthenticated || user?.role !== 'CM') {
-      return;
-    }
+  const [draftedPageInfo, setDraftedPageInfo] = useState<PageInfo>(pageInfo);
+  const [draftedSocialMediaList, setDraftedSocialMediaList] = useState<SocialMedia[]>(socialMediaList);
 
-    const loadInitialData = async () => {
-      if (!initialContactData) {
-        try {
-          const {mockApi} = await import('../services/mockApi');
-          const contactInfo = await mockApi.getContactInfo();
-          setContactData(contactInfo);
-        } catch (error) {
-          console.error('Failed to load contact info:', error);
-        }
-      }
+  const notifications = useUIStore(state => state.notifications);
+  const loading = useUIStore(state => state.loading);
 
-      if (!initialSocialMediaData) {
-        try {
-          const {mockApi} = await import('../services/mockApi');
-          const socialMediaData = await mockApi.getSocialMedia();
-          setSocialMedia(socialMediaData);
-        } catch (error) {
-          console.error('Failed to load social media:', error);
-        }
-      }
-    };
-
-    loadInitialData();
-  }, [isAuthenticated, user, initialContactData, initialSocialMediaData]);
-
-  const handleContactChange = (field: keyof ContactInfo, value: any) => {
-    setContactData(prev => ({
+  const handleContactChange = (field: keyof PageInfo, value: string | boolean) => {
+    setDraftedPageInfo(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleSocialMediaChange = (index: number, field: keyof SocialMedia, value: string) => {
-    setSocialMedia(prev => prev.map((item, i) =>
-      i === index ? {...item, [field]: value} : item
-    ));
+    setDraftedSocialMediaList(prev => {
+      const copy = [...prev];
+      copy[index] = {
+        ...copy[index],
+        [field]: value,
+      };
+      return copy;
+    });
   };
 
-  const addSocialMedia = () => {
-    setSocialMedia(prev => [...prev, {
-      id: Date.now(),
-      image: '',
+  const addSocialMedia = async () => {
+    const media: SocialMedia = {
+      image: '/',
       link: ''
-    }]);
+    }
+
+    await addSocialMediaList(media);
   };
 
-  const removeSocialMedia = (index: number) => {
-    setSocialMedia(prev => prev.filter((_, i) => i !== index));
+  const updateSocialMedia = async () => {
+    await updateSocialMediaList(draftedSocialMediaList);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const removeSocialMedia = async (index: number) => {
+    await removeSocialMedia(index);
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError('');
 
     try {
-      // For testing, use mock API
-      const {mockApi} = await import('../services/mockApi');
+      await Promise.all([updateSocialMedia(), updatePageInfo(draftedPageInfo)]);
 
-      // Update contact info
-      await mockApi.updateContactInfo(contactData);
-
-      // Update social media - in a real app, you'd batch these operations
-      // For now, we'll simulate updating each social media item
-      for (const socialMediaItem of socialMedia) {
-        if (socialMediaItem.id > 0) {
-          // Update existing
-          await mockApi.updateSocialMedia(socialMediaItem.id, socialMediaItem);
-        } else {
-          // Add new
-          await mockApi.addSocialMedia({
-            image: socialMediaItem.image,
-            link: socialMediaItem.link
-          });
-        }
-      }
-
-      onSave(contactData, socialMedia);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Update failed');
-    } finally {
-      setIsLoading(false);
+      console.log(err);
     }
   };
 
-  if (!isAuthenticated || user?.role !== 'CM') {
+  if (!isAuthenticated || role !== 'CONTENT_MANAGER') {
     return null;
   }
 
@@ -129,9 +93,9 @@ const HomePageManager = ({
           </button>
         </div>
 
-        {error && (
-          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-            {error}
+        {notifications.length && (
+          <div className="mb-4 bg-red-50 border text-black px-4 py-3 rounded">
+            {notifications[0].message}
           </div>
         )}
 
@@ -139,25 +103,22 @@ const HomePageManager = ({
           onSubmit={handleSubmit}
           className="space-y-6"
         >
-          {/* Contact Information */}
           <div className="bg-gray-50 p-6 rounded-lg">
             <ContactForm
-              contactData={contactData}
+              contactData={draftedPageInfo}
               onContactChange={handleContactChange}
             />
           </div>
 
-          {/* Social Media */}
           <div className="bg-gray-50 p-6 rounded-lg">
             <SocialMediaForm
-              socialMedia={socialMedia}
+              socialMedia={draftedSocialMediaList}
               onSocialMediaChange={handleSocialMediaChange}
               onAddSocialMedia={addSocialMedia}
               onRemoveSocialMedia={removeSocialMedia}
             />
           </div>
 
-          {/* Action Buttons */}
           <div className="flex justify-end space-x-4 pt-6 border-t">
             <button
               type="button"
@@ -168,10 +129,10 @@ const HomePageManager = ({
             </button>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={loading.upload}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
-              {isLoading ? 'Сохранение...' : 'Сохранить изменения'}
+              {loading.upload ? 'Сохранение...' : 'Сохранить изменения'}
             </button>
           </div>
         </form>

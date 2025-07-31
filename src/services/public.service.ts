@@ -54,6 +54,42 @@ export class PublicService {
     }
   }
 
+  static async updateSocialMedia(data: SocialMedia[], params?: PaginationParams): Promise<void> {
+    try {
+      const response = await apiClient.put<void, SocialMedia[]>('/social_media', data, {params});
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        throw new Error(error.response?.data?.message || 'Failed to update Social Media');
+      }
+      throw error;
+    }
+  }
+
+  static async addSocialMedia(data: SocialMedia, params?: PaginationParams): Promise<void> {
+    try {
+      const response = await apiClient.post<void, SocialMedia>('/social_media', data, {params});
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        throw new Error(error.response?.data?.message || 'Failed to update Social Media');
+      }
+      throw error;
+    }
+  }
+
+  static async deleteSocialMedia(id: number, params?: PaginationParams): Promise<void> {
+    try {
+      const response = await apiClient.delete<void>(`/social_media/${id}`, {params});
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        throw new Error(error.response?.data?.message || 'Failed to update Social Media');
+      }
+      throw error;
+    }
+  }
+
   // Categories - Public Read
   static async getCategories(params?: PaginationParams): Promise<Category[]> {
     try {
@@ -259,7 +295,7 @@ export class PublicService {
   // Requests - Public Create
   static async createRequest(requestData: RequestCreate): Promise<RequestsPost201Response> {
     try {
-      const response = await apiClient.post<RequestsPost201Response, RequestCreate>('/requests', requestData);
+      const response = await apiClient.post<RequestsPost201Response, RequestCreate>('/bids', requestData);
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -300,6 +336,9 @@ export class PublicService {
 export const {
   getPageInfo,
   getSocialMedia,
+  updateSocialMedia,
+  addSocialMedia,
+  deleteSocialMedia,
   getCategories,
   getCategoryById,
   getDescriptions,

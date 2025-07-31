@@ -21,25 +21,31 @@ const HomePage = () => {
   const modals = useUIStore(state => state.modals);
   const closeModal = useUIStore(state => state.closeModal);
 
-  const fetchCategories = usePropertiesStore(state => state.fetchCategories);
   const categories = usePropertiesStore(state => state.categories);
 
   const homePageFlats = usePropertiesStore(state => state.homePageFlats);
   const fetchHomePageFlats = usePropertiesStore(state => state.fetchHomePageFlats);
   const isLoadingHomePageFlats = usePropertiesStore(state => state.isLoadingHomePageFlats);
 
+  const fetchCategories = usePropertiesStore(state => state.fetchCategories);
+
+  useEffect(() => {
+    const load = async () => {
+      await fetchCategories();
+    };
+    load();
+  }, [fetchCategories]);
+
   useEffect(() => {
     const loadHomePageFlats = async () => {
-      await fetchCategories();
-
       const homePageCategories = categories.filter(c => c.isOnMainPage);
+      if (homePageCategories.length === 0) return;
 
-      await fetchHomePageFlats(homePageCategories);
-
+      await fetchHomePageFlats(homePageCategories, true);
     };
 
     loadHomePageFlats();
-  }, [fetchCategories, categories, fetchHomePageFlats]);
+  }, [categories, fetchHomePageFlats]);
 
   const renderSection = (section: HomePageFlats, idx: number) => {
     return (
@@ -238,10 +244,6 @@ const HomePage = () => {
 
       {modals.manager && (
         <HomePageManager
-          onSave={() => {
-            closeModal('manager');
-            window.location.reload();
-          }}
           onCancel={() => closeModal('manager')}
         />
       )}

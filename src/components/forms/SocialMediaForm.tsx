@@ -1,5 +1,5 @@
 import React from 'react';
-import type { SocialMedia } from '../../types';
+import type {SocialMedia} from "../../store/ui.store.ts";
 
 interface SocialMediaFormProps {
   socialMedia: SocialMedia[];

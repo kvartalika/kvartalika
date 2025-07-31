@@ -1,9 +1,10 @@
 import {create} from 'zustand';
 import {
-  createRequest,
+  addSocialMedia,
+  createRequest, deleteSocialMedia,
   getPageInfo,
   getSocialMedia,
-  updatePageInfo
+  updatePageInfo, updateSocialMedia
 } from '../services';
 import type {RequestCreate} from '../services';
 
@@ -113,10 +114,13 @@ export interface UIActions {
 
   // Homepage
   loadPageInfo: () => Promise<void>;
-  updatePageInfo: (newPageInfo: PageInfo) => void;
+  updatePageInfo: (newPageInfo: PageInfo) => Promise<void>;
 
   //Media
   loadSocialMediaList: () => Promise<void>;
+  updateSocialMediaList: (list: SocialMedia[]) => Promise<void>;
+  addSocialMediaList: (media: SocialMedia) => Promise<void>;
+  deleteSocialMediaList: (id: number) => Promise<void>;
 
   addNotification: (notification: Omit<Notification, 'id'>) => void;
   removeNotification: (id: string) => void;
@@ -224,9 +228,64 @@ export const useUIStore = create<UIState & UIActions>((set, get) => ({
     }
   },
 
+  updateSocialMediaList: async (list: SocialMedia[]) => {
+    const {setLoading, addNotification} = get();
+    setLoading('upload', true);
+
+    try {
+      await updateSocialMedia(list);
+    } catch {
+      addNotification({
+        type: 'error',
+        title: 'Ошибка',
+        message: 'Не удалось обновить медиа',
+        duration: 2500,
+      });
+    } finally {
+      setLoading('upload', false);
+    }
+  },
+
+  addSocialMediaList: async (media: SocialMedia) => {
+    const {setLoading, addNotification} = get();
+    setLoading('upload', true);
+
+    try {
+      await addSocialMedia(media);
+      set({socialMediaList: [...get().socialMediaList, media]});
+    } catch {
+      addNotification({
+        type: 'error',
+        title: 'Ошибка',
+        message: 'Не удалось обновить медиа',
+        duration: 2500,
+      });
+    } finally {
+      setLoading('upload', false);
+    }
+  },
+
+  deleteSocialMediaList: async (id: number) => {
+    const {setLoading, addNotification} = get();
+    setLoading('upload', true);
+
+    try {
+      await deleteSocialMedia(id);
+    } catch {
+      addNotification({
+        type: 'error',
+        title: 'Ошибка',
+        message: 'Не удалось удалить медиа',
+        duration: 2500,
+      });
+    } finally {
+      setLoading('upload', false);
+    }
+  },
+
   updatePageInfo: async (newPageInfo: PageInfo) => {
     const {setLoading, addNotification} = get();
-    setLoading('global', true);
+    setLoading('upload', true);
 
     try {
       await updatePageInfo(newPageInfo);
@@ -239,7 +298,7 @@ export const useUIStore = create<UIState & UIActions>((set, get) => ({
         duration: 2500,
       });
     } finally {
-      setLoading('global', false);
+      setLoading('upload', false);
     }
   },
 

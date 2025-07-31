@@ -172,8 +172,8 @@ export const usePropertiesStore = create<PropertiesState & PropertiesActions>((s
 
     } catch {
       set({
-        isLoadingHomes: false,
-        error: 'Failed to fetch homes',
+        isLoadingCategories: false,
+        error: 'Failed to fetch categories',
       });
     }
   },
@@ -213,11 +213,14 @@ export const usePropertiesStore = create<PropertiesState & PropertiesActions>((s
     });
 
     set(state => ({
-      currentFlats,
       isLoadingHomePageFlats: false,
       lastFetch: {...state.lastFetch, homePageFlats: Date.now()},
       error: errors.length > 0 ? errors.join('; ') : null,
     }));
+
+    if (currentFlats.length > 0) {
+      set({homePageFlats: currentFlats})
+    }
   },
 
   fetchFlatById: async (id: number) => {
