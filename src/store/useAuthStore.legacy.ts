@@ -68,14 +68,27 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         console.warn('⚠️ useAuthStore from useAuthStore.ts is deprecated. Use the new auth store instead.');
         set({ isLoading: true, error: null });
         try {
-          // TODO api
-          const { mockApi } = await import('../services/mockApi');
-          const data = await mockApi.login(email, password);
-          const { user, accessToken } = data;
+          // Mock implementation for legacy compatibility
+          const mockUser = {
+            id: 1,
+            name: 'Test',
+            surname: 'User',
+            patronymic: '',
+            email: email,
+            phone: '+1234567890',
+            role: 'CM' as const,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+          
+          const data = {
+            user: mockUser,
+            accessToken: 'mock-token-' + Date.now()
+          };
 
           set({
-            user,
-            accessToken,
+            user: data.user,
+            accessToken: data.accessToken,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -92,9 +105,8 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       logout: async () => {
         console.warn('⚠️ useAuthStore from useAuthStore.ts is deprecated. Use the new auth store instead.');
         try {
-          // TODO api
-          const { mockApi } = await import('../services/mockApi');
-          await mockApi.logout();
+          // Mock logout - no actual API call needed
+          console.log('Mock logout performed');
         } catch (error) {
           console.error('Logout error:', error);
         } finally {
@@ -110,9 +122,8 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       refreshAccessToken: async () => {
         console.warn('⚠️ useAuthStore from useAuthStore.ts is deprecated. Use the new auth store instead.');
         try {
-          // TODO api
-          const { mockApi } = await import('../services/mockApi');
-          const { accessToken } = await mockApi.refreshToken();
+          // Mock token refresh
+          const accessToken = 'refreshed-mock-token-' + Date.now();
 
           set({
             accessToken,

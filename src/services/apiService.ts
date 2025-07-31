@@ -48,28 +48,7 @@ export class ApiService {
       return flats.map(this.transformFlatToApartment);
     } catch (error) {
       console.error('Error fetching apartments:', error);
-      
-      // Fallback to mock data if API fails
-      return [
-        {
-          id: 1,
-          complex: "ЖК Янтарный",
-          complexId: 1,
-          address: "ул. Примерная, 10",
-          rooms: 2,
-          floor: 5,
-          bathroom: "Совмещенный",
-          bathrooms: 1,
-          finishing: "Чистовая",
-          isHot: true,
-          image: "/images/apt1.jpg",
-          price: 5500000,
-          area: 65.5,
-          description: "Уютная двухкомнатная квартира с современным ремонтом",
-          hasParks: true,
-          distanceFromCenter: 5.2
-        }
-      ];
+      throw error;
     }
   }
 
@@ -92,18 +71,7 @@ export class ApiService {
       return homes.map(this.transformHomeToComplex);
     } catch (error) {
       console.error('Error fetching complexes:', error);
-      // Fallback to mock data
-      return [
-        {
-          id: 1,
-          name: "ЖК Янтарный",
-          address: "ул. Примерная, 10",
-          description: "Современный жилой комплекс в центре города",
-          image: "/images/complex1.jpg",
-          apartments: [],
-          amenities: ["Парковка", "Детская площадка", "Спортзал"]
-        }
-      ];
+      throw error;
     }
   }
 
@@ -133,8 +101,7 @@ export class ApiService {
       return { success: true, id: response.id };
     } catch (error) {
       console.error('Error creating booking:', error);
-      // Fallback to mock implementation
-      return { success: true, id: Math.floor(Math.random() * 1000) };
+      throw error;
     }
   }
 
@@ -172,39 +139,7 @@ export class ApiService {
       return apartments;
     } catch (error) {
       console.error('Error searching apartments:', error);
-      // Fallback to local filtering
-      const allApartments = await this.getApartments();
-      let filtered = [...allApartments];
-
-      if (filters.query) {
-        const query = filters.query.toLowerCase();
-        filtered = filtered.filter(apt => 
-          apt.complex.toLowerCase().includes(query) ||
-          apt.address.toLowerCase().includes(query)
-        );
-      }
-
-      if (filters.minPrice) {
-        filtered = filtered.filter(apt => apt.price >= filters.minPrice!);
-      }
-
-      if (filters.maxPrice) {
-        filtered = filtered.filter(apt => apt.price <= filters.maxPrice!);
-      }
-
-      if (filters.rooms && filters.rooms.length > 0) {
-        filtered = filtered.filter(apt => filters.rooms!.includes(apt.rooms));
-      }
-
-      if (filters.finishing && filters.finishing.length > 0) {
-        filtered = filtered.filter(apt => filters.finishing!.includes(apt.finishing));
-      }
-
-      if (filters.complex) {
-        filtered = filtered.filter(apt => apt.complex === filters.complex);
-      }
-
-      return filtered;
+      throw error;
     }
   }
 }

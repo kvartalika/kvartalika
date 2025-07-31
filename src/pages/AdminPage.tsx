@@ -1,510 +1,463 @@
 import { useState, useEffect } from 'react';
-import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate } from 'react-router-dom';
-
-interface User {
-  id: number;
-  name: string;
-  surname: string;
-  patronymic: string;
-  email: string;
-  phone: string;
-  role: 'ADMIN' | 'CM';
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface FileItem {
-  id: number;
-  name: string;
-  path: string;
-  size: number;
-  type: string;
-  createdAt: string;
-}
-
-interface Directory {
-  id: number;
-  name: string;
-  path: string;
-  createdAt: string;
-}
+import { 
+  useAuthStore, 
+  useContentStore, 
+  useUIStore,
+  useIsAuthenticated,
+  useAuthUser,
+  useAuthRole 
+} from '../store';
 
 const AdminPage = () => {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const isAuthenticated = useIsAuthenticated();
+  const user = useAuthUser();
+  const role = useAuthRole();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'users' | 'files' | 'directories'>('users');
-  const [users, setUsers] = useState<User[]>([]);
-  const [files, setFiles] = useState<FileItem[]>([]);
-  const [directories, setDirectories] = useState<Directory[]>([]);
-  const [currentDirectory] = useState('/');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  // Form states
-  const [newUser, setNewUser] = useState({
-    name: '',
-    surname: '',
-    patronymic: '',
-    email: '',
-    phone: '',
-    password: '',
-    role: 'CM' as 'ADMIN' | 'CM'
-  });
-  const [newDirectory, setNewDirectory] = useState({ name: '' });
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const { logout } = useAuthStore();
+  const { addNotification } = useUIStore();
+  
+  const {
+    contentManagers,
+    stats,
+    ui,
+    loading,
+    errors,
+    loadContentManagers,
+    saveContentManager,
+    removeContentManager,
+    editContentManager,
+    setActiveTab,
+    setShowForm,
+    setContentManagerForm,
+    contentManagerForm,
+    refreshAll,
+  } = useContentStore();
 
   useEffect(() => {
-    if (!isAuthenticated || user?.role !== 'ADMIN') {
+    if (!isAuthenticated || role !== 'admin') {
       navigate('/auth');
       return;
     }
-    loadData();
-  }, [isAuthenticated, user, navigate, activeTab, currentDirectory]);
 
-  const loadData = async () => {
-    setIsLoading(true);
-    setError('');
-    try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
+    // Load admin data
+    loadContentManagers();
+    refreshAll();
+  }, [isAuthenticated, role, navigate]);
 
-      if (activeTab === 'users') {
-        const data = await mockApi.getUsers();
-        setUsers(data);
-      } else if (activeTab === 'files') {
-        const data = await mockApi.getFiles();
-        setFiles(data.files);
-        setDirectories(data.directories);
-      }
-    } catch (err) {
-      setError('Failed to load data');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCreateUser = async (e: React.FormEvent) => {
+  const handleCreateContentManager = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-      await mockApi.createUser(newUser);
-      
-      setNewUser({
-        name: '',
-        surname: '',
-        patronymic: '',
-        email: '',
-        phone: '',
-        password: '',
-        role: 'CM'
+      const success = await saveContentManager({
+        username: contentManagerForm.username!,
+        email: contentManagerForm.email!,
+        password: contentManagerForm.password!,
+        role: 'content_manager',
       });
-      loadData();
-    } catch (err) {
-      setError('Failed to create user');
+
+      if (success) {
+        addNotification({
+          type: 'success',
+          title: 'Менеджер создан',
+          message: 'Контент-менеджер успешно создан',
+        });
+      }
+    } catch (error: any) {
+      addNotification({
+        type: 'error',
+        title: 'Ошибка создания',
+        message: error.message || 'Не удалось создать контент-менеджера',
+      });
     }
   };
 
-  const handleDeleteUser = async (userId: number) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
-    
-    try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-      await mockApi.deleteUser(userId);
-      loadData();
-    } catch (err) {
-      setError('Failed to delete user');
+  const handleDeleteContentManager = async (id: string) => {
+    if (!confirm('Вы уверены, что хотите удалить этого контент-менеджера?')) {
+      return;
     }
-  };
-
-  const handleCreateDirectory = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-      await mockApi.createDirectory(newDirectory.name, currentDirectory);
-      
-      setNewDirectory({ name: '' });
-      loadData();
-    } catch (err) {
-      setError('Failed to create directory');
-    }
-  };
-
-  const handleDeleteDirectory = async () => {
-    if (!confirm('Are you sure you want to delete this directory?')) return;
-    
-    try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-      await mockApi.deleteDirectory();
-      loadData();
-    } catch (err) {
-      setError('Failed to delete directory');
-    }
-  };
-
-  const handleFileUpload = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedFile) return;
 
     try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-      await mockApi.uploadFile(selectedFile, currentDirectory);
-      
-      setSelectedFile(null);
-      loadData();
-    } catch (err) {
-      setError('Failed to upload file');
-    }
-  };
-
-  const handleDeleteFile = async () => {
-    if (!confirm('Are you sure you want to delete this file?')) return;
-    
-    try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-      await mockApi.deleteFile();
-      loadData();
-    } catch (err) {
-      setError('Failed to delete file');
+      const success = await removeContentManager(id);
+      if (success) {
+        addNotification({
+          type: 'success',
+          title: 'Менеджер удален',
+          message: 'Контент-менеджер успешно удален',
+        });
+      }
+    } catch (error: any) {
+      addNotification({
+        type: 'error',
+        title: 'Ошибка удаления',
+        message: error.message || 'Не удалось удалить контент-менеджера',
+      });
     }
   };
 
   const handleLogout = async () => {
-    await logout();
-    navigate('/auth');
+    try {
+      logout();
+      navigate('/');
+      addNotification({
+        type: 'success',
+        title: 'Выход выполнен',
+        message: 'Вы успешно вышли из системы',
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
-  if (!isAuthenticated || user?.role !== 'ADMIN') {
-    return null;
+  if (!isAuthenticated || role !== 'admin') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Доступ запрещен</h1>
+          <p className="text-gray-600 mb-4">У вас нет прав для доступа к этой странице</p>
+          <button
+            onClick={() => navigate('/auth')}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Войти в систему
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <div className="bg-white shadow">
+      {/* Header */}
+      <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <h1 className="text-3xl font-bold text-gray-900">Admin Panel</h1>
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-700">Welcome, {user.name}</span>
-              <button
-                onClick={handleLogout}
-                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-              >
-                Logout
-              </button>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Панель администратора</h1>
+              <p className="text-gray-600">Добро пожаловать, {user?.username}!</p>
             </div>
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Выйти
+            </button>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tabs */}
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
-            {['users', 'files', 'directories'].map((tab) => (
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-6 sm:px-0">
+          
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                      <span className="text-white font-semibold">🏠</span>
+                    </div>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">Всего домов</dt>
+                      <dd className="text-lg font-medium text-gray-900">{stats.totalHomes}</dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                      <span className="text-white font-semibold">🏢</span>
+                    </div>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">Всего квартир</dt>
+                      <dd className="text-lg font-medium text-gray-900">{stats.totalFlats}</dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                      <span className="text-white font-semibold">📁</span>
+                    </div>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">Категории</dt>
+                      <dd className="text-lg font-medium text-gray-900">{stats.totalCategories}</dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
+                      <span className="text-white font-semibold">📷</span>
+                    </div>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">Фотографии</dt>
+                      <dd className="text-lg font-medium text-gray-900">{stats.totalPhotos}</dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Navigation Tabs */}
+          <div className="mb-8">
+            <nav className="flex space-x-8">
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab as any)}
+                onClick={() => setActiveTab('managers')}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === tab
+                  ui.activeTab === 'managers'
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                Контент-менеджеры
               </button>
-            ))}
-          </nav>
-        </div>
-
-        {error && (
-          <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-            {error}
+              <button
+                onClick={() => setActiveTab('flats')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  ui.activeTab === 'flats'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Квартиры
+              </button>
+              <button
+                onClick={() => setActiveTab('homes')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  ui.activeTab === 'homes'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Дома
+              </button>
+              <button
+                onClick={() => setActiveTab('photos')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  ui.activeTab === 'photos'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                Фотографии
+              </button>
+            </nav>
           </div>
-        )}
 
-        {isLoading ? (
-          <div className="mt-8 flex justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          </div>
-        ) : (
-          <div className="mt-8">
-            {/* Users Tab */}
-            {activeTab === 'users' && (
-              <div>
-                <div className="bg-white shadow rounded-lg p-6 mb-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Create New User</h3>
-                  <form onSubmit={handleCreateUser} className="grid grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      placeholder="Name"
-                      value={newUser.name}
-                      onChange={(e) => setNewUser({...newUser, name: e.target.value})}
-                      className="border rounded px-3 py-2"
-                      required
-                    />
-                    <input
-                      type="text"
-                      placeholder="Surname"
-                      value={newUser.surname}
-                      onChange={(e) => setNewUser({...newUser, surname: e.target.value})}
-                      className="border rounded px-3 py-2"
-                      required
-                    />
-                    <input
-                      type="text"
-                      placeholder="Patronymic"
-                      value={newUser.patronymic}
-                      onChange={(e) => setNewUser({...newUser, patronymic: e.target.value})}
-                      className="border rounded px-3 py-2"
-                      required
-                    />
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      value={newUser.email}
-                      onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-                      className="border rounded px-3 py-2"
-                      required
-                    />
-                    <input
-                      type="tel"
-                      placeholder="Phone"
-                      value={newUser.phone}
-                      onChange={(e) => setNewUser({...newUser, phone: e.target.value})}
-                      className="border rounded px-3 py-2"
-                      required
-                    />
-                    <input
-                      type="password"
-                      placeholder="Password"
-                      value={newUser.password}
-                      onChange={(e) => setNewUser({...newUser, password: e.target.value})}
-                      className="border rounded px-3 py-2"
-                      required
-                    />
-                    <select
-                      value={newUser.role}
-                      onChange={(e) => setNewUser({...newUser, role: e.target.value as 'ADMIN' | 'CM'})}
-                      className="border rounded px-3 py-2"
-                    >
-                      <option value="CM">Content Manager</option>
-                      <option value="ADMIN">Admin</option>
-                    </select>
+          {/* Content Area */}
+          <div className="bg-white shadow rounded-lg">
+            <div className="px-4 py-5 sm:p-6">
+              
+              {/* Content Managers Tab */}
+              {ui.activeTab === 'managers' && (
+                <div>
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-lg font-medium text-gray-900">Контент-менеджеры</h2>
                     <button
-                      type="submit"
-                      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                      onClick={() => setShowForm(true)}
+                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                     >
-                      Create User
+                      Добавить менеджера
                     </button>
-                  </form>
-                </div>
-
-                <div className="bg-white shadow rounded-lg">
-                  <div className="px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-medium text-gray-900">Users</h3>
                   </div>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Name
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+
+                  {/* Content Manager Form */}
+                  {ui.showForm && (
+                    <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                      <h3 className="text-lg font-medium text-gray-900 mb-4">
+                        {ui.editMode ? 'Редактировать менеджера' : 'Создать нового менеджера'}
+                      </h3>
+                      <form onSubmit={handleCreateContentManager} className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Имя пользователя
+                          </label>
+                          <input
+                            type="text"
+                            value={contentManagerForm.username || ''}
+                            onChange={(e) => setContentManagerForm({ username: e.target.value })}
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
                             Email
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Role
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {users.map((user) => (
-                          <tr key={user.id}>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-medium text-gray-900">
-                                {user.name} {user.surname}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {user.email}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                user.role === 'ADMIN' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                              }`}>
-                                {user.role}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                              <button
-                                onClick={() => handleDeleteUser(user.id)}
-                                className="text-red-600 hover:text-red-900"
-                              >
-                                Delete
-                              </button>
-                            </td>
+                          </label>
+                          <input
+                            type="email"
+                            value={contentManagerForm.email || ''}
+                            onChange={(e) => setContentManagerForm({ email: e.target.value })}
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Пароль
+                          </label>
+                          <input
+                            type="password"
+                            value={contentManagerForm.password || ''}
+                            onChange={(e) => setContentManagerForm({ password: e.target.value })}
+                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                            required={!ui.editMode}
+                          />
+                        </div>
+                        <div className="flex space-x-4">
+                          <button
+                            type="submit"
+                            disabled={loading.saving}
+                            className="bg-blue-500 hover:bg-blue-700 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded"
+                          >
+                            {loading.saving ? 'Сохранение...' : (ui.editMode ? 'Обновить' : 'Создать')}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowForm(false)}
+                            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                          >
+                            Отмена
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+
+                  {/* Content Managers List */}
+                  {loading.contentManagers ? (
+                    <div className="text-center py-4">Загрузка...</div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Пользователь
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Email
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Статус
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Создан
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Действия
+                            </th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {contentManagers.map((manager) => (
+                            <tr key={manager.id}>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm font-medium text-gray-900">
+                                  {manager.username}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-gray-900">{manager.email}</div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                  manager.isActive 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-red-100 text-red-800'
+                                }`}>
+                                  {manager.isActive ? 'Активен' : 'Неактивен'}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {new Date(manager.createdAt).toLocaleDateString()}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button
+                                  onClick={() => editContentManager(manager)}
+                                  className="text-blue-600 hover:text-blue-900 mr-4"
+                                >
+                                  Редактировать
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteContentManager(manager.id)}
+                                  className="text-red-600 hover:text-red-900"
+                                >
+                                  Удалить
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      
+                      {contentManagers.length === 0 && (
+                        <div className="text-center py-8 text-gray-500">
+                          Контент-менеджеры не найдены
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Files Tab */}
-            {activeTab === 'files' && (
-              <div>
-                <div className="bg-white shadow rounded-lg p-6 mb-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Upload File</h3>
-                  <form onSubmit={handleFileUpload} className="flex items-center space-x-4">
-                    <input
-                      type="file"
-                      onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                      className="border rounded px-3 py-2"
-                      required
-                    />
-                    <button
-                      type="submit"
-                      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                    >
-                      Upload
-                    </button>
-                  </form>
+              {/* Other tabs can be implemented similarly */}
+              {ui.activeTab !== 'managers' && (
+                <div className="text-center py-8 text-gray-500">
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    {ui.activeTab === 'flats' && 'Управление квартирами'}
+                    {ui.activeTab === 'homes' && 'Управление домами'}
+                    {ui.activeTab === 'photos' && 'Управление фотографиями'}
+                  </h3>
+                  <p>Эта функция будет доступна в следующих версиях.</p>
+                  <p className="text-sm mt-2">
+                    Используйте панель контент-менеджера для управления содержимым.
+                  </p>
                 </div>
+              )}
 
-                <div className="bg-white shadow rounded-lg">
-                  <div className="px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-medium text-gray-900">Files in {currentDirectory}</h3>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Name
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Size
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Type
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {files.map((file) => (
-                          <tr key={file.id}>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                              {file.name}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {(file.size / 1024).toFixed(2)} KB
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {file.type}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                              <button
-                                onClick={() => handleDeleteFile()}
-                                className="text-red-600 hover:text-red-900"
-                              >
-                                Delete
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+              {/* Error Display */}
+              {Object.keys(errors).length > 0 && (
+                <div className="mt-4 p-4 bg-red-50 rounded-lg">
+                  <h4 className="text-red-800 font-medium">Ошибки:</h4>
+                  <ul className="text-red-700 text-sm mt-2">
+                    {Object.entries(errors).map(([key, error]) => (
+                      error && <li key={key}>{key}: {error}</li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
-            )}
-
-            {/* Directories Tab */}
-            {activeTab === 'directories' && (
-              <div>
-                <div className="bg-white shadow rounded-lg p-6 mb-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Create Directory</h3>
-                  <form onSubmit={handleCreateDirectory} className="flex items-center space-x-4">
-                    <input
-                      type="text"
-                      placeholder="Directory name"
-                      value={newDirectory.name}
-                      onChange={(e) => setNewDirectory({name: e.target.value})}
-                      className="border rounded px-3 py-2"
-                      required
-                    />
-                    <button
-                      type="submit"
-                      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                    >
-                      Create
-                    </button>
-                  </form>
-                </div>
-
-                <div className="bg-white shadow rounded-lg">
-                  <div className="px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-medium text-gray-900">Directories</h3>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Name
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Path
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {directories.map((dir) => (
-                          <tr key={dir.id}>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                              {dir.name}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {dir.path}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                              <button
-                                onClick={() => handleDeleteDirectory()}
-                                className="text-red-600 hover:text-red-900"
-                              >
-                                Delete
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      </main>
     </div>
   );
 };
