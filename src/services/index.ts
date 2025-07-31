@@ -12,21 +12,11 @@ export * from './apiService';
 
 // Re-export types for convenience
 export type {
-  AuthService,
-  AdminService,
-  ContentService,
-  PublicService,
-} from './auth.service';
-
-export type {
   LoginRequest,
   RegisterRequest,
   AuthResponse,
   Admin,
   ContentManager,
-} from './api.types';
-
-export type {
   Flat,
   Home,
   Category,
@@ -34,9 +24,6 @@ export type {
   Photo,
   Footer,
   PaginationParams,
-} from './api.types';
-
-export type {
   SearchRequest,
   PaginatedResponse,
 } from './api.types';
