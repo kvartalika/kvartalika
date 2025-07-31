@@ -34,23 +34,6 @@ export interface Complex {
   apartments: Apartment[];
 }
 
-export interface ContactInfo {
-  id: number;
-  phone: string;
-  email: string;
-  footerDescription: string;
-  title: string;
-  address: string;
-  description: string;
-  published: boolean;
-}
-
-export interface SocialMedia {
-  id: number;
-  image: string;
-  link: string;
-}
-
 export interface MainPageContent {
   id: number;
   heroTitle: string;
@@ -84,16 +67,16 @@ export interface FormData {
   description: string;
   latitude: number;
   longitude: number;
-  
+
   numberOfRooms?: number;
   numberOfBathrooms?: number;
   floor?: number;
   price?: number;
   area?: number;
-  
+
   yearBuilt?: number;
   numberOfFloors?: number;
-  
+
   images?: string[];
   features?: string[];
   hasDecoration?: boolean;

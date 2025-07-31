@@ -1,16 +1,17 @@
 import {useState, useEffect} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
-import {useAppStore} from '../store/useAppStore';
 import {useAuthStore} from '../store/useAuthStore';
 import Logo from './Logo';
+import {useUIStore} from "../store/ui.store.ts";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const {setShowBookingModal, setSelectedApartment} = useAppStore();
   const {user, isAuthenticated, logout} = useAuthStore();
+
+  const openModal = useUIStore(state => state.openModal);
 
   const handleAboutClick = () => {
     if (location.pathname === '/') {
@@ -109,14 +110,12 @@ const Header = () => {
             <button
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
               onClick={() => {
-                setSelectedApartment(null);
-                setShowBookingModal(true);
+                openModal('bid');
               }}
             >
-              Записаться на просмотр
+              Записаться на осмотр
             </button>
-            
-            {/* Authentication Buttons */}
+
             {isAuthenticated && (
               <div className="flex items-center space-x-4">
                 <span className={`text-sm ${
@@ -216,15 +215,13 @@ const Header = () => {
                 <button
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full"
                   onClick={() => {
-                    setSelectedApartment(null);
-                    setShowBookingModal(true);
+                    openModal('bid');
                     setIsMobileMenuOpen(false);
                   }}
                 >
-                  Записаться на просмотр
+                  Записаться на осмотр
                 </button>
-                
-                {/* Mobile Authentication */}
+
                 {isAuthenticated && (
                   <div className="mt-4 space-y-2">
                     <div className="text-sm text-gray-600 px-4 py-2">

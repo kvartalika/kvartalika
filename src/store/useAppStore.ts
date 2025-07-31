@@ -47,7 +47,7 @@ export interface SearchFilters {
   rooms?: number[];
   bathrooms?: number[];
   finishing?: string[];
-  complex?: string;
+  category?: string;
   hasParks?: boolean;
   hasSchools?: boolean;
   hasShops?: boolean;

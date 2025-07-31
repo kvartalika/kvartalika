@@ -1,142 +1,152 @@
-import { useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { useAppStore } from '../store/useAppStore';
+import {useEffect, useMemo} from 'react';
+import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import ApartmentCard from '../components/ApartmentCard';
 import SearchBar from '../components/SearchBar';
-import type { Apartment } from '../store/useAppStore';
-import type { SearchFilters } from '../store/useAppStore';
+import {type SearchFilters, useSearchStore} from "../store/search.store.ts";
+import {useUIStore} from "../store/ui.store.ts";
 
 const ApartmentsPage = () => {
-  const { filteredApartments, setSelectedApartment, setShowBookingModal, setSearchFilters } = useAppStore();
   const [searchParams] = useSearchParams();
-  
-  // Scroll to top on page load
+  const navigate = useNavigate();
+
+  const openModal = useUIStore(state => state.openModal);
+
+  const {
+    filters,
+    searchResultsFlats,
+    isSearching,
+    currentPage,
+    totalPages,
+    totalResults,
+    limit,
+    searchError,
+    performSearch,
+    setFilters,
+    setPage,
+    setLimit,
+    resetFilters,
+  } = useSearchStore();
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Apply URL parameters to search filters
   useEffect(() => {
-    // Reset filters first to avoid conflicts
-    const baseFilters = {
-      query: '',
-      rooms: [],
-      bathrooms: [],
-      finishing: [],
-      minPrice: undefined,
-      maxPrice: undefined,
-      complex: '',
-      hasParks: undefined,
-      hasSchools: undefined,
-      hasShops: undefined,
-      sortBy: 'price' as const,
-      sortOrder: 'asc' as const
-    };
-    
-    // If there are no URL parameters, just reset to base filters and return
-    if (searchParams.toString() === '') {
-      setSearchFilters(baseFilters);
-      return;
-    }
-    
-    const urlFilters: Partial<SearchFilters> = { ...baseFilters };
-    
-    // Handle rooms filter
-    const roomsParam = searchParams.get('rooms');
-    if (roomsParam) {
-      const roomsArray = roomsParam.split(',').map(r => parseInt(r.trim())).filter(r => !isNaN(r));
-      if (roomsArray.length > 0) {
-        urlFilters.rooms = roomsArray;
-      }
-    }
-    
-    // Handle complex filter
-    const complexParam = searchParams.get('complex');
-    if (complexParam) {
-      urlFilters.complex = decodeURIComponent(complexParam);
-    }
-    
-    // Handle finishing filter
-    const finishingParam = searchParams.get('finishing');
-    if (finishingParam) {
-      const finishingArray = finishingParam.split(',').map(f => decodeURIComponent(f.trim()));
-      urlFilters.finishing = finishingArray;
-    }
-    
-    // Handle price filters
-    const minPriceParam = searchParams.get('minPrice');
-    const maxPriceParam = searchParams.get('maxPrice');
-    if (minPriceParam) {
-      const minPrice = parseInt(minPriceParam);
-      if (!isNaN(minPrice)) {
-        urlFilters.minPrice = minPrice;
-      }
-    }
-    if (maxPriceParam) {
-      const maxPrice = parseInt(maxPriceParam);
-      if (!isNaN(maxPrice)) {
-        urlFilters.maxPrice = maxPrice;
-      }
-    }
-    
-    // Apply the URL-based filters
-    setSearchFilters(urlFilters);
-  }, [searchParams, setSearchFilters]);
+    const raw = Object.fromEntries([...searchParams]);
 
-  const handleBookingClick = (apartment: Apartment) => {
-    setSelectedApartment(apartment);
-    setShowBookingModal(true);
-  };
+    const parsed: Partial<SearchFilters> = {};
+
+    if (raw.query) {
+      parsed.query = String(raw.query);
+    }
+
+    if (raw.minPrice) {
+      const v = parseInt(String(raw.minPrice), 10);
+      if (!isNaN(v)) parsed.minPrice = v;
+    }
+    if (raw.maxPrice) {
+      const v = parseInt(String(raw.maxPrice), 10);
+      if (!isNaN(v)) parsed.maxPrice = v;
+    }
+
+    if (raw.rooms) {
+      const v = parseInt(String(raw.rooms), 10);
+      if (!isNaN(v)) parsed.rooms = v;
+    }
+
+    if (raw.bathrooms) {
+      const v = parseInt(String(raw.bathrooms), 10);
+      if (!isNaN(v)) parsed.bathrooms = v;
+    }
+
+    if (raw.isDecorated !== undefined) {
+      parsed.isDecorated = String(raw.isDecorated).toLowerCase() === 'true';
+    }
+
+    if (raw.homeId) {
+      const v = parseInt(String(raw.homeId), 10);
+      if (!isNaN(v)) parsed.homeId = v;
+    }
+
+    if (raw.hasParks !== undefined) {
+      parsed.hasParks = String(raw.hasParks).toLowerCase() === 'true';
+    }
+    if (raw.hasSchools !== undefined) {
+      parsed.hasSchools = String(raw.hasSchools).toLowerCase() === 'true';
+    }
+    if (raw.hasShops !== undefined) {
+      parsed.hasShops = String(raw.hasShops).toLowerCase() === 'true';
+    }
+
+    const categoriesParam = searchParams.get('categoriesId') || searchParams.get('category');
+    if (categoriesParam) {
+      const arr = categoriesParam
+        .split(',')
+        .map(s => parseInt(s.trim(), 10))
+        .filter(n => !isNaN(n));
+      if (arr.length) parsed.categoriesId = arr;
+    }
+
+    const sortBy = searchParams.get('sortBy');
+    if (sortBy && ['price', 'rooms', 'area', 'location'].includes(sortBy)) {
+      parsed.sortBy = sortBy as SearchFilters['sortBy'];
+    }
+    const sortOrder = searchParams.get('sortOrder');
+    if (sortOrder && ['asc', 'desc'].includes(sortOrder)) {
+      parsed.sortOrder = sortOrder as SearchFilters['sortOrder'];
+    }
+
+    setFilters(parsed);
+  }, [performSearch, searchParams, setFilters]);
+
+  const pagedFlats = useMemo(() => {
+    const start = (currentPage - 1) * limit;
+    return searchResultsFlats.slice(start, start + limit);
+  }, [searchResultsFlats, currentPage, limit]);
 
   const getPageTitle = () => {
-    const hot = searchParams.get('hot');
-    const rooms = searchParams.get('rooms');
-    const complex = searchParams.get('complex');
-    
-    if (hot === 'true') {
-      return '🔥 Горячие предложения';
+    if (filters.categoriesId && filters.categoriesId.length === 1) {
+      return `Квартиры категории ${filters.categoriesId[0]}`;
     }
-    if (rooms) {
-      return `${rooms}-комнатные квартиры`;
+    if (filters.rooms) {
+      return `${filters.rooms}-комнатные квартиры`;
     }
-    if (complex) {
-      return `Квартиры в ${decodeURIComponent(complex)}`;
+    if (filters.homeId) {
+      return `Квартиры в комплексе ${filters.homeId}`;
     }
     return 'Все квартиры';
   };
 
   const getPageDescription = () => {
-    const hot = searchParams.get('hot');
-    const rooms = searchParams.get('rooms');
-    const complex = searchParams.get('complex');
-    
-    if (hot === 'true') {
-      return 'Лучшие квартиры по специальным ценам с ограниченным предложением';
+    if (filters.categoriesId && filters.categoriesId.length === 1) {
+      return `Подборка квартир из категории ${filters.categoriesId[0]}`;
     }
-    if (rooms) {
-      return `Подберите идеальную ${rooms}-комнатную квартиру из нашего каталога`;
+    if (filters.rooms) {
+      return `Подберите идеальную ${filters.rooms}-комнатную квартиру`;
     }
-    if (complex) {
-      return `Большой выбор квартир в жилом комплексе ${decodeURIComponent(complex)}`;
+    if (filters.homeId) {
+      return `Большой выбор квартир в выбранном комплексе`;
     }
     return 'Большой выбор квартир в лучших жилых комплексах города';
   };
 
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleLimitChange = (newLimit: number) => {
+    setLimit(newLimit);
+  };
   return (
     <div className="min-h-screen pt-20">
-      {/* Page Header */}
+
       <section className="bg-gradient-to-r from-blue-600 to-blue-800 py-16">
         <div className="container mx-auto px-4">
           <div className="text-center text-white mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              {getPageTitle()}
-            </h1>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-              {getPageDescription()}
-            </p>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{getPageTitle()}</h1>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto">{getPageDescription()}</p>
           </div>
-          
-          {/* Search Bar */}
+
           <div className="max-w-4xl mx-auto">
             <SearchBar />
           </div>
@@ -144,10 +154,12 @@ const ApartmentsPage = () => {
       </section>
 
       <div className="container mx-auto px-4 py-12">
-        {/* Breadcrumbs */}
         <nav className="mb-8">
           <div className="flex items-center text-sm text-gray-600">
-            <Link to="/" className="text-blue-600 hover:text-blue-700">
+            <Link
+              to="/"
+              className="text-blue-600 hover:text-blue-700"
+            >
               Главная
             </Link>
             <span className="mx-2">›</span>
@@ -155,31 +167,60 @@ const ApartmentsPage = () => {
           </div>
         </nav>
 
-        {/* Results Info */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
             <p className="text-gray-600">
-              Найдено квартир: <span className="font-semibold text-gray-900">{filteredApartments.length}</span>
+              Найдено квартир:{' '}
+              <span className="font-semibold text-gray-900">{totalResults}</span>
             </p>
+          </div>
+          <div className="flex gap-4">
+            <div>
+              <label className="text-sm text-gray-500 mr-2">На странице:</label>
+              <select
+                value={limit}
+                onChange={(e) => handleLimitChange(Number(e.target.value))}
+                className="rounded border px-2 py-1"
+              >
+                {[10, 20, 50].map(n => (
+                  <option
+                    key={n}
+                    value={n}
+                  >{n}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <span className="text-sm text-gray-500">
+                Страница {currentPage} из {totalPages}
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Apartments Grid */}
-        {filteredApartments.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredApartments.map(apartment => (
-              <ApartmentCard
-                key={apartment.id}
-                apartment={apartment}
-                onBookingClick={() => handleBookingClick(apartment)}
-              />
-            ))}
-          </div>
-        ) : (
+        {isSearching && (
+          <div className="mb-6 text-gray-500 font-medium">Загрузка квартир...</div>
+        )}
+
+        {searchError && (
+          <div className="mb-6 text-red-600 font-medium">{searchError}</div>
+        )}
+
+        {!isSearching && searchResultsFlats.length === 0 && !searchError && (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              <svg
+                className="w-12 h-12 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                />
               </svg>
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -187,14 +228,53 @@ const ApartmentsPage = () => {
             </h3>
             <p className="text-gray-600 mb-6">
               Попробуйте изменить параметры поиска или{' '}
-              <Link to="/apartments" className="text-blue-600 hover:text-blue-700 font-medium">
+              <button
+                onClick={() => {
+                  resetFilters();
+                  navigate('/apartments');
+                }}
+                className="text-blue-600 hover:text-blue-700 font-medium"
+              >
                 посмотреть все квартиры
-              </Link>
+              </button>
             </p>
           </div>
         )}
 
-        {/* Additional Info Section */}
+        {pagedFlats.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {pagedFlats.map((apartment) => (
+              <ApartmentCard
+                key={apartment.id}
+                apartment={apartment}
+                onBookingClick={() => openModal('bid')}
+              />
+            ))}
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4 mt-8">
+            <button
+              disabled={currentPage === 1 || isSearching}
+              onClick={() => handlePageChange(currentPage - 1)}
+              className="px-4 py-2 bg-gray-100 rounded disabled:opacity-50"
+            >
+              Назад
+            </button>
+            <span>
+              {currentPage} / {totalPages}
+            </span>
+            <button
+              disabled={currentPage === totalPages || isSearching}
+              onClick={() => handlePageChange(currentPage + 1)}
+              className="px-4 py-2 bg-gray-100 rounded disabled:opacity-50"
+            >
+              Вперед
+            </button>
+          </div>
+        )}
+
         <section className="mt-16 bg-blue-600 rounded-2xl p-8">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl font-bold text-white mb-4">
@@ -204,7 +284,7 @@ const ApartmentsPage = () => {
               Наши специалисты помогут подобрать идеальный вариант под ваши требования и бюджет
             </p>
             <button
-              onClick={() => setShowBookingModal(true)}
+              onClick={() => openModal('bid')}
               className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-medium transition-colors"
             >
               Получить персональную подборку

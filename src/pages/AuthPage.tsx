@@ -1,19 +1,26 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/useAuthStore';
+import {useState, useEffect, type FormEvent} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useAuthStore, type UserRole} from "../store/auth.store.ts";
+import type {LoginRequest} from "../api";
 
 const AuthPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
 
-  const { login, user, isAuthenticated, isLoading: authLoading } = useAuthStore();
+  const [currentRole, setCurrentRole] = useState<UserRole>('ADMIN');
+
+  const {
+    loginAsAdmin,
+    loginAsContentManager,
+    user,
+    isAuthenticated,
+    isLoading: authLoading,
+    error,
+  } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      // Redirect based on role
       if (user.role === 'ADMIN') {
         navigate('/admin');
       } else {
@@ -22,17 +29,19 @@ const AuthPage = () => {
     }
   }, [isAuthenticated, user, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError('');
+
+    const req: LoginRequest = {email, password};
 
     try {
-      await login(email, password);
+      if (currentRole === 'ADMIN') {
+        await loginAsAdmin(req);
+      } else if (currentRole === 'CONTENT_MANAGER') {
+        await loginAsContentManager(req);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
-    } finally {
-      setIsLoading(false);
+      console.log(err);
     }
   };
 
@@ -55,10 +64,54 @@ const AuthPage = () => {
             Введите ваши учетные данные
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form
+          className="mt-8 space-y-6"
+          onSubmit={handleSubmit}
+        >
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">Роль</label>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={currentRole === 'ADMIN'}
+                onChange={() => {
+                  setCurrentRole(currentRole === 'ADMIN' ? 'CONTENT_MANAGER' : 'ADMIN');
+                }}
+                className="w-4 h-4"
+                id="admin-checkbox"
+              />
+              <label
+                htmlFor="admin-checkbox"
+                className="ml-2 text-sm"
+              >
+                Админ
+              </label>
+            </div>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={currentRole === 'CONTENT_MANAGER'}
+                onChange={() => {
+                  setCurrentRole(currentRole === 'CONTENT_MANAGER' ? 'ADMIN' : 'CONTENT_MANAGER');
+                }}
+                className="w-4 h-4"
+                id="cm-checkbox"
+              />
+              <label
+                htmlFor='cm-checkbox'
+                className="ml-2 text-sm"
+              >
+                Контент Менеджер
+              </label>
+            </div>
+          </div>
+
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="email" className="sr-only">
+              <label
+                htmlFor="email"
+                className="sr-only"
+              >
                 Email
               </label>
               <input
@@ -74,7 +127,10 @@ const AuthPage = () => {
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">
+              <label
+                htmlFor="password"
+                className="sr-only"
+              >
                 Пароль
               </label>
               <input
@@ -100,10 +156,10 @@ const AuthPage = () => {
           <div>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={authLoading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? (
+              {authLoading ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
               ) : (
                 'Войти'

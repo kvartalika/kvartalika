@@ -1,16 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type {UserRole} from "./auth.store.ts";
 
 export interface User {
-  id: number;
   name: string;
   surname: string;
   patronymic: string;
   email: string;
   phone: string;
-  role: 'ADMIN' | 'CM';
-  createdAt: string;
-  updatedAt: string;
+  role: UserRole;
 }
 
 export interface AuthState {

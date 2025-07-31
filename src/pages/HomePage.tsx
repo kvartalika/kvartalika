@@ -1,97 +1,71 @@
 import {Link} from 'react-router-dom';
-import {useEffect, useState} from 'react';
-import {
-  type Apartment,
-  type HomepageSection,
-  useAppStore
-} from '../store/useAppStore';
-import {useAuthStore} from '../store/useAuthStore';
+import {useEffect} from 'react';
 import SearchBar from '../components/SearchBar';
 import ApartmentCard from '../components/ApartmentCard';
 import BackgroundPattern from "../components/BackgroundPattern.tsx";
 import HomePageManager from '../components/HomePageManager';
 
+import {useUIStore} from "../store/ui.store.ts";
+import {useAuthStore} from "../store/auth.store.ts";
+import {usePropertiesStore} from "../store/properties.store.ts";
+import type {HomePageFlats} from "../services";
+import PageLoader from "../components/PageLoader.tsx";
+
 const HomePage = () => {
-  const {
-    filteredApartments,
-    homepageSections,
-    setSelectedApartment,
-    setShowBookingModal,
-    setSearchFilters
-  } = useAppStore();
-  const {user, isAuthenticated} = useAuthStore();
-  const [showHomePageManager, setShowHomePageManager] = useState(false);
+  const user = useAuthStore(state => state.user);
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
+  const pageInfo = useUIStore(state => state.pageInfo);
+
+  const openModal = useUIStore(state => state.openModal);
+  const modals = useUIStore(state => state.modals);
+  const closeModal = useUIStore(state => state.closeModal);
+
+  const fetchCategories = usePropertiesStore(state => state.fetchCategories);
+  const categories = usePropertiesStore(state => state.categories);
+
+  const homePageFlats = usePropertiesStore(state => state.homePageFlats);
+  const fetchHomePageFlats = usePropertiesStore(state => state.fetchHomePageFlats);
+  const isLoadingHomePageFlats = usePropertiesStore(state => state.isLoadingHomePageFlats);
 
   useEffect(() => {
-    setSearchFilters({
-      query: '',
-      rooms: [],
-      bathrooms: [],
-      finishing: [],
-      minPrice: undefined,
-      maxPrice: undefined,
-      complex: '',
-      hasParks: undefined,
-      hasSchools: undefined,
-      hasShops: undefined,
-      sortBy: 'price',
-      sortOrder: 'asc'
-    });
-  }, [setSearchFilters]);
+    const loadHomePageFlats = async () => {
+      await fetchCategories();
 
-  const handleBookingClick = (apartment: Apartment) => {
-    setSelectedApartment(apartment);
-    setShowBookingModal(true);
-  };
+      const homePageCategories = categories.filter(c => c.isOnMainPage);
 
-  const getApartmentsForSection = (section: HomepageSection): Apartment[] => {
-    let apartments: Apartment[] = [];
+      await fetchHomePageFlats(homePageCategories);
 
-    if (section.type === 'hot_deals') {
-      apartments = filteredApartments.filter(apt => apt.isHot);
-    } else if (section.type === 'rooms' && section.rooms) {
-      apartments = filteredApartments.filter(apt => apt.rooms === section.rooms);
-    } else if (section.type === 'custom' && section.customFilter) {
-      apartments = section.customFilter(filteredApartments);
-    }
+    };
 
-    return apartments.slice(0, 5);
-  };
+    loadHomePageFlats();
+  }, [fetchCategories, categories, fetchHomePageFlats]);
 
-  const renderSection = (section: HomepageSection, apartments: Apartment[]) => {
-    if (!section.isVisible || apartments.length === 0) return null;
-
+  const renderSection = (section: HomePageFlats, idx: number) => {
     return (
       <section
-        key={section.id}
-        className={`py-16 ${section.backgroundColor === 'gray' ? 'bg-gray-50' : 'bg-white'}`}
+        key={section.category.id}
+        className={`py-16 ${idx % 2 === 1 ? 'bg-gray-50' : 'bg-white'}`}
       >
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-12">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">{section.title}</h2>
-              <p className="text-gray-600">{section.description}</p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">{section.category.name}</h2>
             </div>
-            {section.linkText && section.linkUrl && (
-              <Link
-                to={section.linkUrl}
-                className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                  section.type === 'hot_deals'
-                    ? 'bg-red-600 hover:bg-red-700 text-white'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white'
-                }`}
-              >
-                {section.linkText}
-              </Link>
-            )}
+            <Link
+              to={`/apartments?categoriesId=${section.category.id}`}
+              className={`px-6 py-3 rounded-lg font-medium transition-colors bg-blue-600 hover:bg-blue-700 text-white`}
+            >
+              Посмотреть все
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            {apartments.map(apartment => (
+            {section.flats.map(apartment => (
               <ApartmentCard
                 key={apartment.id}
                 apartment={apartment}
-                onBookingClick={() => handleBookingClick(apartment)}
+                onBookingClick={() => openModal('bid')}
               />
             ))}
           </div>
@@ -106,11 +80,10 @@ const HomePage = () => {
         <BackgroundPattern />
         <div className="container mx-auto px-4 text-center text-white relative z-10">
           <h1 className="heading-xl mb-6">
-            Найдите квартиру<br />
-            <span className="text-blue-200">своей мечты</span>
+            {pageInfo.title}
           </h1>
           <p className="text-xl md:text-2xl mb-12 text-blue-100 max-w-3xl mx-auto">
-            Современные жилые комплексы с лучшими условиями для комфортной жизни
+            {pageInfo.description}
           </p>
 
           <div className="max-w-4xl mx-auto">
@@ -153,11 +126,10 @@ const HomePage = () => {
           </svg>
         </div>
 
-        {/* Content Manager Edit Button */}
-        {isAuthenticated && user?.role === 'CM' && (
+        {isAuthenticated && user?.role === 'CONTENT_MANAGER' && (
           <div className="absolute top-32 right-8 z-50">
             <button
-              onClick={() => setShowHomePageManager(true)}
+              onClick={() => openModal('manager')}
               className="bg-white bg-opacity-20 backdrop-blur-sm text-black px-4 py-2 rounded-lg font-medium hover:bg-opacity-30 transition-all"
             >
               ✏️ Редактировать главную
@@ -166,13 +138,8 @@ const HomePage = () => {
         )}
       </section>
 
-      {homepageSections
-        .filter(section => section.isVisible)
-        .sort((a, b) => a.order - b.order)
-        .map(section => {
-          const apartments = getApartmentsForSection(section);
-          return renderSection(section, apartments);
-        })}
+      {isLoadingHomePageFlats ?
+        <PageLoader /> : homePageFlats.map((section, idx) => renderSection(section, idx))}
 
       <section
         id="about"
@@ -261,7 +228,7 @@ const HomePage = () => {
             Оставьте заявку и наш менеджер подберет лучшие варианты специально для вас
           </p>
           <button
-            onClick={() => setShowBookingModal(true)}
+            onClick={() => openModal('bid')}
             className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors"
           >
             Оставить заявку
@@ -269,16 +236,13 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Home Page Manager Modal */}
-      {showHomePageManager && (
+      {modals.manager && (
         <HomePageManager
           onSave={() => {
-            // Update the home page data
-            setShowHomePageManager(false);
-            // Reload the page or update the data
+            closeModal('manager');
             window.location.reload();
           }}
-          onCancel={() => setShowHomePageManager(false)}
+          onCancel={() => closeModal('manager')}
         />
       )}
     </div>

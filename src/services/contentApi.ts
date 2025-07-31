@@ -1,4 +1,4 @@
-
+import apiClient from "./api.config.ts";
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('auth-storage') ? 
@@ -11,18 +11,9 @@ const getAuthHeaders = () => {
 };
 
 export const contentApi = {
-  // Get all apartments
   getApartments: async () => {
-    try {
-      const response = await fetch('/api/content/apartments');
-      if (!response.ok) {
-        throw new Error('Failed to fetch apartments');
-      }
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching apartments:', error);
-      throw error;
-    }
+    const res = await apiClient.get('/api/content/apartments');
+    return res.data;
   },
 
   // Get apartment by ID

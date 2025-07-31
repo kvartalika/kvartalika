@@ -2,7 +2,6 @@ const PageLoader = () => {
   return (
     <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
       <div className="text-center">
-        {/* Logo */}
         <div className="mb-8">
           <div className="w-16 h-16 mx-auto bg-blue-600 rounded-xl flex items-center justify-center mb-4">
             <svg
@@ -29,7 +28,6 @@ const PageLoader = () => {
           <p className="text-gray-600">Загружаем для вас лучшие предложения</p>
         </div>
 
-        {/* Loading Animation */}
         <div className="flex justify-center space-x-1">
           <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
           <div

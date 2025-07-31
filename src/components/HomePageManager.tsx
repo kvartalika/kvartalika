@@ -1,59 +1,30 @@
 import { useState, useEffect } from 'react';
-import { useAuthStore } from '../store/useAuthStore';
 import ContactForm from './forms/ContactForm';
 import SocialMediaForm from './forms/SocialMediaForm';
-
-interface ContactInfo {
-  id: number;
-  phone: string;
-  email: string;
-  footerDescription: string;
-  title: string;
-  address: string;
-  description: string;
-  published: boolean;
-}
-
-interface SocialMedia {
-  id: number;
-  image: string;
-  link: string;
-}
+import {useAuthStore} from "../store/auth.store.ts";
+import {useUIStore} from "../store/ui.store.ts";
 
 interface HomePageManagerProps {
-  onSave: (contactData: ContactInfo, socialMediaData: SocialMedia[]) => void;
+  onSave: () => void;
   onCancel: () => void;
-  initialContactData?: ContactInfo;
-  initialSocialMediaData?: SocialMedia[];
 }
 
 const HomePageManager = ({ 
   onSave, 
-  onCancel, 
-  initialContactData, 
-  initialSocialMediaData 
+  onCancel,
 }: HomePageManagerProps) => {
-  const { user, isAuthenticated } = useAuthStore();
-  const [contactData, setContactData] = useState<ContactInfo>(initialContactData || {
-    id: 1,
-    phone: '',
-    email: '',
-    footerDescription: '',
-    title: '',
-    address: '',
-    description: '',
-    published: true
-  });
-  const [socialMedia, setSocialMedia] = useState<SocialMedia[]>(initialSocialMediaData || []);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const { role, isAuthenticated } = useAuthStore();
+
+  const pageInfo = useUIStore(state => state.pageInfo);
+  const updatePageInfo = useUIStore(state => state.updatePageInfo);
+
+  const socialMediaList = useUIStore(state => state.socialMediaList);
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== 'CM') {
       return;
     }
 
-    // Load initial data if not provided
     const loadInitialData = async () => {
       if (!initialContactData) {
         try {

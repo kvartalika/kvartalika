@@ -1,77 +1,69 @@
-import {type FormEvent, useState} from 'react';
-import {useAppStore} from '../store/useAppStore';
-import {createBooking} from '../services/apiService';
+import {type FormEvent} from 'react';
+import {useUIStore} from "../store/ui.store.ts";
 
 const BookingModal = () => {
-  const {
-    bookingForm,
-    setBookingForm,
-    setShowBookingModal,
-    resetBookingForm,
-    selectedApartment,
-    selectedComplex
-  } = useAppStore();
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const setBidForm = useUIStore(state => state.setBidForm);
+  const bidForm = useUIStore(state => state.bidForm);
+  const closeModal = useUIStore(state => state.closeModal);
+  const resetBidForm = useUIStore(state => state.resetBidForm);
+  const submitBid = useUIStore(state => state.submitBid);
+  const loading = useUIStore(state => state.loading);
+  const notifications = useUIStore(state => state.notifications);
 
   const handleClose = () => {
-    setShowBookingModal(false);
-    resetBookingForm();
-    setIsSuccess(false);
+    closeModal('bid');
+    resetBidForm();
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      const result = await createBooking({
-        ...bookingForm,
-        apartmentId: selectedApartment?.id,
-        complexId: selectedComplex?.id,
-      });
-
-      if (result.success) {
-        setIsSuccess(true);
-      }
-
-      setTimeout(() => {
-        handleClose();
-      }, 2000);
-    } catch (error) {
-      console.error('Error submitting booking:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await submitBid();
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setBookingForm({[field]: value});
+    setBidForm({[field]: value});
   };
 
-  if (isSuccess) {
+  if (notifications.length > 0) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="w-8 h-8 text-green-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">Заявка отправлена!</h3>
+          {notifications[0].type === 'success'
+            ?
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                className="w-8 h-8 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            :
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                className="w-8 h-8 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </div>}
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">{notifications[0].title}</h3>
           <p className="text-gray-600">
-            Спасибо за вашу заявку. Наш менеджер свяжется с вами в ближайшее время.
+            {notifications[0].message}
           </p>
         </div>
       </div>
@@ -83,7 +75,7 @@ const BookingModal = () => {
       <div className="bg-white rounded-2xl p-6 max-w-sm w-full max-h-[85vh] overflow-y-auto shadow-2xl">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">
-            Записаться на просмотр
+            Записаться на осмотр
           </h2>
           <button
             onClick={handleClose}
@@ -110,43 +102,54 @@ const BookingModal = () => {
           className="space-y-4"
         >
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Ваше имя *
-            </label>
+            <input
+              type="text"
+              value={bidForm.surname}
+              onChange={(e) => handleInputChange('surname', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              placeholder="Фамилия"
+            />
+          </div>
+
+          <div>
             <input
               type="text"
               required
-              value={bookingForm.name}
+              value={bidForm.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              placeholder="Введите ваше имя"
+              placeholder="Имя*"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Телефон *
-            </label>
+            <input
+              type="text"
+              value={bidForm.patronymic}
+              onChange={(e) => handleInputChange('patronymic', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              placeholder="Отчество"
+            />
+          </div>
+
+          <div>
             <input
               type="tel"
               required
-              value={bookingForm.phone}
+              value={bidForm.phone}
               onChange={(e) => handleInputChange('phone', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              placeholder="+7 (999) 999-99-99"
+              placeholder="Номер телефона*"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
             <input
               type="email"
-              value={bookingForm.email}
+              value={bidForm.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-              placeholder="your@email.com"
+              placeholder="Электронная почта"
             />
           </div>
 
@@ -160,10 +163,10 @@ const BookingModal = () => {
             </button>
             <button
               type="submit"
-              disabled={isSubmitting || !bookingForm.name || !bookingForm.phone}
+              disabled={loading.bid || !bidForm.name || !bidForm.phone}
               className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
             >
-              {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
+              {loading.bid ? 'Отправка...' : 'Отправить заявку'}
             </button>
           </div>
         </form>
