@@ -1,206 +1,244 @@
-import { useState, useEffect } from 'react';
-import { useAuthStore } from '../store/useAuthStore';
-import ContactForm from './forms/ContactForm';
-import SocialMediaForm from './forms/SocialMediaForm';
-
-interface ContactInfo {
-  id: number;
-  phone: string;
-  email: string;
-  footerDescription: string;
-  title: string;
-  address: string;
-  description: string;
-  published: boolean;
-}
-
-interface SocialMedia {
-  id: number;
-  image: string;
-  link: string;
-}
+import { useState } from 'react';
+import {
+  useUIStore,
+  useIsAuthenticated,
+  useAuthRole,
+  type HomepageSection
+} from '../store';
 
 interface HomePageManagerProps {
-  onSave: (contactData: ContactInfo, socialMediaData: SocialMedia[]) => void;
-  onCancel: () => void;
-  initialContactData?: ContactInfo;
-  initialSocialMediaData?: SocialMedia[];
+  sections: HomepageSection[];
+  onSectionsChange: (sections: HomepageSection[]) => void;
 }
 
-const HomePageManager = ({ 
-  onSave, 
-  onCancel, 
-  initialContactData, 
-  initialSocialMediaData 
-}: HomePageManagerProps) => {
-  const { user, isAuthenticated } = useAuthStore();
-  const [contactData, setContactData] = useState<ContactInfo>(initialContactData || {
-    id: 1,
-    phone: '',
-    email: '',
-    footerDescription: '',
-    title: '',
-    address: '',
-    description: '',
-    published: true
-  });
-  const [socialMedia, setSocialMedia] = useState<SocialMedia[]>(initialSocialMediaData || []);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+const HomePageManager = ({ sections, onSectionsChange }: HomePageManagerProps) => {
+  const isAuthenticated = useIsAuthenticated();
+  const role = useAuthRole();
+  const { addNotification } = useUIStore();
+  
+  const [editingSection, setEditingSection] = useState<HomepageSection | null>(null);
 
-  useEffect(() => {
-    if (!isAuthenticated || user?.role !== 'CM') {
-      return;
-    }
-
-    // Load initial data if not provided
-    const loadInitialData = async () => {
-      if (!initialContactData) {
-        try {
-          const { mockApi } = await import('../services/mockApi');
-          const contactInfo = await mockApi.getContactInfo();
-          setContactData(contactInfo);
-        } catch (error) {
-          console.error('Failed to load contact info:', error);
-        }
-      }
-
-      if (!initialSocialMediaData) {
-        try {
-          const { mockApi } = await import('../services/mockApi');
-          const socialMediaData = await mockApi.getSocialMedia();
-          setSocialMedia(socialMediaData);
-        } catch (error) {
-          console.error('Failed to load social media:', error);
-        }
-      }
-    };
-
-    loadInitialData();
-  }, [isAuthenticated, user, initialContactData, initialSocialMediaData]);
-
-  const handleContactChange = (field: keyof ContactInfo, value: any) => {
-    setContactData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleSocialMediaChange = (index: number, field: keyof SocialMedia, value: string) => {
-    setSocialMedia(prev => prev.map((item, i) => 
-      i === index ? { ...item, [field]: value } : item
-    ));
-  };
-
-  const addSocialMedia = () => {
-    setSocialMedia(prev => [...prev, {
-      id: Date.now(),
-      image: '',
-      link: ''
-    }]);
-  };
-
-  const removeSocialMedia = (index: number) => {
-    setSocialMedia(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
-
-    try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-      
-      // Update contact info
-      await mockApi.updateContactInfo(contactData);
-      
-      // Update social media - in a real app, you'd batch these operations
-      // For now, we'll simulate updating each social media item
-      for (const socialMediaItem of socialMedia) {
-        if (socialMediaItem.id > 0) {
-          // Update existing
-          await mockApi.updateSocialMedia(socialMediaItem.id, socialMediaItem);
-        } else {
-          // Add new
-          await mockApi.addSocialMedia({
-            image: socialMediaItem.image,
-            link: socialMediaItem.link
-          });
-        }
-      }
-      
-      onSave(contactData, socialMedia);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Update failed');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (!isAuthenticated || user?.role !== 'CM') {
+  if (!isAuthenticated || (role !== 'admin' && role !== 'content_manager')) {
     return null;
   }
 
+  const handleSectionUpdate = (updatedSection: HomepageSection) => {
+    const updatedSections = sections.map(section =>
+      section.id === updatedSection.id ? updatedSection : section
+    );
+    onSectionsChange(updatedSections);
+    setEditingSection(null);
+    
+    addNotification({
+      type: 'success',
+      title: 'Секция обновлена',
+      message: 'Настройки главной страницы сохранены',
+    });
+  };
+
+  const handleToggleVisibility = (sectionId: string) => {
+    const updatedSections = sections.map(section =>
+      section.id === sectionId ? { ...section, isVisible: !section.isVisible } : section
+    );
+    onSectionsChange(updatedSections);
+  };
+
+  const handleReorder = (dragIndex: number, hoverIndex: number) => {
+    const draggedSection = sections[dragIndex];
+    const newSections = [...sections];
+    newSections.splice(dragIndex, 1);
+    newSections.splice(hoverIndex, 0, draggedSection);
+    
+    // Update order numbers
+    const reorderedSections = newSections.map((section, index) => ({
+      ...section,
+      order: index + 1
+    }));
+    
+    onSectionsChange(reorderedSections);
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">
-            Редактировать главную страницу
-          </h2>
-          <button
-            onClick={onCancel}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            ✕
-          </button>
+    <div className="bg-white rounded-lg shadow p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-gray-900">Настройка главной страницы</h2>
+      </div>
+
+      <div className="space-y-4">
+        {sections
+          .sort((a, b) => a.order - b.order)
+          .map((section, index) => (
+            <div
+              key={section.id}
+              className={`p-4 border rounded-lg ${
+                section.isVisible ? 'bg-white border-gray-200' : 'bg-gray-50 border-gray-300'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => index > 0 && handleReorder(index, index - 1)}
+                      disabled={index === 0}
+                      className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      onClick={() => index < sections.length - 1 && handleReorder(index, index + 1)}
+                      disabled={index === sections.length - 1}
+                      className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
+                    >
+                      ↓
+                    </button>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-medium text-gray-900">{section.title}</h3>
+                    <p className="text-sm text-gray-600">{section.description}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={() => setEditingSection(section)}
+                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                  >
+                    Редактировать
+                  </button>
+                  
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={section.isVisible}
+                      onChange={() => handleToggleVisibility(section.id)}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-gray-700">Показывать</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          ))}
+      </div>
+
+      {/* Edit Section Modal */}
+      {editingSection && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-lg w-full mx-4">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">
+              Редактировать секцию
+            </h3>
+            
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSectionUpdate(editingSection);
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Заголовок
+                </label>
+                <input
+                  type="text"
+                  value={editingSection.title}
+                  onChange={(e) => setEditingSection({
+                    ...editingSection,
+                    title: e.target.value
+                  })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Описание
+                </label>
+                <textarea
+                  value={editingSection.description}
+                  onChange={(e) => setEditingSection({
+                    ...editingSection,
+                    description: e.target.value
+                  })}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Цвет фона
+                </label>
+                <select
+                  value={editingSection.backgroundColor}
+                  onChange={(e) => setEditingSection({
+                    ...editingSection,
+                    backgroundColor: e.target.value as 'white' | 'gray'
+                  })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="white">Белый</option>
+                  <option value="gray">Серый</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Текст ссылки
+                </label>
+                <input
+                  type="text"
+                  value={editingSection.linkText || ''}
+                  onChange={(e) => setEditingSection({
+                    ...editingSection,
+                    linkText: e.target.value
+                  })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  URL ссылки
+                </label>
+                <input
+                  type="text"
+                  value={editingSection.linkUrl || ''}
+                  onChange={(e) => setEditingSection({
+                    ...editingSection,
+                    linkUrl: e.target.value
+                  })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setEditingSection(null)}
+                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+                >
+                  Отмена
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Сохранить
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
+      )}
 
-        {error && (
-          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Contact Information */}
-          <div className="bg-gray-50 p-6 rounded-lg">
-            <ContactForm
-              contactData={contactData}
-              onContactChange={handleContactChange}
-            />
-          </div>
-
-          {/* Social Media */}
-          <div className="bg-gray-50 p-6 rounded-lg">
-            <SocialMediaForm
-              socialMedia={socialMedia}
-              onSocialMediaChange={handleSocialMediaChange}
-              onAddSocialMedia={addSocialMedia}
-              onRemoveSocialMedia={removeSocialMedia}
-            />
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-4 pt-6 border-t">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-            >
-              Отмена
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-            >
-              {isLoading ? 'Сохранение...' : 'Сохранить изменения'}
-            </button>
-          </div>
-        </form>
+      <div className="mt-6 text-sm text-gray-600">
+        <p>
+          <strong>Подсказка:</strong> Используйте стрелки для изменения порядка секций.
+          Снимите флажок "Показывать", чтобы скрыть секцию с главной страницы.
+        </p>
       </div>
     </div>
   );

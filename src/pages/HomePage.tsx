@@ -1,286 +1,387 @@
-import {Link} from 'react-router-dom';
-import {useEffect, useState} from 'react';
+import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import {
-  type Apartment,
-  type HomepageSection,
-  useAppStore
-} from '../store/useAppStore';
-import {useAuthStore} from '../store/useAuthStore';
+  usePropertiesStore,
+  useUIStore,
+  useAuthStore,
+  useSearchStore,
+  useApartments,
+  useFeaturedHomes,
+  usePopularFlats,
+  useHomepageSections,
+  useIsAuthenticated,
+  useAuthUser,
+  useAuthRole,
+  type Apartment
+} from '../store';
 import SearchBar from '../components/SearchBar';
 import ApartmentCard from '../components/ApartmentCard';
 import BackgroundPattern from "../components/BackgroundPattern.tsx";
 import HomePageManager from '../components/HomePageManager';
 
 const HomePage = () => {
-  const {
-    filteredApartments,
-    homepageSections,
-    setSelectedApartment,
-    setShowBookingModal,
-    setSearchFilters
-  } = useAppStore();
-  const {user, isAuthenticated} = useAuthStore();
+  const apartments = useApartments();
+  const featuredHomes = useFeaturedHomes();
+  const popularFlats = usePopularFlats();
+  const homepageSections = useHomepageSections();
+  const isAuthenticated = useIsAuthenticated();
+  const user = useAuthUser();
+  const role = useAuthRole();
+  
+  const { 
+    fetchFlats, 
+    fetchHomes, 
+    fetchFeaturedContent,
+    isLoading: propertiesLoading 
+  } = usePropertiesStore();
+  
+  const { 
+    openModal, 
+    setBookingForm,
+    setHomepageSections 
+  } = useUIStore();
+  
+  const { resetFilters } = useSearchStore();
+  
   const [showHomePageManager, setShowHomePageManager] = useState(false);
 
   useEffect(() => {
-    setSearchFilters({
-      query: '',
-      rooms: [],
-      bathrooms: [],
-      finishing: [],
-      minPrice: undefined,
-      maxPrice: undefined,
-      complex: '',
-      hasParks: undefined,
-      hasSchools: undefined,
-      hasShops: undefined,
-      sortBy: 'price',
-      sortOrder: 'asc'
-    });
-  }, [setSearchFilters]);
+    // Reset search filters on homepage
+    resetFilters();
+    
+    // Load initial data
+    const loadData = async () => {
+      try {
+        await Promise.all([
+          fetchFlats(),
+          fetchHomes(),
+          fetchFeaturedContent(),
+        ]);
+      } catch (error) {
+        console.error('Failed to load homepage data:', error);
+      }
+    };
+    
+    loadData();
+  }, []);
 
   const handleBookingClick = (apartment: Apartment) => {
-    setSelectedApartment(apartment);
-    setShowBookingModal(true);
+    setBookingForm({ 
+      apartmentId: apartment.id,
+      flatId: apartment.id,
+      complexId: apartment.complexId,
+      homeId: apartment.complexId 
+    });
+    openModal('booking');
   };
 
-  const getApartmentsForSection = (section: HomepageSection): Apartment[] => {
-    let apartments: Apartment[] = [];
-
+  const getApartmentsForSection = (section: any): Apartment[] => {
     if (section.type === 'hot_deals') {
-      apartments = filteredApartments.filter(apt => apt.isHot);
-    } else if (section.type === 'rooms' && section.rooms) {
-      apartments = filteredApartments.filter(apt => apt.rooms === section.rooms);
-    } else if (section.type === 'custom' && section.customFilter) {
-      apartments = section.customFilter(filteredApartments);
+      // Show popular flats from API
+      return popularFlats.map(flat => ({
+        id: flat.id,
+        complex: flat.home?.name || "Неизвестный комплекс",
+        complexId: flat.homeId,
+        address: flat.home?.address || "Адрес не указан",
+        rooms: flat.rooms,
+        floor: flat.floor,
+        bathroom: "Совмещенный",
+        bathrooms: 1,
+        finishing: "Чистовая",
+        isHot: true,
+        image: flat.photos?.[0]?.url || "/images/default-apartment.jpg",
+        price: flat.price,
+        area: flat.area,
+        description: flat.description,
+        hasParks: flat.home?.amenities?.includes("Парковка") || false,
+        distanceFromCenter: 5.0
+      }));
     }
-
-    return apartments.slice(0, 5);
+    
+    if (section.type === 'rooms' && section.rooms) {
+      return apartments.filter(apt => apt.rooms === section.rooms);
+    }
+    
+    if (section.type === 'custom' && section.customFilter) {
+      try {
+        // Apply custom filter if it exists
+        return apartments.filter(apt => {
+          if (section.id === 'by_complex_yantar') {
+            return apt.complex.includes('Янтарный');
+          }
+          if (section.id === 'by_complex_nizhniy') {
+            return apt.complex.includes('Нижний');
+          }
+          if (section.id === 'by_finishing_ready') {
+            return apt.finishing === 'Чистовая' || apt.finishing === 'Под ключ';
+          }
+          return true;
+        });
+      } catch (error) {
+        console.error('Error applying custom filter:', error);
+        return [];
+      }
+    }
+    
+    return [];
   };
 
-  const renderSection = (section: HomepageSection, apartments: Apartment[]) => {
-    if (!section.isVisible || apartments.length === 0) return null;
+  const canManageHomepage = isAuthenticated && (role === 'admin' || role === 'content_manager');
 
+  if (propertiesLoading) {
     return (
-      <section
-        key={section.id}
-        className={`py-16 ${section.backgroundColor === 'gray' ? 'bg-gray-50' : 'bg-white'}`}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-12">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">{section.title}</h2>
-              <p className="text-gray-600">{section.description}</p>
-            </div>
-            {section.linkText && section.linkUrl && (
-              <Link
-                to={section.linkUrl}
-                className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                  section.type === 'hot_deals'
-                    ? 'bg-red-600 hover:bg-red-700 text-white'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white'
-                }`}
-              >
-                {section.linkText}
-              </Link>
-            )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            {apartments.map(apartment => (
-              <ApartmentCard
-                key={apartment.id}
-                apartment={apartment}
-                onBookingClick={() => handleBookingClick(apartment)}
-              />
-            ))}
-          </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Загрузка данных...</p>
         </div>
-      </section>
+      </div>
     );
-  };
+  }
 
   return (
-    <div className="min-h-screen">
-      <section className="relative min-h-screen flex pt-24 pb-6 justify-center gradient-primary overflow-hidden">
-        <BackgroundPattern />
-        <div className="container mx-auto px-4 text-center text-white relative z-10">
-          <h1 className="heading-xl mb-6">
-            Найдите квартиру<br />
-            <span className="text-blue-200">своей мечты</span>
+    <div className="relative min-h-screen">
+      <BackgroundPattern />
+      
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-r from-blue-600 to-blue-800 text-white py-20">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            Найдите идеальную квартиру
           </h1>
-          <p className="text-xl md:text-2xl mb-12 text-blue-100 max-w-3xl mx-auto">
-            Современные жилые комплексы с лучшими условиями для комфортной жизни
+          <p className="text-xl md:text-2xl mb-8 opacity-90">
+            Премиальная недвижимость в лучших районах города
           </p>
-
+          
+          {/* Search Bar */}
           <div className="max-w-4xl mx-auto">
             <SearchBar />
           </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-200 mb-2">50+</div>
-              <div className="text-sm text-blue-100">Жилых комплексов</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-200 mb-2">1000+</div>
-              <div className="text-sm text-blue-100">Квартир в продаже</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-200 mb-2">15</div>
-              <div className="text-sm text-blue-100">Лет на рынке</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-200 mb-2">5000+</div>
-              <div className="text-sm text-blue-100">Довольных клиентов</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <svg
-            className="w-6 h-6 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 14l-7 7m0 0l-7-7m7 7V3"
-            />
-          </svg>
-        </div>
-
-        {/* Content Manager Edit Button */}
-        {isAuthenticated && user?.role === 'CM' && (
-          <div className="absolute top-32 right-8 z-50">
-            <button
-              onClick={() => setShowHomePageManager(true)}
-              className="bg-white bg-opacity-20 backdrop-blur-sm text-black px-4 py-2 rounded-lg font-medium hover:bg-opacity-30 transition-all"
+          
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link
+              to="/apartments"
+              className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
             >
-              ✏️ Редактировать главную
-            </button>
+              Все квартиры
+            </Link>
+            <Link
+              to="/complexes"
+              className="bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+            >
+              Жилые комплексы
+            </Link>
           </div>
-        )}
+        </div>
       </section>
 
-      {homepageSections
-        .filter(section => section.isVisible)
-        .sort((a, b) => a.order - b.order)
-        .map(section => {
-          const apartments = getApartmentsForSection(section);
-          return renderSection(section, apartments);
-        })}
+      {/* Featured Content */}
+      {featuredHomes.length > 0 && (
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                Рекомендуемые комплексы
+              </h2>
+              <p className="text-xl text-gray-600">
+                Лучшие предложения от наших партнеров
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {featuredHomes.slice(0, 6).map((home) => (
+                <div key={home.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                  <div className="h-48 bg-gray-200">
+                    {home.photos?.[0]?.url ? (
+                      <img
+                        src={home.photos[0].url}
+                        alt={home.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <span className="text-4xl">🏠</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{home.name}</h3>
+                    <p className="text-gray-600 mb-2">{home.address}</p>
+                    <p className="text-gray-700 text-sm mb-4 line-clamp-2">{home.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500">
+                        {home.flats?.length || 0} квартир
+                      </span>
+                      <Link
+                        to={`/complex/${home.id}`}
+                        className="text-blue-600 hover:text-blue-800 font-medium"
+                      >
+                        Подробнее →
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
-      <section
-        id="about"
-        className="py-16 bg-white"
-      >
+      {/* Homepage Sections */}
+      <main className="py-16">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              Почему выбирают нас?
-            </h2>
-            <p className="text-lg text-gray-600 mb-12">
-              Мы предлагаем только проверенные объекты недвижимости от надежных застройщиков
-            </p>
+          {canManageHomepage && (
+            <div className="mb-8 text-center">
+              <button
+                onClick={() => setShowHomePageManager(!showHomePageManager)}
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                {showHomePageManager ? 'Скрыть настройки' : 'Настроить страницу'}
+              </button>
+            </div>
+          )}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg
-                    className="w-8 h-8 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Проверенные объекты</h3>
-                <p className="text-gray-600">Все квартиры проходят тщательную проверку на юридическую чистоту</p>
-              </div>
+          {showHomePageManager && (
+            <div className="mb-12">
+              <HomePageManager 
+                sections={homepageSections}
+                onSectionsChange={setHomepageSections}
+              />
+            </div>
+          )}
 
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg
-                    className="w-8 h-8 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Быстрый поиск</h3>
-                <p className="text-gray-600">Удобные фильтры помогут найти идеальную квартиру за минуты</p>
-              </div>
+          {homepageSections
+            .filter(section => section.isVisible)
+            .sort((a, b) => a.order - b.order)
+            .map((section) => {
+              const sectionApartments = getApartmentsForSection(section);
+              
+              if (sectionApartments.length === 0) {
+                return null;
+              }
 
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg
-                    className="w-8 h-8 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Поддержка 24/7</h3>
-                <p className="text-gray-600">Наши специалисты готовы помочь вам в любое время</p>
-              </div>
+              return (
+                <section
+                  key={section.id}
+                  className={`mb-16 py-12 rounded-lg ${
+                    section.backgroundColor === 'gray' ? 'bg-gray-50' : 'bg-white'
+                  }`}
+                >
+                  <div className="container mx-auto px-4">
+                    <div className="flex justify-between items-center mb-8">
+                      <div>
+                        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                          {section.title}
+                        </h2>
+                        <p className="text-xl text-gray-600">
+                          {section.description}
+                        </p>
+                      </div>
+                      {section.linkUrl && (
+                        <Link
+                          to={section.linkUrl}
+                          className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                          {section.linkText || 'Смотреть все'} →
+                        </Link>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      {sectionApartments.slice(0, 8).map((apartment) => (
+                        <ApartmentCard
+                          key={apartment.id}
+                          apartment={apartment}
+                          onBookingClick={() => handleBookingClick(apartment)}
+                        />
+                      ))}
+                    </div>
+
+                    {sectionApartments.length > 8 && section.linkUrl && (
+                      <div className="text-center mt-8">
+                        <Link
+                          to={section.linkUrl}
+                          className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                          Показать все {sectionApartments.length} предложений
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </section>
+              );
+            })}
+
+          {/* Empty State */}
+          {apartments.length === 0 && !propertiesLoading && (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">🏠</div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                Квартиры скоро появятся
+              </h3>
+              <p className="text-gray-600 mb-8">
+                Мы работаем над наполнением каталога недвижимости
+              </p>
+              <Link
+                to="/apartments"
+                className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Перейти в каталог
+              </Link>
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* Stats Section */}
+      <section className="py-16 bg-blue-600 text-white">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="text-4xl font-bold mb-2">{apartments.length}</div>
+              <div className="text-xl opacity-90">Квартир в продаже</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">{featuredHomes.length}</div>
+              <div className="text-xl opacity-90">Жилых комплексов</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">100%</div>
+              <div className="text-xl opacity-90">Проверенных объектов</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">24/7</div>
+              <div className="text-xl opacity-90">Поддержка клиентов</div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-16 bg-blue-600">
+      {/* CTA Section */}
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Готовы найти свою идеальную квартиру?
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Готовы найти свою квартиру?
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Оставьте заявку и наш менеджер подберет лучшие варианты специально для вас
+          <p className="text-xl text-gray-600 mb-8">
+            Свяжитесь с нами, и мы поможем подобрать идеальный вариант
           </p>
-          <button
-            onClick={() => setShowBookingModal(true)}
-            className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors"
-          >
-            Оставить заявку
-          </button>
+          <div className="flex flex-wrap justify-center gap-4">
+            <button
+              onClick={() => openModal('contactForm')}
+              className="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors"
+            >
+              Связаться с нами
+            </button>
+            <Link
+              to="/apartments"
+              className="bg-gray-200 text-gray-900 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-300 transition-colors"
+            >
+              Смотреть каталог
+            </Link>
+          </div>
         </div>
       </section>
-
-      {/* Home Page Manager Modal */}
-      {showHomePageManager && (
-        <HomePageManager
-          onSave={() => {
-            // Update the home page data
-            setShowHomePageManager(false);
-            // Reload the page or update the data
-            window.location.reload();
-          }}
-          onCancel={() => setShowHomePageManager(false)}
-        />
-      )}
     </div>
   );
 };

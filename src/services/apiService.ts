@@ -1,47 +1,51 @@
-// Import the existing API client
-// import { DefaultApi, Configuration } from '../api';
-
-// TODO: Configure the API client with proper base URL and configuration
-// const apiConfiguration = new Configuration({
-//   basePath: process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000/api',
-// });
-// const apiClient = new DefaultApi(apiConfiguration);
-
-import type {Apartment, BookingForm, Complex} from "../store/useAppStore.ts";
+// Updated to use new axios-based API services
+import { PublicService, createRequest } from './index';
+import type { Apartment, BookingForm, Complex } from "../store/useAppStore.ts";
+import type { Flat, Home, RequestCreate } from './api.types';
 
 export class ApiService {
+  // Helper method to transform API Flat to legacy Apartment
+  private static transformFlatToApartment(flat: Flat): Apartment {
+    return {
+      id: flat.id,
+      complex: flat.home?.name || "Неизвестный комплекс",
+      complexId: flat.homeId,
+      address: flat.home?.address || "Адрес не указан",
+      rooms: flat.rooms,
+      floor: flat.floor,
+      bathroom: "Совмещенный", // Default value, could be improved with additional API data
+      bathrooms: 1, // Default value
+      finishing: "Чистовая", // Default value, could be improved with additional API data
+      isHot: false, // Default value, could be improved with additional API data
+      image: flat.photos?.[0]?.url || "/images/default-apartment.jpg",
+      price: flat.price,
+      area: flat.area,
+      description: flat.description,
+      hasParks: flat.home?.amenities?.includes("Парковка") || false,
+      distanceFromCenter: 5.0 // Default value, could be improved with additional API data
+    };
+  }
+
+  // Helper method to transform API Home to legacy Complex
+  private static transformHomeToComplex(home: Home): Complex {
+    return {
+      id: home.id,
+      name: home.name,
+      address: home.address,
+      description: home.description,
+      image: home.photos?.[0]?.url || "/images/default-complex.jpg",
+      apartments: home.flats?.map(this.transformFlatToApartment) || [],
+      amenities: home.amenities || []
+    };
+  }
   // Apartments
   static async getApartments(): Promise<Apartment[]> {
     try {
-      // TODO: Replace with actual API call
-      // const response = await apiClient.getApartments();
-      // return response.data;
+      // Get flats from the new API service
+      const flats = await PublicService.getFlats();
       
-      // Mock implementation for now
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve([
-            {
-              id: 1,
-              complex: "ЖК Янтарный",
-              complexId: 1,
-              address: "ул. Примерная, 10",
-              rooms: 2,
-              floor: 5,
-              bathroom: "Совмещенный",
-              bathrooms: 1,
-              finishing: "Чистовая",
-              isHot: true,
-              image: "/images/apt1.jpg",
-              price: 5500000,
-              area: 65.5,
-              description: "Уютная двухкомнатная квартира с современным ремонтом",
-              hasParks: true,
-              distanceFromCenter: 5.2
-            }
-          ]);
-        }, 500);
-      });
+      // Transform API flats to legacy apartment format
+      return flats.map(this.transformFlatToApartment);
     } catch (error) {
       console.error('Error fetching apartments:', error);
       throw error;
@@ -50,41 +54,21 @@ export class ApiService {
 
   static async getApartmentById(id: number): Promise<Apartment | null> {
     try {
-      // TODO: Replace with actual API call
-      // const response = await apiClient.getApartmentById(id);
-      // return response.data;
-      
-      const apartments = await this.getApartments();
-      return apartments.find(apt => apt.id === id) || null;
+      const flat = await PublicService.getFlatById(id);
+      return flat ? this.transformFlatToApartment(flat) : null;
     } catch (error) {
       console.error('Error fetching apartment:', error);
-      throw error;
+      // Fallback to searching in all apartments
+      const apartments = await this.getApartments();
+      return apartments.find(apt => apt.id === id) || null;
     }
   }
 
   // Complexes
   static async getComplexes(): Promise<Complex[]> {
     try {
-      // TODO: Replace with actual API call
-      // const response = await apiClient.getComplexes();
-      // return response.data;
-      
-      // Mock implementation for now
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve([
-            {
-              id: 1,
-              name: "ЖК Янтарный",
-              address: "ул. Примерная, 10",
-              description: "Современный жилой комплекс в центре города",
-              image: "/images/complex1.jpg",
-              apartments: [],
-              amenities: ["Парковка", "Детская площадка", "Спортзал"]
-            }
-          ]);
-        }, 500);
-      });
+      const homes = await PublicService.getHomes();
+      return homes.map(this.transformHomeToComplex);
     } catch (error) {
       console.error('Error fetching complexes:', error);
       throw error;
@@ -93,32 +77,28 @@ export class ApiService {
 
   static async getComplexByName(name: string): Promise<Complex | null> {
     try {
-      // TODO: Replace with actual API call
-      // const response = await apiClient.getComplexByName(name);
-      // return response.data;
-      
       const complexes = await this.getComplexes();
       return complexes.find(complex => complex.name === name) || null;
     } catch (error) {
       console.error('Error fetching complex:', error);
-      throw error;
+      return null;
     }
   }
 
   // Bookings
   static async createBooking(bookingData: BookingForm): Promise<{ success: boolean; id?: number }> {
     try {
-      // TODO: Replace with actual API call
-      // const response = await apiClient.createBooking(bookingData);
-      // return response.data;
-      
-      // Mock implementation for now
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          console.log('Booking data:', bookingData);
-          resolve({ success: true, id: Math.floor(Math.random() * 1000) });
-        }, 1000);
-      });
+      // Transform legacy booking to API request format
+      const requestData: RequestCreate = {
+        name: bookingData.name,
+        phone: bookingData.phone,
+        email: bookingData.email,
+        message: bookingData.message || '',
+        flatId: bookingData.apartmentId,
+      };
+
+      const response = await createRequest(requestData);
+      return { success: true, id: response.id };
     } catch (error) {
       console.error('Error creating booking:', error);
       throw error;
@@ -135,43 +115,28 @@ export class ApiService {
     complex?: string;
   }): Promise<Apartment[]> {
     try {
-      // TODO: Replace with actual API call
-      // const response = await apiClient.searchApartments(filters);
-      // return response.data;
-      
-      // Mock implementation with filtering
-      const allApartments = await this.getApartments();
-      let filtered = [...allApartments];
+      // Use the new search API
+      const searchParams = {
+        query: filters.query,
+        minPrice: filters.minPrice,
+        maxPrice: filters.maxPrice,
+        rooms: filters.rooms,
+      };
 
-      if (filters.query) {
-        const query = filters.query.toLowerCase();
-        filtered = filtered.filter(apt => 
-          apt.complex.toLowerCase().includes(query) ||
-          apt.address.toLowerCase().includes(query)
-        );
-      }
+      const homes = await PublicService.searchHomes(searchParams);
+      const flats: Flat[] = homes.flatMap(home => home.flats || []);
+      let apartments = flats.map(this.transformFlatToApartment);
 
-      if (filters.minPrice) {
-        filtered = filtered.filter(apt => apt.price >= filters.minPrice!);
-      }
-
-      if (filters.maxPrice) {
-        filtered = filtered.filter(apt => apt.price <= filters.maxPrice!);
-      }
-
-      if (filters.rooms && filters.rooms.length > 0) {
-        filtered = filtered.filter(apt => filters.rooms!.includes(apt.rooms));
-      }
-
+      // Apply additional legacy filters
       if (filters.finishing && filters.finishing.length > 0) {
-        filtered = filtered.filter(apt => filters.finishing!.includes(apt.finishing));
+        apartments = apartments.filter(apt => filters.finishing!.includes(apt.finishing));
       }
 
       if (filters.complex) {
-        filtered = filtered.filter(apt => apt.complex === filters.complex);
+        apartments = apartments.filter(apt => apt.complex === filters.complex);
       }
 
-      return filtered;
+      return apartments;
     } catch (error) {
       console.error('Error searching apartments:', error);
       throw error;
