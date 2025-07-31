@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { 
-  useAuthStore, 
   useContentStore,
   useUIStore,
   useIsAuthenticated,
@@ -8,7 +7,7 @@ import {
 } from '../store';
 
 interface ContentManagerProps {
-  contentType: 'flat' | 'home' | 'category';
+  contentType: 'flat' | 'home' | 'category' | 'apartment' | 'complex';
   contentId?: number;
   onSave?: () => void;
   onCancel?: () => void;
@@ -45,9 +44,11 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
     if (initialData) {
       switch (contentType) {
         case 'flat':
+        case 'apartment':
           setFlatForm(initialData);
           break;
         case 'home':
+        case 'complex':
           setHomeForm(initialData);
           break;
         case 'category':
@@ -66,6 +67,7 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
 
       switch (contentType) {
         case 'flat':
+        case 'apartment':
           success = await saveFlat({
             title: flatForm.title || '',
             description: flatForm.description || '',
@@ -80,6 +82,7 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
           });
           break;
         case 'home':
+        case 'complex':
           success = await saveHome({
             name: homeForm.name || '',
             description: homeForm.description || '',
@@ -119,28 +122,42 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
 
   const getContentTypeName = () => {
     switch (contentType) {
-      case 'flat': return 'Квартира';
-      case 'home': return 'Дом';
-      case 'category': return 'Категория';
-      default: return 'Элемент';
+      case 'flat':
+      case 'apartment':
+        return 'Квартира';
+      case 'home':
+      case 'complex':
+        return 'Дом';
+      case 'category':
+        return 'Категория';
+      default:
+        return 'Элемент';
     }
   };
 
   const getCurrentForm = () => {
     switch (contentType) {
-      case 'flat': return flatForm;
-      case 'home': return homeForm;
-      case 'category': return categoryForm;
-      default: return {};
+      case 'flat':
+      case 'apartment':
+        return flatForm as any;
+      case 'home':
+      case 'complex':
+        return homeForm as any;
+      case 'category':
+        return categoryForm as any;
+      default:
+        return {} as any;
     }
   };
 
   const updateForm = (field: string, value: any) => {
     switch (contentType) {
       case 'flat':
+      case 'apartment':
         setFlatForm({ [field]: value });
         break;
       case 'home':
+      case 'complex':
         setHomeForm({ [field]: value });
         break;
       case 'category':
@@ -178,7 +195,7 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Category Form */}
-        {contentType === 'category' && (
+        {(contentType === 'category') && (
           <>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -207,7 +224,7 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
         )}
 
         {/* Home Form */}
-        {contentType === 'home' && (
+        {(contentType === 'home' || contentType === 'complex') && (
           <>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -260,7 +277,7 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
         )}
 
         {/* Flat Form */}
-        {contentType === 'flat' && (
+        {(contentType === 'flat' || contentType === 'apartment') && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>

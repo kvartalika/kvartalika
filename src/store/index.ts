@@ -5,6 +5,13 @@ export * from './search.store';
 export * from './ui.store';
 export * from './content.store';
 
+// Import store hooks for internal use
+import { useAuthStore } from './auth.store';
+import { usePropertiesStore } from './properties.store';
+import { useSearchStore } from './search.store';
+import { useUIStore } from './ui.store';
+import { useContentStore } from './content.store';
+
 // Main store hooks for easy importing
 export {
   // Auth store
@@ -196,7 +203,7 @@ export const handleStoreError = (storeName: string, error: any) => {
 
 // Store debugging helpers (development only)
 export const debugStores = () => {
-  if (process.env.NODE_ENV === 'development') {
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
     const states = getStoreStates();
     console.group('🏪 Store States');
     Object.entries(states).forEach(([name, state]) => {
@@ -208,7 +215,7 @@ export const debugStores = () => {
 
 // Store reset for testing
 export const resetAllStores = () => {
-  if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
     const authStore = useAuthStore.getState();
     const uiStore = useUIStore.getState();
     const searchStore = useSearchStore.getState();

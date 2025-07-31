@@ -1,6 +1,6 @@
 // Updated to use new axios-based API services
-import { PublicService, createRequest } from './index';
-import type { Apartment, BookingForm, Complex } from "../store/useAppStore.ts";
+import { PublicService, createRequest } from './public.service';
+import type { Apartment, BookingForm, Complex } from "../store/useAppStore";
 import type { Flat, Home, RequestCreate } from './api.types';
 
 export class ApiService {
@@ -93,7 +93,7 @@ export class ApiService {
         name: bookingData.name,
         phone: bookingData.phone,
         email: bookingData.email,
-        message: bookingData.message || '',
+        message: (bookingData as any).message || '',
         flatId: bookingData.apartmentId,
       };
 
