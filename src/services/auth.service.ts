@@ -13,7 +13,7 @@ export class AuthService {
       const response = await apiClient.post<AuthResponse, LoginRequest>('/admin/login', credentials);
 
       if (response.data?.accessToken) {
-        apiClient.setAdminToken(response.data.accessToken);
+        apiClient.setAccessToken(response.data.accessToken);
       }
 
       return response.data;
@@ -54,7 +54,7 @@ export class AuthService {
       const response = await apiClient.post<AuthResponse, LoginRequest>('/content-manager/login', credentials);
 
       if (response.data?.accessToken) {
-        apiClient.setContentToken(response.data.accessToken);
+        apiClient.setAccessToken(response.data.accessToken);
       }
 
       return response.data;

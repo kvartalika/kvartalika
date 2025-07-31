@@ -12,7 +12,7 @@ import type {HomePageFlats} from "../services";
 import PageLoader from "../components/PageLoader.tsx";
 
 const HomePage = () => {
-  const user = useAuthStore(state => state.user);
+  const role = useAuthStore(state => state.role);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
   const pageInfo = useUIStore(state => state.pageInfo);
@@ -126,7 +126,7 @@ const HomePage = () => {
           </svg>
         </div>
 
-        {isAuthenticated && user?.role === 'CONTENT_MANAGER' && (
+        {isAuthenticated && role === 'CONTENT_MANAGER' && (
           <div className="absolute top-32 right-8 z-50">
             <button
               onClick={() => openModal('manager')}

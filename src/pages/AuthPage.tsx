@@ -12,7 +12,7 @@ const AuthPage = () => {
   const {
     loginAsAdmin,
     loginAsContentManager,
-    user,
+    role,
     isAuthenticated,
     isLoading: authLoading,
     error,
@@ -20,14 +20,14 @@ const AuthPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-      if (user.role === 'ADMIN') {
+    if (isAuthenticated && role) {
+      if (role === 'ADMIN') {
         navigate('/admin');
       } else {
         navigate('/');
       }
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, role, navigate]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();

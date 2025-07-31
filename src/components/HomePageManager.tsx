@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import {useEffect} from 'react';
 import ContactForm from './forms/ContactForm';
 import SocialMediaForm from './forms/SocialMediaForm';
 import {useAuthStore} from "../store/auth.store.ts";
@@ -9,11 +9,11 @@ interface HomePageManagerProps {
   onCancel: () => void;
 }
 
-const HomePageManager = ({ 
-  onSave, 
-  onCancel,
-}: HomePageManagerProps) => {
-  const { role, isAuthenticated } = useAuthStore();
+const HomePageManager = ({
+                           onSave,
+                           onCancel,
+                         }: HomePageManagerProps) => {
+  const {role, isAuthenticated} = useAuthStore();
 
   const pageInfo = useUIStore(state => state.pageInfo);
   const updatePageInfo = useUIStore(state => state.updatePageInfo);
@@ -28,7 +28,7 @@ const HomePageManager = ({
     const loadInitialData = async () => {
       if (!initialContactData) {
         try {
-          const { mockApi } = await import('../services/mockApi');
+          const {mockApi} = await import('../services/mockApi');
           const contactInfo = await mockApi.getContactInfo();
           setContactData(contactInfo);
         } catch (error) {
@@ -38,7 +38,7 @@ const HomePageManager = ({
 
       if (!initialSocialMediaData) {
         try {
-          const { mockApi } = await import('../services/mockApi');
+          const {mockApi} = await import('../services/mockApi');
           const socialMediaData = await mockApi.getSocialMedia();
           setSocialMedia(socialMediaData);
         } catch (error) {
@@ -58,8 +58,8 @@ const HomePageManager = ({
   };
 
   const handleSocialMediaChange = (index: number, field: keyof SocialMedia, value: string) => {
-    setSocialMedia(prev => prev.map((item, i) => 
-      i === index ? { ...item, [field]: value } : item
+    setSocialMedia(prev => prev.map((item, i) =>
+      i === index ? {...item, [field]: value} : item
     ));
   };
 
@@ -82,11 +82,11 @@ const HomePageManager = ({
 
     try {
       // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-      
+      const {mockApi} = await import('../services/mockApi');
+
       // Update contact info
       await mockApi.updateContactInfo(contactData);
-      
+
       // Update social media - in a real app, you'd batch these operations
       // For now, we'll simulate updating each social media item
       for (const socialMediaItem of socialMedia) {
@@ -101,7 +101,7 @@ const HomePageManager = ({
           });
         }
       }
-      
+
       onSave(contactData, socialMedia);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Update failed');
@@ -135,7 +135,10 @@ const HomePageManager = ({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
+        >
           {/* Contact Information */}
           <div className="bg-gray-50 p-6 rounded-lg">
             <ContactForm

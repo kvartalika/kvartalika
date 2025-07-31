@@ -21,7 +21,7 @@ const ComplexPage = () => {
   const modals = useUIStore(state => state.modals);
   const closeModal = useUIStore(state => state.closeModal);
 
-  const user = useAuthStore(state => state.user);
+  const role = useAuthStore(state => state.role);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -521,7 +521,7 @@ const ComplexPage = () => {
             Записаться на осмотр
           </button>
 
-          {isAuthenticated && user?.role === 'CONTENT_MANAGER' && (
+          {isAuthenticated && role === 'CONTENT_MANAGER' && (
             <button
               onClick={() => openModal('manager')}
               className="mb-4 bg-gray-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-700 transition-colors"
