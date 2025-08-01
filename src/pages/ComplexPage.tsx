@@ -201,7 +201,7 @@ const ComplexPage = () => {
             <h2 className="text-2xl font-bold text-gray-900">Доступные квартиры</h2>
             {flatsByHome.length > 4 && (
               <Link
-                to={`/apartments?homeId=${encodeURIComponent(selectedHome.id)}`}
+                to={`/apartments?homeId=${selectedHome.id}`}
                 className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
               >
                 Показать все квартиры
@@ -212,8 +212,9 @@ const ComplexPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {flatsByHome.slice(0, 4).map(apartment => (
                 <ApartmentCard
-                  key={apartment.id}
-                  apartment={apartment}
+                  key={apartment.flat.id}
+                  homeName={selectedHome.name}
+                  apartment={apartment.flat}
                   onBookingClick={() => openModal('bid')}
                 />
               ))}
@@ -349,7 +350,7 @@ const ComplexPage = () => {
                   </div>
                   <div className="flex justify-between py-2 border-b border-gray-200">
                     <span className="text-gray-600">Тип квартир:</span>
-                    <span className="font-medium">{Array.from(new Set(flatsByHome.map(apt => `${apt.numberOfRooms}-комн.`))).join(', ')}</span>
+                    <span className="font-medium">{Array.from(new Set(flatsByHome.map(apt => `${apt.flat.numberOfRooms}-комн.`))).join(', ')}</span>
                   </div>
                   <div className="flex justify-between py-2 border-b border-gray-200">
                     <span className="text-gray-600">Адрес:</span>

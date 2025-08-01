@@ -1,7 +1,7 @@
 import {type FormEvent, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useAuthStore, type UserRole} from "../store/auth.store.ts";
-import type {LoginRequest} from "../api";
+import {useAuthStore, type UserRole} from "../store";
+import type {LoginRequest} from "../services";
 
 const AuthPage = () => {
   const [email, setEmail] = useState('');

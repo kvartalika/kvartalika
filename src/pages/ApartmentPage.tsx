@@ -10,7 +10,14 @@ const ApartmentPage = () => {
   const modals = useUIStore(state => state.modals);
   const closeModal = useUIStore(state => state.closeModal);
 
-  const {setSelectedFlat, getFlatById, selectedFlat, homes, setSelectedHome, selectedHome} = useFlatsStore();
+  const {
+    setSelectedFlat,
+    getFlatById,
+    selectedFlat,
+    homes,
+    setSelectedHome,
+    selectedHome
+  } = useFlatsStore();
 
   const role = useAuthStore(state => state.role);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -28,7 +35,7 @@ const ApartmentPage = () => {
       const flat = await getFlatById(id);
       if (flat) {
         setSelectedFlat(flat);
-        setSelectedHome(homes.find(home => flat.homeId === home.id) ?? null)
+        setSelectedHome(homes.find(home => flat.flat.homeId === home.id) ?? null)
       } else {
         setSelectedFlat(null);
       }
@@ -36,7 +43,7 @@ const ApartmentPage = () => {
     void load()
   }, [apartmentId, getFlatById, setSelectedFlat]);
 
-  if (!selectedFlat) {
+  if (!selectedFlat?.flat) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center">
         <div className="text-center">
@@ -58,9 +65,9 @@ const ApartmentPage = () => {
     return new Intl.NumberFormat('ru-RU').format(price);
   };
 
-  const pricePerSqm = Math.round(selectedFlat.price / selectedFlat.area);
+  const pricePerSqm = Math.round(selectedFlat.flat.price / selectedFlat.flat.area);
 
-  const images = selectedFlat?.images || [
+  const images = selectedFlat.flat?.images || [
     '/images/apartment-2.jpg',
     '/images/apartment-3.jpg',
     '/images/apartment-4.jpg'
@@ -87,14 +94,14 @@ const ApartmentPage = () => {
             </Link>
             <span className="mx-2 text-gray-400">›</span>
             <Link
-              to={`/complex/${encodeURIComponent(selectedFlat?.homeId)}`}
+              to={`/complex/${selectedFlat.flat.homeId}`}
               className="text-blue-600 hover:text-blue-700"
             >
-              {selectedHome?.name ?? selectedFlat.homeId}
+              {selectedHome?.name ?? selectedFlat.flat.homeId}
             </Link>
             <span className="mx-2 text-gray-400">›</span>
             <span className="text-gray-600">
-              {selectedFlat?.numberOfRooms}-комнатная квартира
+              {selectedFlat.flat?.numberOfRooms}-комнатная квартира
             </span>
           </nav>
         </div>
@@ -107,11 +114,11 @@ const ApartmentPage = () => {
               <div className="relative h-96 rounded-xl overflow-hidden bg-gray-200">
                 <img
                   src={images[currentImageIndex]}
-                  alt={`${selectedFlat?.numberOfRooms}-комнатная квартира`}
+                  alt={`${selectedFlat.flat?.numberOfRooms}-комнатная квартира`}
                   className="w-full h-full object-cover"
                 />
 
-                {selectedFlat?.features.length >= 3 && (
+                {selectedFlat.flat?.features.length >= 3 && (
                   <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-2 rounded-lg font-semibold">
                     🔥 Горячее предложение
                   </div>
@@ -186,14 +193,14 @@ const ApartmentPage = () => {
               )}
             </div>
 
-            {selectedFlat.layout && (
+            {selectedFlat.flat.layout && (
               <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">
                   Планировка квартиры
                 </h2>
                 <div className="flex justify-center">
                   <img
-                    src={selectedFlat.layout}
+                    src={selectedFlat.flat.layout}
                     alt="Планировка квартиры"
                     className="max-w-full h-auto rounded-lg border border-gray-200"
                   />
@@ -210,26 +217,26 @@ const ApartmentPage = () => {
                 <div className="space-y-4">
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Комнат:</span>
-                    <span className="font-medium">{selectedFlat?.numberOfRooms}</span>
+                    <span className="font-medium">{selectedFlat.flat?.numberOfRooms}</span>
                   </div>
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Площадь:</span>
-                    <span className="font-medium">{selectedFlat?.area} м²</span>
+                    <span className="font-medium">{selectedFlat.flat?.area} м²</span>
                   </div>
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Этаж:</span>
-                    <span className="font-medium">{selectedFlat?.floor}</span>
+                    <span className="font-medium">{selectedFlat.flat?.floor}</span>
                   </div>
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Количество санузлов:</span>
-                    <span className="font-medium">{selectedFlat?.numberOfBathrooms}</span>
+                    <span className="font-medium">{selectedFlat.flat?.numberOfBathrooms}</span>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Отделка:</span>
-                    <span className="font-medium">{selectedFlat.hasDecoration}</span>
+                    <span className="font-medium">{selectedFlat.flat.hasDecoration}</span>
                   </div>
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Цена за м²:</span>
@@ -238,26 +245,26 @@ const ApartmentPage = () => {
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Жилой комплекс:</span>
                     <Link
-                      to={`/complex/${encodeURIComponent(selectedFlat.homeId)}`}
+                      to={`/complex/${selectedFlat.flat.homeId}`}
                       className="font-medium text-blue-600 hover:text-blue-700"
                     >
-                      {selectedHome?.name ?? selectedFlat.homeId}
+                      {selectedHome?.name ?? selectedFlat.flat.homeId}
                     </Link>
                   </div>
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Адрес:</span>
-                    <span className="font-medium">{selectedFlat.address}</span>
+                    <span className="font-medium">{selectedFlat.flat.address}</span>
                   </div>
                 </div>
               </div>
 
-              {selectedFlat.description && (
+              {selectedFlat.flat.description && (
                 <div className="mt-8">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     Описание
                   </h3>
                   <p className="text-gray-600 leading-relaxed">
-                    {selectedFlat.description}
+                    {selectedFlat.flat.description}
                   </p>
                 </div>
               )}
@@ -267,7 +274,7 @@ const ApartmentPage = () => {
                   Особенности квартиры
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {selectedFlat?.features.map((feature) => (
+                  {selectedFlat.flat?.features.map((feature) => (
                     <div className="flex items-center text-gray-600">
                       <svg
                         className="w-5 h-5 text-green-500 mr-3"
@@ -315,7 +322,7 @@ const ApartmentPage = () => {
                 </div>
                 <h4 className="text-lg font-semibold text-gray-900 mb-2">Интерактивная карта</h4>
                 <p className="text-gray-600 mb-4">Здесь будет отображена карта с расположением квартиры</p>
-                <p className="text-sm text-gray-500">📍 {selectedFlat.address}</p>
+                <p className="text-sm text-gray-500">📍 {selectedFlat.flat.address}</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
@@ -433,7 +440,7 @@ const ApartmentPage = () => {
               <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
                 <div className="text-center mb-6">
                   <div className="text-3xl font-bold text-gray-900 mb-2">
-                    {formatPrice(selectedFlat.price)} ₽
+                    {formatPrice(selectedFlat.flat.price)} ₽
                   </div>
                   <div className="text-sm text-gray-600">
                     {formatPrice(pricePerSqm)} ₽ за м²
@@ -443,15 +450,15 @@ const ApartmentPage = () => {
                 <div className="space-y-4 mb-6">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Площадь:</span>
-                    <span className="font-medium">{selectedFlat.area} м²</span>
+                    <span className="font-medium">{selectedFlat.flat.area} м²</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Комнат:</span>
-                    <span className="font-medium">{selectedFlat.numberOfRooms}</span>
+                    <span className="font-medium">{selectedFlat.flat.numberOfRooms}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Этаж:</span>
-                    <span className="font-medium">{selectedFlat.floor}</span>
+                    <span className="font-medium">{selectedFlat.flat.floor}</span>
                   </div>
                 </div>
 
@@ -485,8 +492,8 @@ const ApartmentPage = () => {
       {modals.manager && (
         <ContentManager
           contentType="apartment"
-          contentId={selectedFlat.id}
-          initialData={selectedFlat}
+          contentId={selectedFlat.flat.id}
+          initialData={selectedFlat.flat}
           onSave={() => {
             closeModal('manager')
             window.location.reload();

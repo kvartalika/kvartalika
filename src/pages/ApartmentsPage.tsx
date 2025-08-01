@@ -21,26 +21,23 @@ const ApartmentsPage = () => {
     totalResults,
     limit,
     searchError,
-    searchFlats,
     setFilters,
     setPage,
     setLimit,
     clearSearch,
+    searchFlats,
+    homes
   } = useFlatsStore();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
 
-  useEffect(() => {
     const raw = Object.fromEntries([...searchParams]);
-
     const parsed: Partial<SearchRequest> = {};
 
     if (raw.query) {
       parsed.query = String(raw.query);
     }
-
     if (raw.minPrice) {
       const v = parseInt(String(raw.minPrice), 10);
       if (!isNaN(v)) parsed.minPrice = v;
@@ -49,26 +46,21 @@ const ApartmentsPage = () => {
       const v = parseInt(String(raw.maxPrice), 10);
       if (!isNaN(v)) parsed.maxPrice = v;
     }
-
     if (raw.rooms) {
       const v = parseInt(String(raw.rooms), 10);
       if (!isNaN(v)) parsed.rooms = v;
     }
-
     if (raw.bathrooms) {
       const v = parseInt(String(raw.bathrooms), 10);
       if (!isNaN(v)) parsed.bathrooms = v;
     }
-
     if (raw.isDecorated !== undefined) {
       parsed.isDecorated = String(raw.isDecorated).toLowerCase() === 'true';
     }
-
     if (raw.homeId) {
       const v = parseInt(String(raw.homeId), 10);
       if (!isNaN(v)) parsed.homeId = v;
     }
-
     if (raw.hasParks !== undefined) {
       parsed.hasParks = String(raw.hasParks).toLowerCase() === 'true';
     }
@@ -98,7 +90,8 @@ const ApartmentsPage = () => {
     }
 
     setFilters(parsed);
-  }, [searchFlats, searchParams, setFilters]);
+    void searchFlats(1);
+  }, [searchParams, setFilters, searchFlats]);
 
   const pagedFlats = useMemo(() => {
     const start = (currentPage - 1) * limit;
@@ -138,6 +131,7 @@ const ApartmentsPage = () => {
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
   };
+
   return (
     <div className="min-h-screen pt-20">
 
@@ -246,8 +240,9 @@ const ApartmentsPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {pagedFlats.map((apartment) => (
               <ApartmentCard
-                key={apartment.id}
-                apartment={apartment}
+                homeName={homes.find(home => home.id === apartment.flat.homeId)?.name ?? '?'}
+                key={apartment.flat.id}
+                apartment={apartment.flat}
                 onBookingClick={() => openModal('bid')}
               />
             ))}

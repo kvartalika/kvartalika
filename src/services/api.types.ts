@@ -1,5 +1,5 @@
 // API Request Types
-import type {UserRole} from "../store/auth.store.ts";
+import type {UserRole} from "../store";
 
 export interface LoginRequest {
   username?: string;
@@ -217,7 +217,8 @@ export interface Flat {
   published: boolean;
 }
 
-export interface FlatWithCategory extends Flat {
+export interface FlatWithCategory {
+  flat: Flat;
   categories: Category[];
 }
 

@@ -1,7 +1,7 @@
 import {create} from 'zustand';
 import {
   type Category,
-  type Flat, type FlatWithCategory,
+  type FlatWithCategory,
   getCategories,
   getFlats,
   getFlatsByCategory, getFlatsByHome,
@@ -13,16 +13,16 @@ import {
 } from '../services';
 
 export interface flatsState {
-  flats: Flat[];
+  flats: FlatWithCategory[];
   homes: Home[];
   categories: Category[];
-  searchResults: Flat[];
+  searchResults: FlatWithCategory[];
 
   homePageFlats: HomePageFlats[];
   flatsByHome: FlatWithCategory[];
 
   selectedCategory: Category | null;
-  selectedFlat: Flat | null;
+  selectedFlat: FlatWithCategory | null;
   selectedHome: Home | null;
 
   isLoadingFlats: boolean;
@@ -60,13 +60,13 @@ export interface flatsActions {
   loadHomePageFlats: (force?: boolean) => Promise<void>;
   loadAllData: (force?: boolean) => Promise<void>;
 
-  loadFlatsByHome: (homeId: number) => Promise<Flat[]>;
-  loadFlatsByCategory: (categoryId: number) => Promise<Flat[]>;
+  loadFlatsByHome: (homeId: number) => Promise<FlatWithCategory[]>;
+  loadFlatsByCategory: (categoryId: number) => Promise<FlatWithCategory[]>;
 
-  getFlatById: (id: number) => Promise<Flat | null>;
+  getFlatById: (id: number) => Promise<FlatWithCategory | null>;
   getHomeById: (id: number) => Promise<Home | null>;
 
-  setSelectedFlat: (flat: Flat | null) => void;
+  setSelectedFlat: (flat: FlatWithCategory | null) => void;
   setSelectedHome: (home: Home | null) => void;
   setSelectedCategory: (category: Category | null) => void;
 
@@ -146,10 +146,10 @@ export const useFlatsStore = create<flatsState & flatsActions>((set, get) => ({
     try {
       const flats = await getFlats();
       set(state => ({
-        flats: flats.filter((flat) => flat.published),
+        flats: flats.filter((flat) => flat.flat.published),
         isLoadingFlats: false,
         lastFetch: {...state.lastFetch, flats: Date.now()},
-        ...(get().hasSearched ? {} : {searchResults: flats.filter((flat) => flat.published)})
+        ...(get().hasSearched ? {} : {searchResults: flats.filter((flat) => flat.flat.published)})
       }));
     } catch (error) {
       set({
@@ -241,11 +241,11 @@ export const useFlatsStore = create<flatsState & flatsActions>((set, get) => ({
   getFlatById: async (id: number) => {
     const {flats} = get();
 
-    const flat = flats.find(apt => apt.id === id);
+    const flat = flats.find(apt => apt.flat.id === id);
     if (flat) return flat;
 
     await get().loadFlats();
-    return get().flats.find(apt => apt.id === id) || null;
+    return get().flats.find(apt => apt.flat.id === id) || null;
   },
 
   getHomeById: async (id: number) => {
@@ -290,7 +290,7 @@ export const useFlatsStore = create<flatsState & flatsActions>((set, get) => ({
       set(state => {
         const updatedFlats = [...state.flats];
         flats.forEach(flat => {
-          const existingIndex = updatedFlats.findIndex(h => h.id === flat.id);
+          const existingIndex = updatedFlats.findIndex(h => h.flat.id === flat.flat.id);
           if (existingIndex >= 0) {
             updatedFlats[existingIndex] = flat;
           } else {
@@ -362,7 +362,7 @@ export const useFlatsStore = create<flatsState & flatsActions>((set, get) => ({
     });
   },
 
-  setSelectedFlat: (flat: Flat | null) => {
+  setSelectedFlat: (flat: FlatWithCategory | null) => {
     set({selectedFlat: flat});
   },
 

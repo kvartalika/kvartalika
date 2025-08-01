@@ -28,18 +28,17 @@ function ScrollToTop() {
   return null;
 }
 
-function App() {
+const InnerApp = () => {
   const loading = useUIStore(state => state.loading);
   const setLoading = useUIStore(state => state.setLoading);
   const modals = useUIStore(state => state.modals);
 
   const loadPageInfo = useUIStore(state => state.loadPageInfo);
-  const loadSocialMediaList = useUIStore(state => state.loadSocialMediaList)
-
-  const pageInfo = useUIStore(state => state.pageInfo)
+  const loadSocialMediaList = useUIStore(state => state.loadSocialMediaList);
+  const pageInfo = useUIStore(state => state.pageInfo);
 
   const {role, isAuthenticated} = useAuthStore();
-
+  const location = useLocation();
 
   useEffect(() => {
     const loadData = async () => {
@@ -56,21 +55,25 @@ function App() {
     loadData();
   }, [loadPageInfo, loadSocialMediaList, setLoading]);
 
-  if (
-    loading.global ||
+  const shouldShowLoader =
+    location.pathname !== '/auth' &&
     (
-      !pageInfo?.published &&
+      loading.global ||
       (
-        !isAuthenticated ||
-        (role !== 'ADMIN' && role !== 'CONTENT_MANAGER')
+        !pageInfo?.published &&
+        (
+          !isAuthenticated ||
+          (role !== 'ADMIN' && role !== 'CONTENT_MANAGER')
+        )
       )
-    )
-  ) {
+    );
+
+  if (shouldShowLoader) {
     return <PageLoader />;
   }
 
   return (
-    <BrowserRouter>
+    <>
       <ScrollToTop />
       <ScrollToAnchor />
       <div className="min-h-screen flex flex-col bg-gray-50">
@@ -103,7 +106,7 @@ function App() {
               element={<ComplexesPage />}
             />
             <Route
-              path="/complex/:complexName"
+              path="/complex/:complexId"
               element={<ComplexPage />}
             />
             <Route
@@ -123,9 +126,18 @@ function App() {
             />
           </Routes>
         </main>
+
         <Footer />
         {modals.bid && <BookingModal />}
       </div>
+    </>
+  );
+};
+
+function App() {
+  return (
+    <BrowserRouter>
+      <InnerApp />
     </BrowserRouter>
   );
 }

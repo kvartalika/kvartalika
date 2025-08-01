@@ -3,10 +3,11 @@ import type {Flat} from "../services";
 
 interface ApartmentCardProps {
   apartment: Flat;
+  homeName: string;
   onBookingClick?: () => void;
 }
 
-const ApartmentCard = ({apartment, onBookingClick}: ApartmentCardProps) => {
+const ApartmentCard = ({apartment, onBookingClick, homeName}: ApartmentCardProps) => {
   const navigate = useNavigate();
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ru-RU').format(price);
@@ -40,10 +41,10 @@ const ApartmentCard = ({apartment, onBookingClick}: ApartmentCardProps) => {
 
       <div className="p-4">
         <Link
-          to={`/complex/${encodeURIComponent(apartment.homeId)}`}
+          to={`/complex/${apartment.homeId}`}
           className="text-sm text-blue-600 hover:text-blue-700 font-medium mb-1 block"
         >
-          {apartment.homeId}
+          {homeName}
         </Link>
 
         <p className="text-gray-600 text-sm mb-3">{apartment.address}</p>

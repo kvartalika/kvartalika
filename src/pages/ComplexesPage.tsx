@@ -6,7 +6,7 @@ import {useFlatsStore} from "../store";
 const ComplexesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const {isLoadingHomes, error, loadHomes, homes, setError} = useFlatsStore();
+  const {isLoadingHomes, error, loadHomes, homes} = useFlatsStore();
 
   const [filteredComplexes, setFilteredComplexes] = useState<Home[]>([]);
 
@@ -17,15 +17,14 @@ const ComplexesPage = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        await loadHomes(homes.length === 0);
-        setFilteredComplexes(homes);
+        await loadHomes(true);
       } catch (error) {
         console.error('Error loading data:', error);
       }
     };
 
     loadData();
-  }, [homes, loadHomes, setError]);
+  }, [loadHomes]);
 
   useEffect(() => {
     if (searchQuery.trim() === '') {
@@ -100,7 +99,7 @@ const ComplexesPage = () => {
             {filteredComplexes.map(complex => (
               <Link
                 key={complex.id}
-                to={`/complex/${encodeURIComponent(complex.name)}`}
+                to={`/complex/${complex.id}`}
                 className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
               >
                 <div className="relative h-64 overflow-hidden">

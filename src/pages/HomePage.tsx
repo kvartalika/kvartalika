@@ -25,6 +25,7 @@ const HomePage = () => {
     isLoadingHomePageFlats,
     isLoadingHomes,
     loadAllData,
+    homes,
   } = useFlatsStore();
 
 
@@ -54,8 +55,9 @@ const HomePage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {section.flats.map(apartment => (
               <ApartmentCard
-                key={apartment.id}
-                apartment={apartment}
+                homeName={homes.find(item => item.id === apartment.flat.homeId)?.name ?? "?"}
+                key={apartment.flat.id}
+                apartment={apartment.flat}
                 onBookingClick={() => openModal('bid')}
               />
             ))}

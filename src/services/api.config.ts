@@ -166,4 +166,3 @@ const apiConfig: ApiConfig = {
 };
 
 export const apiClient = new ApiClient(apiConfig);
-export default apiClient;
