@@ -1,8 +1,6 @@
 import {useCallback, type FormEvent, useRef, useState} from 'react';
 import {useNavigate, createSearchParams} from 'react-router-dom';
-import {useSearchStore, type SearchFilters} from '../store/search.store.ts';
-import {useUIStore} from "../store/ui.store.ts";
-import {usePropertiesStore} from "../store/properties.store.ts";
+import {useSearchStore, useUIStore, usePropertiesStore, type SearchFilters} from "../store";
 import {useClickOutside} from "../hooks/useClickOutside.ts";
 
 const serializeFiltersToParams = (filters: SearchFilters): Record<string, string> => {

@@ -16,7 +16,7 @@ import ApartmentPage from './pages/ApartmentPage';
 import AuthPage from './pages/AuthPage';
 import AdminPage from './pages/AdminPage';
 
-import {useUIStore} from "./store/ui.store.ts";
+import {useUIStore} from "./store";
 
 function ScrollToTop() {
   const {pathname} = useLocation();

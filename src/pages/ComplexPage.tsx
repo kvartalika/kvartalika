@@ -3,9 +3,7 @@ import {useParams, Link} from 'react-router-dom';
 import ApartmentCard from '../components/ApartmentCard';
 
 import ContentManager from '../components/ContentManager';
-import {useAuthStore} from "../store/auth.store.ts";
-import {useUIStore} from "../store/ui.store.ts";
-import {usePropertiesStore} from "../store/properties.store.ts";
+import {useAuthStore, useUIStore, usePropertiesStore} from "../store";
 
 const ComplexPage = () => {
   const {homeId} = useParams<{ homeId: string }>();

@@ -2,8 +2,7 @@ import {useEffect, useMemo} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import ApartmentCard from '../components/ApartmentCard';
 import SearchBar from '../components/SearchBar';
-import {type SearchFilters, useSearchStore} from "../store/search.store.ts";
-import {useUIStore} from "../store/ui.store.ts";
+import {type SearchFilters, useSearchStore, useUIStore} from "../store";
 
 const ApartmentsPage = () => {
   const [searchParams] = useSearchParams();

@@ -1,12 +1,7 @@
 import {type FormEvent, useState} from 'react';
 import ContactForm from './forms/ContactForm';
 import SocialMediaForm from './forms/SocialMediaForm';
-import {useAuthStore} from "../store/auth.store.ts";
-import {
-  type PageInfo,
-  type SocialMedia,
-  useUIStore
-} from "../store/ui.store.ts";
+import {useAuthStore, useUIStore, type PageInfo, type SocialMedia} from "../store";
 
 interface HomePageManagerProps {
   onCancel: () => void;

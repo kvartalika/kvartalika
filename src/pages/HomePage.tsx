@@ -5,9 +5,7 @@ import ApartmentCard from '../components/ApartmentCard';
 import BackgroundPattern from "../components/BackgroundPattern.tsx";
 import HomePageManager from '../components/HomePageManager';
 
-import {useUIStore} from "../store/ui.store.ts";
-import {useAuthStore} from "../store/auth.store.ts";
-import {usePropertiesStore} from "../store/properties.store.ts";
+import {useUIStore, useAuthStore, usePropertiesStore} from "../store";
 import type {HomePageFlats} from "../services";
 import PageLoader from "../components/PageLoader.tsx";
 

@@ -48,6 +48,7 @@ export interface SearchFilters {
   bathrooms?: number[];
   finishing?: string[];
   category?: string;
+  complex?: string;
   hasParks?: boolean;
   hasSchools?: boolean;
   hasShops?: boolean;

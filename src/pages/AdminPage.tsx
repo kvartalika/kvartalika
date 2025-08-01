@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useAdminStore} from '../store/admin.store.ts';
-import {useAuthStore} from "../store/auth.store.ts";
+import {useAdminStore, useAuthStore} from "../store";
 import type {UserDto} from '../services';
 
 const AdminPage = () => {
@@ -22,21 +21,12 @@ const AdminPage = () => {
     addAdmin,
     editAdmin,
     removeAdmin,
-    setError,
     clearError,
   } = useAdminStore();
 
   const [activeTab, setActiveTab] = useState<'managers' | 'admins' | 'files' | 'directories'>('managers');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [newDirectoryName, setNewDirectoryName] = useState('');
-  const [files, setFiles] = useState<FileItem[]>([]);
-  const [directories, setDirectories] = useState<Directory[]>([]);
-  const [currentDirectory, setCurrentDirectory] = useState('/');
-  const [isLoadingLocal, setIsLoadingLocal] = useState(false);
-  const [localError, setLocalError] = useState<string | null>(null);
 
   // Form states
-  const [showForm, setShowForm] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState<UserDto>({
     name: '',
@@ -74,7 +64,6 @@ const AdminPage = () => {
       } else {
         await addContentManager(formData);
       }
-      setShowForm(false);
       setEditMode(false);
       resetForm();
     } catch (error) {
@@ -92,7 +81,6 @@ const AdminPage = () => {
       } else {
         await addAdmin(formData);
       }
-      setShowForm(false);
       setEditMode(false);
       resetForm();
     } catch (error) {
@@ -125,7 +113,6 @@ const AdminPage = () => {
       telegramId: item.telegramId || '',
     });
     setEditMode(true);
-    setShowForm(true);
   };
 
   const handleDeleteManager = async (email: string) => {
@@ -187,13 +174,7 @@ const AdminPage = () => {
           </div>
         )}
 
-        {localError && (
-          <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-            {localError}
-          </div>
-        )}
-
-        {(isLoadingContentManagers || isLoadingAdmins || isLoadingLocal) ? (
+        {(isLoadingContentManagers || isLoadingAdmins) ? (
           <div className="mt-8 flex justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
@@ -209,7 +190,6 @@ const AdminPage = () => {
                     </h3>
                     <button
                       onClick={() => {
-                        setShowForm(true);
                         setEditMode(false);
                         resetForm();
                       }}
@@ -332,7 +312,7 @@ const AdminPage = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          setShowForm(false);
+                          
                           setEditMode(false);
                           resetForm();
                         }}
@@ -355,7 +335,7 @@ const AdminPage = () => {
                   <div className="space-y-3">
                     {contentManagers.map((manager) => (
                       <div
-                        key={manager.id}
+                        key={manager.email}
                         className="flex justify-between items-center p-3 border rounded"
                       >
                         <div>
@@ -396,7 +376,6 @@ const AdminPage = () => {
                     </h3>
                     <button
                       onClick={() => {
-                        setShowForm(true);
                         setEditMode(false);
                         resetForm();
                         setFormData({...formData, role: 'ADMIN'});
@@ -520,7 +499,7 @@ const AdminPage = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          setShowForm(false);
+                          
                           setEditMode(false);
                           resetForm();
                         }}
@@ -543,7 +522,7 @@ const AdminPage = () => {
                   <div className="space-y-3">
                     {admins.map((admin) => (
                       <div
-                        key={admin.id}
+                        key={admin.email}
                         className="flex justify-between items-center p-3 border rounded"
                       >
                         <div>
@@ -595,15 +574,6 @@ const AdminPage = () => {
   );
 };
 
-interface FileItem {
-  name: string;
-  size: number;
-  type: string;
-}
 
-interface Directory {
-  name: string;
-  path: string;
-}
 
 export default AdminPage;

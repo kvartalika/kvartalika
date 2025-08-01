@@ -1,9 +1,7 @@
 import {useEffect, useState} from 'react';
 import {useParams, Link} from 'react-router-dom';
 import ContentManager from '../components/ContentManager';
-import {useUIStore} from "../store/ui.store.ts";
-import {usePropertiesStore} from "../store/properties.store.ts";
-import {useAuthStore} from "../store/auth.store.ts";
+import {useUIStore, usePropertiesStore, useAuthStore} from "../store";
 
 const ApartmentPage = () => {
   const {apartmentId} = useParams<{ apartmentId: string }>();

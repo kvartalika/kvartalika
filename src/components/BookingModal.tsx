@@ -1,5 +1,5 @@
 import {type FormEvent} from 'react';
-import {useUIStore} from "../store/ui.store.ts";
+import {useUIStore} from "../store";
 
 const BookingModal = () => {
   const setBidForm = useUIStore(state => state.setBidForm);

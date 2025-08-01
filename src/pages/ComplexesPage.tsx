@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react';
 import {Link} from 'react-router-dom';
-import {usePropertiesStore} from "../store/properties.store.ts";
+import {usePropertiesStore} from "../store";
 import type {Home} from "../services";
 
 const ComplexesPage = () => {

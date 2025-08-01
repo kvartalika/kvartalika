@@ -1,8 +1,8 @@
 import {useState, useEffect} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
-import {useAuthStore} from '../store/useAuthStore';
+import {useAuthStore} from '../store/auth.store';
 import Logo from './Logo';
-import {useUIStore} from "../store/ui.store.ts";
+import {useUIStore} from "../store";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);

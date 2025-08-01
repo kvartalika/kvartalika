@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuthStore } from '../store/useAuthStore';
+import { useAuthStore } from '../store/auth.store';
 import type { FormData, ContentType } from '../types';
 
 interface ContentManagerProps {
@@ -17,7 +17,7 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!isAuthenticated || user?.role !== 'CM') {
+    if (!isAuthenticated || user?.role !== 'CONTENT_MANAGER') {
       return;
     }
   }, [isAuthenticated, user]);
@@ -32,7 +32,7 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
   const handleArrayChange = (field: string, index: number, value: string) => {
     setFormData((prev: FormData) => ({
       ...prev,
-      [field]: (prev[field] as string[])?.map((item: string, i: number) => 
+      [field]: ((prev as any)[field] as string[])?.map((item: string, i: number) => 
         i === index ? value : item
       ) || []
     }));
@@ -41,14 +41,14 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
   const handleAddArrayItem = (field: string) => {
     setFormData((prev: FormData) => ({
       ...prev,
-      [field]: [...((prev[field] as string[]) || []), '']
+      [field]: [...(((prev as any)[field] as string[]) || []), '']
     }));
   };
 
   const handleRemoveArrayItem = (field: string, index: number) => {
     setFormData((prev: FormData) => ({
       ...prev,
-      [field]: (prev[field] as string[])?.filter((_: string, i: number) => i !== index) || []
+      [field]: ((prev as any)[field] as string[])?.filter((_: string, i: number) => i !== index) || []
     }));
   };
 
@@ -75,7 +75,7 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
     }
   };
 
-  if (!isAuthenticated || user?.role !== 'CM') {
+  if (!isAuthenticated || user?.role !== 'CONTENT_MANAGER') {
     return null;
   }
 

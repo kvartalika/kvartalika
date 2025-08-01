@@ -15,7 +15,15 @@ import {
   updatePhoto,
   deletePhoto,
   bulkDeletePhotos,
+  createFooter,
+  updateFooter,
 } from '../services';
+import {
+  getContentManagers,
+  addContentManager as createContentManager,
+  updateContentManager,
+  deleteContentManager,
+} from '../services/admin.service';
 import type {
   Category,
   Description,
@@ -23,13 +31,16 @@ import type {
   Home,
   Photo,
   ContentManager,
+  Footer,
   CategoryRequest,
   DescriptionRequest,
   FlatRequest,
   HomeRequest,
   FooterRequest,
   ContentManagerRequest,
+  UserDto,
 } from '../services';
+import type { UserRole } from './auth.store';
 
 export interface ContentState {
   categories: Category[];
@@ -37,6 +48,7 @@ export interface ContentState {
   flats: Flat[];
   homes: Home[];
   photos: Photo[];
+  contentManagers: ContentManager[];
 
   selectedCategory: Category | null;
   selectedDescription: Description | null;
@@ -44,12 +56,14 @@ export interface ContentState {
   selectedHome: Home | null;
   selectedPhoto: Photo | null;
   selectedContentManager: ContentManager | null;
+  footer: Footer | null;
 
   categoryForm: Partial<CategoryRequest>;
   descriptionForm: Partial<DescriptionRequest>;
   flatForm: Partial<FlatRequest>;
   homeForm: Partial<HomeRequest>;
   contentManagerForm: Partial<ContentManagerRequest>;
+  footerForm: Partial<FooterRequest>;
 
   loading: {
     categories: boolean;
@@ -58,6 +72,7 @@ export interface ContentState {
     homes: boolean;
     photos: boolean;
     contentManagers: boolean;
+    footer: boolean;
     uploading: boolean;
     saving: boolean;
     deleting: boolean;
@@ -105,6 +120,11 @@ export interface ContentActions {
   removeHome: (id: number) => Promise<boolean>;
   editHome: (home: Home) => void;
 
+  loadContentManagers: () => Promise<void>;
+  saveContentManager: (data: ContentManagerRequest) => Promise<boolean>;
+  removeContentManager: (id: string) => Promise<boolean>;
+  editContentManager: (manager: ContentManager) => void;
+
   loadPhotos: () => Promise<void>;
   uploadPhotos: (files: File[]) => Promise<boolean>;
   updatePhotoData: (id: number, altText: string) => Promise<boolean>;
@@ -118,6 +138,7 @@ export interface ContentActions {
   setFlatForm: (form: Partial<FlatRequest>) => void;
   setHomeForm: (form: Partial<HomeRequest>) => void;
   setContentManagerForm: (form: Partial<ContentManagerRequest>) => void;
+  setFooterForm: (form: Partial<FooterRequest>) => void;
   resetForms: () => void;
 
   setActiveTab: (tab: ContentState['ui']['activeTab']) => void;
@@ -170,6 +191,16 @@ const initialContentManagerForm: Partial<ContentManagerRequest> = {
   role: 'CONTENT_MANAGER'
 };
 
+const initialFooterForm: Partial<FooterRequest> = {
+  content: '',
+  links: [],
+  contacts: {
+    phone: '',
+    email: '',
+    address: '',
+  },
+};
+
 export const useContentStore = create<ContentState & ContentActions>((set, get) => ({
   categories: [],
   descriptions: [],
@@ -177,6 +208,7 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
   homes: [],
   photos: [],
   contentManagers: [],
+  footer: null,
 
   selectedCategory: null,
   selectedDescription: null,
@@ -190,6 +222,7 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
   flatForm: initialFlatForm,
   homeForm: initialHomeForm,
   contentManagerForm: initialContentManagerForm,
+  footerForm: initialFooterForm,
 
   loading: {
     categories: false,
@@ -198,6 +231,7 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
     homes: false,
     photos: false,
     contentManagers: false,
+    footer: false,
     uploading: false,
     saving: false,
     deleting: false,
@@ -430,16 +464,14 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
     set({
       selectedFlat: flat,
       flatForm: {
-        title: flat.title,
+        name: flat.name,
         description: flat.description,
         price: flat.price,
         area: flat.area,
-        rooms: flat.rooms,
+        numberOfRooms: flat.numberOfRooms,
         floor: flat.floor,
-        totalFloors: flat.totalFloors,
         homeId: flat.homeId,
-        categoryId: flat.categoryId,
-        photos: flat.photos?.map(p => p.id),
+        images: flat.images,
       },
       ui: {...get().ui, showForm: true, editMode: true},
     });
@@ -516,9 +548,8 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
         name: home.name,
         description: home.description,
         address: home.address,
-        categoryId: home.categoryId,
-        photos: home.photos?.map(p => p.id),
-        amenities: home.amenities,
+        images: home.images,
+        features: home.features,
       },
       ui: {...get().ui, showForm: true, editMode: true},
     });
@@ -670,9 +701,19 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
 
     try {
       const managers = await getContentManagers();
+      // Convert UserDto[] to ContentManager[]
+      const contentManagers: ContentManager[] = managers.map(manager => ({
+        id: manager.email, // Use email as id since UserDto doesn't have id
+        username: manager.name,
+        email: manager.email,
+        role: manager.role,
+        isActive: true,
+        createdAt: manager.createdAt || new Date().toISOString(),
+        updatedAt: manager.updatedAt || new Date().toISOString(),
+      }));
       set({
         loading: {...get().loading, contentManagers: false},
-        contentManagers: managers,
+        contentManagers,
       });
     } catch (error: any) {
       set({
@@ -688,10 +729,22 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
     try {
       const {selectedContentManager} = get();
 
+      // Convert ContentManagerRequest to UserDto
+      const userData: UserDto = {
+        name: data.name || '',
+        surname: data.surname || '',
+        patronymic: data.patronymic,
+        email: data.email || '',
+        phone: data.phone,
+        password: data.password || '',
+        role: data.role || 'CONTENT_MANAGER',
+        telegramId: data.telegramId,
+      };
+
       if (selectedContentManager) {
-        await updateContentManager(selectedContentManager.id, data);
+        await updateContentManager(selectedContentManager.id, userData);
       } else {
-        await createContentManager(data);
+        await createContentManager(userData);
       }
 
       await get().loadContentManagers();
@@ -731,9 +784,9 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
     set({
       selectedContentManager: manager,
       contentManagerForm: {
-        username: manager.username,
+        name: manager.username,
         email: manager.email,
-        role: manager.role,
+        role: manager.role as UserRole,
         // Don't populate password for security
       },
       ui: {...get().ui, showForm: true, editMode: true},
@@ -768,6 +821,12 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
   setContentManagerForm: (form) => {
     set(state => ({
       contentManagerForm: {...state.contentManagerForm, ...form},
+    }));
+  },
+
+  setFooterForm: (form) => {
+    set(state => ({
+      footerForm: {...state.footerForm, ...form},
     }));
   },
 
