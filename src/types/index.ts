@@ -1,9 +1,16 @@
+import type {UserRole} from "../store/auth.store.ts";
+
 export interface User {
   id: number;
   name: string;
   surname: string;
+  patronymic?: string;
   email: string;
-  role: 'ADMIN' | 'CM';
+  phone?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  role: UserRole;
+  telegramId?: string;
 }
 
 export interface Apartment {

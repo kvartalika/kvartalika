@@ -15,10 +15,6 @@ import {
   updatePhoto,
   deletePhoto,
   bulkDeletePhotos,
-  getContentManagers,
-  createContentManager,
-  updateContentManager,
-  deleteContentManager,
 } from '../services';
 import type {
   Category,
@@ -41,8 +37,6 @@ export interface ContentState {
   flats: Flat[];
   homes: Home[];
   photos: Photo[];
-
-  contentManagers: ContentManager[];
 
   selectedCategory: Category | null;
   selectedDescription: Description | null;
@@ -119,11 +113,6 @@ export interface ContentActions {
   selectPhoto: (id: number, selected: boolean) => void;
   selectAllPhotos: (selected: boolean) => void;
 
-  loadContentManagers: () => Promise<void>;
-  saveContentManager: (data: ContentManagerRequest) => Promise<boolean>;
-  removeContentManager: (id: string) => Promise<boolean>;
-  editContentManager: (manager: ContentManager) => void;
-
   setCategoryForm: (form: Partial<CategoryRequest>) => void;
   setDescriptionForm: (form: Partial<DescriptionRequest>) => void;
   setFlatForm: (form: Partial<FlatRequest>) => void;
@@ -174,7 +163,8 @@ const initialHomeForm: Partial<HomeRequest> = {
 };
 
 const initialContentManagerForm: Partial<ContentManagerRequest> = {
-  username: '',
+  name: '',
+  surname: '',
   email: '',
   password: '',
   role: 'CONTENT_MANAGER'

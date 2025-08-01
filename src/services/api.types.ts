@@ -10,9 +10,9 @@ export interface LoginRequest {
 export interface RegisterRequest {
   name: string;
   surname: string;
-  patronymic: string;
+  patronymic?: string;
   email: string;
-  phone: string;
+  phone?: string;
   password: string;
   telegramId: string;
 }
@@ -23,10 +23,27 @@ export interface RegisterResponse {
 }
 
 export interface ContentManagerRequest {
-  username?: string;
-  email: string;
+  name?: string;
+  surname?: string;
+  patronymic?: string;
+  email?: string;
+  phone?: string;
   password?: string;
+  telegramId?: string;
   role?: UserRole;
+}
+
+export interface UserDto {
+  name: string;
+  surname: string;
+  patronymic?: string;
+  email: string;
+  phone?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  role: string;
+  password: string;
+  telegramId?: string;
 }
 
 export interface CategoryRequest {

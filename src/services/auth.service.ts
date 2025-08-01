@@ -81,22 +81,6 @@ export class AuthService {
   static logout() {
     apiClient.clearTokens();
   }
-
-  static isAdminAuthenticated(): boolean {
-    return !!localStorage.getItem('admin_token');
-  }
-
-  static isContentManagerAuthenticated(): boolean {
-    return !!localStorage.getItem('content_token');
-  }
-
-  static getCurrentAdminToken(): string | null {
-    return localStorage.getItem('admin_token');
-  }
-
-  static getCurrentContentToken(): string | null {
-    return localStorage.getItem('content_token');
-  }
 }
 
 export const {
@@ -106,8 +90,4 @@ export const {
   contentManagerLogin,
   contentManagerRegister,
   logout,
-  isAdminAuthenticated,
-  isContentManagerAuthenticated,
-  getCurrentAdminToken,
-  getCurrentContentToken,
 } = AuthService;
