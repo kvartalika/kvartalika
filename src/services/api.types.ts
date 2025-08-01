@@ -23,16 +23,16 @@ export interface RegisterResponse {
 }
 
 export interface ContentManagerRequest {
-  username: string;
+  username?: string;
   email: string;
-  password: string;
-  role?: string;
+  password?: string;
+  role?: UserRole;
 }
 
 export interface CategoryRequest {
+  id: number;
   name: string;
-  description?: string;
-  parentId?: number;
+  isOnMainPage: boolean;
 }
 
 export interface DescriptionRequest {
@@ -42,25 +42,47 @@ export interface DescriptionRequest {
 }
 
 export interface FlatRequest {
-  title: string;
-  description: string;
-  price: number;
-  area: number;
-  rooms: number;
-  floor: number;
-  totalFloors?: number;
-  homeId: number;
-  categoryId?: number;
-  photos?: number[];
+  id?: number;
+  name?: string;
+  description?: string;
+  images?: string[];
+  layout?: string;
+  address?: string;
+  price?: number;
+  latitude?: number;
+  longitude?: number;
+  features?: string[];
+  numberOfRooms?: number;
+  area?: number;
+  about?: string;
+  floor?: number;
+  homeId?: number;
+  numberOfBathrooms?: number
+  hasDecoration?: boolean;
+  numberForSale?: number
+  published?: boolean;
 }
 
 export interface HomeRequest {
-  name: string;
-  description: string;
-  address: string;
-  categoryId?: number;
-  photos?: number[];
-  amenities?: string[];
+  id?: number;
+  name?: string;
+  description?: string;
+  images?: string[];
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  yearBuilt?: number;
+  history?: string[];
+  historyImages?: string[];
+  features?: string[];
+  about?: string;
+  numberOfFloors?: number;
+  storesNearby?: boolean;
+  schoolsNearby?: boolean;
+  hospitalsNearby?: boolean;
+  hasYards?: boolean;
+  yardsImages?: string[];
+  published?: boolean;
 }
 
 export interface FooterRequest {
@@ -125,6 +147,15 @@ export interface Category {
   id: number;
   name: string;
   isOnMainPage: boolean;
+}
+
+export interface BidRequest {
+  name?: string;
+  surname?: string;
+  patronymic?: string;
+  phone?: string;
+  email?: string;
+  isChecked: boolean;
 }
 
 export interface Description {

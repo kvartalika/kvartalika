@@ -7,12 +7,13 @@ export interface ApiConfig {
 }
 
 interface QueueItem {
-  resolve: (value: AxiosResponse) => void;
+  resolve: () => void;
   reject: (err: any) => void;
 }
 
 class ApiClient {
   private readonly axiosInstance: AxiosInstance;
+  private readonly refreshInstance: AxiosInstance;
   private accessToken: string | null = null;
   private isRefreshing = false;
   private refreshQueue: QueueItem[] = [];
@@ -24,6 +25,12 @@ class ApiClient {
       headers: {
         'Content-Type': 'application/json',
       },
+      withCredentials: true,
+    });
+
+    this.refreshInstance = axios.create({
+      baseURL: config.baseURL,
+      timeout: config.timeout,
       withCredentials: true,
     });
 
@@ -46,46 +53,31 @@ class ApiClient {
       (response: AxiosResponse) => response,
       async (error: any) => {
         const originalRequest = error.config;
-
-        if (
-          error.response?.status === 401 &&
-          !originalRequest._retry
-        ) {
+        if (error.response?.status === 401 && !originalRequest?._retry) {
           originalRequest._retry = true;
 
           if (this.isRefreshing) {
-            return new Promise<AxiosResponse>((resolve, reject) => {
+            return new Promise<void>((resolve, reject) => {
               this.refreshQueue.push({resolve, reject});
-            }).then(() => {
-              return this.axiosInstance(originalRequest);
-            });
+            }).then(() => this.axiosInstance(originalRequest));
           }
 
           this.isRefreshing = true;
-
           try {
             this.accessToken = await this.refreshAccessToken();
 
-            this.refreshQueue.forEach(({resolve}) => {
-              resolve({} as AxiosResponse);
-            });
+            this.refreshQueue.forEach(({resolve}) => resolve());
             this.refreshQueue = [];
+
+            originalRequest.headers = originalRequest.headers || {};
 
             originalRequest.headers.Authorization = `Bearer ${this.accessToken}`;
             return this.axiosInstance(originalRequest);
 
           } catch (refreshError) {
             this.clearTokens();
-
-            this.refreshQueue.forEach(({reject}) => {
-              reject(refreshError);
-            });
+            this.refreshQueue.forEach(({reject}) => reject(refreshError));
             this.refreshQueue = [];
-
-            if (typeof window !== 'undefined') {
-              window.location.href = '/login';
-            }
-
             return Promise.reject(refreshError);
           } finally {
             this.isRefreshing = false;
@@ -98,22 +90,18 @@ class ApiClient {
   }
 
   private async refreshAccessToken(): Promise<string> {
-    try {
-      const response = await this.axiosInstance.post<{
-        accessToken: string
-      }>('/auth/refresh');
-
-      if (!response.data?.accessToken) {
-        throw new Error('Не удалось получить новый access token');
-      }
-
-      return response.data.accessToken;
-    } catch (error) {
-      console.error('Ошибка обновления токена:', error);
-      throw error;
+    // POST без тела, сервер возьмёт refresh-token из HttpOnly cookie
+    const response = await this.refreshInstance.post<{
+      accessToken: string
+    }>('/auth/refresh');
+    const newToken = response.data?.accessToken;
+    if (!newToken) {
+      throw new Error('Не удалось получить новый access token');
     }
+    return newToken;
   }
 
+  /** Устанавливаем access-token после логина */
   setAccessToken(token: string) {
     this.accessToken = token;
   }
@@ -134,7 +122,6 @@ class ApiClient {
     return this.axiosInstance.post<TResponse>(url, data, config);
   }
 
-
   async put<TResponse, TData = unknown>(
     url: string,
     data?: TData,
@@ -143,15 +130,12 @@ class ApiClient {
     return this.axiosInstance.put<TResponse>(url, data, config);
   }
 
+
   async delete<T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
     return this.axiosInstance.delete<T>(url, config);
   }
 
-  async postForm<T>(
-    url: string,
-    formData: FormData,
-    config?: AxiosRequestConfig
-  ): Promise<AxiosResponse<T>> {
+  async postForm<T>(url: string, formData: FormData, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
     return this.axiosInstance.post<T>(url, formData, {
       ...config,
       headers: {

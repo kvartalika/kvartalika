@@ -9,11 +9,11 @@ interface SocialMediaFormProps {
 }
 
 const SocialMediaForm: React.FC<SocialMediaFormProps> = ({
-  socialMedia,
-  onSocialMediaChange,
-  onAddSocialMedia,
-  onRemoveSocialMedia
-}) => {
+                                                           socialMedia,
+                                                           onSocialMediaChange,
+                                                           onAddSocialMedia,
+                                                           onRemoveSocialMedia
+                                                         }) => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -28,7 +28,10 @@ const SocialMediaForm: React.FC<SocialMediaFormProps> = ({
       </div>
 
       {socialMedia.map((item, index) => (
-        <div key={index} className="border rounded-lg p-4 bg-gray-50">
+        <div
+          key={index}
+          className="border rounded-lg p-4 bg-gray-50"
+        >
           <div className="flex justify-between items-center mb-4">
             <h4 className="font-medium text-gray-900">Социальная сеть {index + 1}</h4>
             <button
@@ -47,8 +50,8 @@ const SocialMediaForm: React.FC<SocialMediaFormProps> = ({
               </label>
               <input
                 type="text"
-                value={item.image}
-                onChange={(e) => onSocialMediaChange(index, 'image', e.target.value)}
+                value={item.image ?? ''}
+                onChange={(e) => onSocialMediaChange(index, 'image', e.target.value ?? '')}
                 className="w-full border rounded px-3 py-2"
                 placeholder="https://example.com/icon.png"
               />
@@ -59,8 +62,8 @@ const SocialMediaForm: React.FC<SocialMediaFormProps> = ({
               </label>
               <input
                 type="text"
-                value={item.link}
-                onChange={(e) => onSocialMediaChange(index, 'link', e.target.value)}
+                value={item.link ?? ''}
+                onChange={(e) => onSocialMediaChange(index, 'link', e.target.value ?? '')}
                 className="w-full border rounded px-3 py-2"
                 placeholder="https://example.com"
               />

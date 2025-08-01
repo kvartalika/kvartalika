@@ -1,186 +1,78 @@
-import { useState, useEffect } from 'react';
-import { useAuthStore } from '../store/useAuthStore';
-import { useNavigate } from 'react-router-dom';
-
-interface User {
-  id: number;
-  name: string;
-  surname: string;
-  patronymic: string;
-  email: string;
-  phone: string;
-  role: 'ADMIN' | 'CM';
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface FileItem {
-  id: number;
-  name: string;
-  path: string;
-  size: number;
-  type: string;
-  createdAt: string;
-}
-
-interface Directory {
-  id: number;
-  name: string;
-  path: string;
-  createdAt: string;
-}
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {
+  useContentStore,
+  useContentManagers,
+  useContentLoading,
+  useContentErrors
+} from '../store/content.store.ts';
+import {useAuthStore} from "../store/auth.store.ts";
 
 const AdminPage = () => {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const {role, isAuthenticated, logout} = useAuthStore();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'users' | 'files' | 'directories'>('users');
-  const [users, setUsers] = useState<User[]>([]);
+
+  const contentManagers = useContentManagers();
+  const loading = useContentLoading();
+  const errors = useContentErrors();
+
+  const loadContentManagers = useContentStore(state => state.loadContentManagers);
+  const saveContentManager = useContentStore(state => state.saveContentManager);
+  const removeContentManager = useContentStore(state => state.removeContentManager);
+  const editContentManager = useContentStore(state => state.editContentManager);
+  const contentManagerForm = useContentStore(state => state.contentManagerForm);
+  const setContentManagerForm = useContentStore(state => state.setContentManagerForm);
+  const ui = useContentStore(state => state.ui);
+  const setShowForm = useContentStore(state => state.setShowForm);
+  const setEditMode = useContentStore(state => state.setEditMode);
+  const clearErrors = useContentStore(state => state.clearErrors);
+
+  const [activeTab, setActiveTab] = useState<'managers' | 'files' | 'directories'>('managers');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [newDirectoryName, setNewDirectoryName] = useState('');
   const [files, setFiles] = useState<FileItem[]>([]);
   const [directories, setDirectories] = useState<Directory[]>([]);
-  const [currentDirectory] = useState('/');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  // Form states
-  const [newUser, setNewUser] = useState({
-    name: '',
-    surname: '',
-    patronymic: '',
-    email: '',
-    phone: '',
-    password: '',
-    role: 'CM' as 'ADMIN' | 'CM'
-  });
-  const [newDirectory, setNewDirectory] = useState({ name: '' });
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [currentDirectory, setCurrentDirectory] = useState('/');
+  const [isLoadingLocal, setIsLoadingLocal] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isAuthenticated || user?.role !== 'ADMIN') {
+    if (!isAuthenticated || role !== 'ADMIN') {
       navigate('/auth');
       return;
     }
-    loadData();
-  }, [isAuthenticated, user, navigate, activeTab, currentDirectory]);
-
-  const loadData = async () => {
-    setIsLoading(true);
-    setError('');
-    try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-
-      if (activeTab === 'users') {
-        const data = await mockApi.getUsers();
-        setUsers(data);
-      } else if (activeTab === 'files') {
-        const data = await mockApi.getFiles();
-        setFiles(data.files);
-        setDirectories(data.directories);
-      }
-    } catch (err) {
-      setError('Failed to load data');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCreateUser = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-      await mockApi.createUser(newUser);
-      
-      setNewUser({
-        name: '',
-        surname: '',
-        patronymic: '',
-        email: '',
-        phone: '',
-        password: '',
-        role: 'CM'
-      });
-      loadData();
-    } catch (err) {
-      setError('Failed to create user');
-    }
-  };
-
-  const handleDeleteUser = async (userId: number) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
-    
-    try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-      await mockApi.deleteUser(userId);
-      loadData();
-    } catch (err) {
-      setError('Failed to delete user');
-    }
-  };
-
-  const handleCreateDirectory = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-      await mockApi.createDirectory(newDirectory.name, currentDirectory);
-      
-      setNewDirectory({ name: '' });
-      loadData();
-    } catch (err) {
-      setError('Failed to create directory');
-    }
-  };
-
-  const handleDeleteDirectory = async () => {
-    if (!confirm('Are you sure you want to delete this directory?')) return;
-    
-    try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-      await mockApi.deleteDirectory();
-      loadData();
-    } catch (err) {
-      setError('Failed to delete directory');
-    }
-  };
-
-  const handleFileUpload = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedFile) return;
-
-    try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-      await mockApi.uploadFile(selectedFile, currentDirectory);
-      
-      setSelectedFile(null);
-      loadData();
-    } catch (err) {
-      setError('Failed to upload file');
-    }
-  };
-
-  const handleDeleteFile = async () => {
-    if (!confirm('Are you sure you want to delete this file?')) return;
-    
-    try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-      await mockApi.deleteFile();
-      loadData();
-    } catch (err) {
-      setError('Failed to delete file');
-    }
-  };
+    void loadContentManagers();
+    // TODO: load files/directories if real API exists
+  }, [isAuthenticated, role, navigate, loadContentManagers]);
 
   const handleLogout = async () => {
     await logout();
     navigate('/auth');
   };
 
-  if (!isAuthenticated || user?.role !== 'ADMIN') {
+  const handleCreateOrUpdateManager = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearErrors();
+    const success = await saveContentManager(contentManagerForm as any);
+    if (success) {
+      setShowForm(false);
+      setEditMode(false);
+    }
+  };
+
+  const handleEdit = (id: string) => {
+    const manager = contentManagers.find(m => m.id === id);
+    if (manager) {
+      editContentManager(manager);
+    }
+  };
+
+  const handleDeleteManager = async (id: string) => {
+    if (!confirm('Вы уверены, что хотите удалить этого контент-менеджера?')) return;
+    await removeContentManager(id);
+  };
+
+  if (!isAuthenticated || role !== 'ADMIN') {
     return null;
   }
 
@@ -191,7 +83,7 @@ const AdminPage = () => {
           <div className="flex justify-between items-center py-6">
             <h1 className="text-3xl font-bold text-gray-900">Admin Panel</h1>
             <div className="flex items-center space-x-4">
-              <span className="text-gray-700">Welcome, {user.name}</span>
+              <span className="text-gray-700">Welcome, {role}</span>
               <button
                 onClick={handleLogout}
                 className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
@@ -207,7 +99,7 @@ const AdminPage = () => {
         {/* Tabs */}
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8">
-            {['users', 'files', 'directories'].map((tab) => (
+            {['managers', 'files', 'directories'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab as any)}
@@ -223,99 +115,135 @@ const AdminPage = () => {
           </nav>
         </div>
 
-        {error && (
+        {(errors && Object.values(errors).some(Boolean)) && (
           <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-            {error}
+            {Object.entries(errors)
+              .filter(([, v]) => v)
+              .map(([k, v]) => (
+                <div key={k}>
+                  <strong>{k}:</strong> {v}
+                </div>
+              ))}
           </div>
         )}
 
-        {isLoading ? (
+        {localError && (
+          <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            {localError}
+          </div>
+        )}
+
+        {(loading.contentManagers || isLoadingLocal) ? (
           <div className="mt-8 flex justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
         ) : (
-          <div className="mt-8">
-            {/* Users Tab */}
-            {activeTab === 'users' && (
-              <div>
-                <div className="bg-white shadow rounded-lg p-6 mb-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Create New User</h3>
-                  <form onSubmit={handleCreateUser} className="grid grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      placeholder="Name"
-                      value={newUser.name}
-                      onChange={(e) => setNewUser({...newUser, name: e.target.value})}
-                      className="border rounded px-3 py-2"
-                      required
-                    />
-                    <input
-                      type="text"
-                      placeholder="Surname"
-                      value={newUser.surname}
-                      onChange={(e) => setNewUser({...newUser, surname: e.target.value})}
-                      className="border rounded px-3 py-2"
-                      required
-                    />
-                    <input
-                      type="text"
-                      placeholder="Patronymic"
-                      value={newUser.patronymic}
-                      onChange={(e) => setNewUser({...newUser, patronymic: e.target.value})}
-                      className="border rounded px-3 py-2"
-                      required
-                    />
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      value={newUser.email}
-                      onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-                      className="border rounded px-3 py-2"
-                      required
-                    />
-                    <input
-                      type="tel"
-                      placeholder="Phone"
-                      value={newUser.phone}
-                      onChange={(e) => setNewUser({...newUser, phone: e.target.value})}
-                      className="border rounded px-3 py-2"
-                      required
-                    />
-                    <input
-                      type="password"
-                      placeholder="Password"
-                      value={newUser.password}
-                      onChange={(e) => setNewUser({...newUser, password: e.target.value})}
-                      className="border rounded px-3 py-2"
-                      required
-                    />
-                    <select
-                      value={newUser.role}
-                      onChange={(e) => setNewUser({...newUser, role: e.target.value as 'ADMIN' | 'CM'})}
-                      className="border rounded px-3 py-2"
-                    >
-                      <option value="CM">Content Manager</option>
-                      <option value="ADMIN">Admin</option>
-                    </select>
+          <div className="mt-8 space-y-8">
+            {/* Content Managers Tab */}
+            {activeTab === 'managers' && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-white shadow rounded-lg p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium text-gray-900">
+                      {ui.editMode ? 'Edit Content Manager' : 'Create Content Manager'}
+                    </h3>
                     <button
-                      type="submit"
-                      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                      onClick={() => {
+                        setShowForm(true);
+                        setEditMode(false);
+                      }}
+                      className="text-sm text-blue-600 hover:underline"
                     >
-                      Create User
+                      Новая запись
                     </button>
+                  </div>
+
+                  <form
+                    onSubmit={handleCreateOrUpdateManager}
+                    className="space-y-4"
+                  >
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Username
+                        </label>
+                        <input
+                          type="text"
+                          value={(contentManagerForm as any).username || ''}
+                          onChange={(e) => setContentManagerForm({username: e.target.value})}
+                          className="w-full border rounded px-3 py-2"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Email
+                        </label>
+                        <input
+                          type="email"
+                          value={(contentManagerForm as any).email || ''}
+                          onChange={(e) => setContentManagerForm({email: e.target.value})}
+                          className="w-full border rounded px-3 py-2"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Role
+                        </label>
+                        <select
+                          value={(contentManagerForm as any).role || ''}
+                          onChange={(e) => setContentManagerForm({role: e.target.value as any})}
+                          className="w-full border rounded px-3 py-2"
+                        >
+                          <option value="content_manager">Content Manager</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Password {ui.editMode ? '(оставьте пустым чтобы не менять)' : ''}
+                        </label>
+                        <input
+                          type="password"
+                          value={(contentManagerForm as any).password || ''}
+                          onChange={(e) => setContentManagerForm({password: e.target.value})}
+                          className="w-full border rounded px-3 py-2"
+                          {...(ui.editMode ? {} : {required: true})}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end space-x-3 pt-4 border-t">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowForm(false);
+                          setEditMode(false);
+                        }}
+                        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                      >
+                        Отмена
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      >
+                        {ui.editMode ? 'Сохранить' : 'Создать'}
+                      </button>
+                    </div>
                   </form>
                 </div>
 
-                <div className="bg-white shadow rounded-lg">
-                  <div className="px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-medium text-gray-900">Users</h3>
+                <div className="bg-white shadow rounded-lg overflow-hidden">
+                  <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 className="text-lg font-medium text-gray-900">Content Managers</h3>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Name
+                            Username
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Email
@@ -329,33 +257,43 @@ const AdminPage = () => {
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {users.map((user) => (
-                          <tr key={user.id}>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="text-sm font-medium text-gray-900">
-                                {user.name} {user.surname}
-                              </div>
+                        {contentManagers.map((mgr) => (
+                          <tr key={mgr.id}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                              {mgr.username}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {user.email}
+                              {mgr.email}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                user.role === 'ADMIN' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                              }`}>
-                                {user.role}
-                              </span>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                              {mgr.role}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
                               <button
-                                onClick={() => handleDeleteUser(user.id)}
-                                className="text-red-600 hover:text-red-900"
+                                onClick={() => handleEdit(mgr.id)}
+                                className="text-blue-600 hover:underline"
                               >
-                                Delete
+                                Редактировать
+                              </button>
+                              <button
+                                onClick={() => handleDeleteManager(mgr.id)}
+                                className="text-red-600 hover:underline"
+                              >
+                                Удалить
                               </button>
                             </td>
                           </tr>
                         ))}
+                        {contentManagers.length === 0 && (
+                          <tr>
+                            <td
+                              colSpan={4}
+                              className="px-6 py-4 text-center text-sm text-gray-500"
+                            >
+                              Нет контент-менеджеров
+                            </td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -363,12 +301,18 @@ const AdminPage = () => {
               </div>
             )}
 
-            {/* Files Tab */}
+            {/* Files Tab - заглушка */}
             {activeTab === 'files' && (
               <div>
                 <div className="bg-white shadow rounded-lg p-6 mb-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Upload File</h3>
-                  <form onSubmit={handleFileUpload} className="flex items-center space-x-4">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Upload File (заглушка)</h3>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      alert('Загрузка файлов пока не реализована');
+                    }}
+                    className="flex items-center space-x-4"
+                  >
                     <input
                       type="file"
                       onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
@@ -389,63 +333,29 @@ const AdminPage = () => {
                     <h3 className="text-lg font-medium text-gray-900">Files in {currentDirectory}</h3>
                   </div>
                   <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Name
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Size
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Type
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {files.map((file) => (
-                          <tr key={file.id}>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                              {file.name}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {(file.size / 1024).toFixed(2)} KB
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {file.type}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                              <button
-                                onClick={() => handleDeleteFile()}
-                                className="text-red-600 hover:text-red-900"
-                              >
-                                Delete
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                    <p className="p-4 text-sm text-gray-500">Файловая система пока не подключена.</p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Directories Tab */}
+            {/* Directories Tab - заглушка */}
             {activeTab === 'directories' && (
               <div>
                 <div className="bg-white shadow rounded-lg p-6 mb-6">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Create Directory</h3>
-                  <form onSubmit={handleCreateDirectory} className="flex items-center space-x-4">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Create Directory (заглушка)</h3>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      alert('Создание папок пока не реализовано');
+                    }}
+                    className="flex items-center space-x-4"
+                  >
                     <input
                       type="text"
                       placeholder="Directory name"
-                      value={newDirectory.name}
-                      onChange={(e) => setNewDirectory({name: e.target.value})}
+                      value={newDirectoryName}
+                      onChange={(e) => setNewDirectoryName(e.target.value)}
                       className="border rounded px-3 py-2"
                       required
                     />
@@ -463,41 +373,7 @@ const AdminPage = () => {
                     <h3 className="text-lg font-medium text-gray-900">Directories</h3>
                   </div>
                   <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Name
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Path
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {directories.map((dir) => (
-                          <tr key={dir.id}>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                              {dir.name}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {dir.path}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                              <button
-                                onClick={() => handleDeleteDirectory()}
-                                className="text-red-600 hover:text-red-900"
-                              >
-                                Delete
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                    <p className="p-4 text-sm text-gray-500">Файловая система пока не подключена.</p>
                   </div>
                 </div>
               </div>

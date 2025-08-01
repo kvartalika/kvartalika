@@ -55,10 +55,6 @@ const HomePageManager = ({onCancel}: HomePageManagerProps) => {
     await addSocialMediaList(media);
   };
 
-  const updateSocialMedia = async () => {
-    await updateSocialMediaList(draftedSocialMediaList);
-  };
-
   const removeSocialMedia = async (index: number) => {
     await removeSocialMedia(index);
   };
@@ -67,7 +63,7 @@ const HomePageManager = ({onCancel}: HomePageManagerProps) => {
     e.preventDefault();
 
     try {
-      await Promise.all([updateSocialMedia(), updatePageInfo(draftedPageInfo)]);
+      await Promise.all([updateSocialMediaList(draftedSocialMediaList), updatePageInfo(draftedPageInfo)]);
 
     } catch (err) {
       console.log(err);

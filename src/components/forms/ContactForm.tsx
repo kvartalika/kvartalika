@@ -21,8 +21,8 @@ const ContactForm: React.FC<ContactFormProps> = ({
           </label>
           <input
             type="tel"
-            value={contactData.phone}
-            onChange={(e) => onContactChange('phone', e.target.value)}
+            value={contactData.phone ?? ''}
+            onChange={(e) => onContactChange('phone', e.target.value ?? '')}
             className="w-full border rounded px-3 py-2"
           />
         </div>
@@ -32,8 +32,8 @@ const ContactForm: React.FC<ContactFormProps> = ({
           </label>
           <input
             type="email"
-            value={contactData.email}
-            onChange={(e) => onContactChange('email', e.target.value)}
+            value={contactData.email ?? ''}
+            onChange={(e) => onContactChange('email', e.target.value ?? '')}
             className="w-full border rounded px-3 py-2"
           />
         </div>
@@ -45,8 +45,8 @@ const ContactForm: React.FC<ContactFormProps> = ({
         </label>
         <input
           type="text"
-          value={contactData.title}
-          onChange={(e) => onContactChange('title', e.target.value)}
+          value={contactData.title ?? ''}
+          onChange={(e) => onContactChange('title', e.target.value ?? '')}
           className="w-full border rounded px-3 py-2"
         />
       </div>
@@ -57,8 +57,8 @@ const ContactForm: React.FC<ContactFormProps> = ({
         </label>
         <input
           type="text"
-          value={contactData.address}
-          onChange={(e) => onContactChange('address', e.target.value)}
+          value={contactData.address ?? ''}
+          onChange={(e) => onContactChange('address', e.target.value ?? '')}
           className="w-full border rounded px-3 py-2"
         />
       </div>
@@ -68,8 +68,8 @@ const ContactForm: React.FC<ContactFormProps> = ({
           Описание в футере
         </label>
         <textarea
-          value={contactData.footerDescription}
-          onChange={(e) => onContactChange('footerDescription', e.target.value)}
+          value={contactData.footerDescription ?? ''}
+          onChange={(e) => onContactChange('footerDescription', e.target.value ?? '')}
           className="w-full border rounded px-3 py-2 h-24"
         />
       </div>
@@ -79,8 +79,8 @@ const ContactForm: React.FC<ContactFormProps> = ({
           Основное описание
         </label>
         <textarea
-          value={contactData.description}
-          onChange={(e) => onContactChange('description', e.target.value)}
+          value={contactData.description ?? ''}
+          onChange={(e) => onContactChange('description', e.target.value ?? '')}
           className="w-full border rounded px-3 py-2 h-24"
         />
       </div>
@@ -89,7 +89,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
         <input
           type="checkbox"
           id="published"
-          checked={contactData.published}
+          checked={!!contactData.published}
           onChange={(e) => onContactChange('published', e.target.checked)}
           className="mr-2"
         />

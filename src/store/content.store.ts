@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import {create} from 'zustand';
 import {
   createCategory,
   updateCategory,
@@ -12,8 +12,6 @@ import {
   createHome,
   updateHome,
   deleteHome,
-  createFooter,
-  updateFooter,
   updatePhoto,
   deletePhoto,
   bulkDeletePhotos,
@@ -27,7 +25,6 @@ import type {
   Description,
   Flat,
   Home,
-  Footer,
   Photo,
   ContentManager,
   CategoryRequest,
@@ -44,7 +41,6 @@ export interface ContentState {
   flats: Flat[];
   homes: Home[];
   photos: Photo[];
-  footer: Footer | null;
 
   contentManagers: ContentManager[];
 
@@ -59,7 +55,6 @@ export interface ContentState {
   descriptionForm: Partial<DescriptionRequest>;
   flatForm: Partial<FlatRequest>;
   homeForm: Partial<HomeRequest>;
-  footerForm: Partial<FooterRequest>;
   contentManagerForm: Partial<ContentManagerRequest>;
 
   loading: {
@@ -68,7 +63,6 @@ export interface ContentState {
     flats: boolean;
     homes: boolean;
     photos: boolean;
-    footer: boolean;
     contentManagers: boolean;
     uploading: boolean;
     saving: boolean;
@@ -153,7 +147,7 @@ export interface ContentActions {
 
 const initialCategoryForm: Partial<CategoryRequest> = {
   name: '',
-  description: '',
+  isOnMainPage: false,
 };
 
 const initialDescriptionForm: Partial<DescriptionRequest> = {
@@ -163,11 +157,11 @@ const initialDescriptionForm: Partial<DescriptionRequest> = {
 };
 
 const initialFlatForm: Partial<FlatRequest> = {
-  title: '',
+  name: '',
   description: '',
   price: 0,
   area: 0,
-  rooms: 1,
+  numberOfRooms: 1,
   floor: 1,
   homeId: 0,
 };
@@ -176,20 +170,14 @@ const initialHomeForm: Partial<HomeRequest> = {
   name: '',
   description: '',
   address: '',
-  amenities: [],
-};
-
-const initialFooterForm: Partial<FooterRequest> = {
-  content: '',
-  links: [],
-  contacts: {},
+  yearBuilt: 2025
 };
 
 const initialContentManagerForm: Partial<ContentManagerRequest> = {
   username: '',
   email: '',
   password: '',
-  role: 'content_manager',
+  role: 'CONTENT_MANAGER'
 };
 
 export const useContentStore = create<ContentState & ContentActions>((set, get) => ({
@@ -198,7 +186,6 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
   flats: [],
   homes: [],
   photos: [],
-  footer: null,
   contentManagers: [],
 
   selectedCategory: null,
@@ -212,7 +199,6 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
   descriptionForm: initialDescriptionForm,
   flatForm: initialFlatForm,
   homeForm: initialHomeForm,
-  footerForm: initialFooterForm,
   contentManagerForm: initialContentManagerForm,
 
   loading: {
@@ -221,7 +207,6 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
     flats: false,
     homes: false,
     photos: false,
-    footer: false,
     contentManagers: false,
     uploading: false,
     saving: false,
@@ -247,28 +232,28 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
   },
 
   loadCategories: async () => {
-    set({ loading: { ...get().loading, categories: true } });
+    set({loading: {...get().loading, categories: true}});
 
     try {
 
       set({
-        loading: { ...get().loading, categories: false },
+        loading: {...get().loading, categories: false},
         categories: [],
       });
       get().updateStats();
     } catch {
       set({
-        loading: { ...get().loading, categories: false },
-        errors: { ...get().errors, categories: 'Error' },
+        loading: {...get().loading, categories: false},
+        errors: {...get().errors, categories: 'Error'},
       });
     }
   },
 
   saveCategory: async (data: CategoryRequest) => {
-    set({ loading: { ...get().loading, saving: true } });
+    set({loading: {...get().loading, saving: true}});
 
     try {
-      const { selectedCategory } = get();
+      const {selectedCategory} = get();
 
       if (selectedCategory) {
         await updateCategory(selectedCategory.id, data);
@@ -280,30 +265,30 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
       get().resetForms();
       get().setShowForm(false);
 
-      set({ loading: { ...get().loading, saving: false } });
+      set({loading: {...get().loading, saving: false}});
       return true;
     } catch (error: any) {
       set({
-        loading: { ...get().loading, saving: false },
-        errors: { ...get().errors, saveCategory: error.message },
+        loading: {...get().loading, saving: false},
+        errors: {...get().errors, saveCategory: error},
       });
       return false;
     }
   },
 
   removeCategory: async (id: number) => {
-    set({ loading: { ...get().loading, deleting: true } });
+    set({loading: {...get().loading, deleting: true}});
 
     try {
       await deleteCategory(id);
       await get().loadCategories();
 
-      set({ loading: { ...get().loading, deleting: false } });
+      set({loading: {...get().loading, deleting: false}});
       return true;
     } catch (error: any) {
       set({
-        loading: { ...get().loading, deleting: false },
-        errors: { ...get().errors, deleteCategory: error.message },
+        loading: {...get().loading, deleting: false},
+        errors: {...get().errors, deleteCategory: error.message},
       });
       return false;
     }
@@ -313,29 +298,28 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
     console.log(category);
   },
 
-  // Descriptions
   loadDescriptions: async () => {
-    set({ loading: { ...get().loading, descriptions: true } });
+    set({loading: {...get().loading, descriptions: true}});
 
     try {
       // Would load from API
       set({
-        loading: { ...get().loading, descriptions: false },
+        loading: {...get().loading, descriptions: false},
         descriptions: [],
       });
     } catch (error: any) {
       set({
-        loading: { ...get().loading, descriptions: false },
-        errors: { ...get().errors, descriptions: error.message },
+        loading: {...get().loading, descriptions: false},
+        errors: {...get().errors, descriptions: error.message},
       });
     }
   },
 
   saveDescription: async (data: DescriptionRequest) => {
-    set({ loading: { ...get().loading, saving: true } });
+    set({loading: {...get().loading, saving: true}});
 
     try {
-      const { selectedDescription } = get();
+      const {selectedDescription} = get();
 
       if (selectedDescription) {
         await updateDescription(selectedDescription.id, data);
@@ -347,30 +331,30 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
       get().resetForms();
       get().setShowForm(false);
 
-      set({ loading: { ...get().loading, saving: false } });
+      set({loading: {...get().loading, saving: false}});
       return true;
     } catch (error: any) {
       set({
-        loading: { ...get().loading, saving: false },
-        errors: { ...get().errors, saveDescription: error.message },
+        loading: {...get().loading, saving: false},
+        errors: {...get().errors, saveDescription: error.message},
       });
       return false;
     }
   },
 
   removeDescription: async (id: number) => {
-    set({ loading: { ...get().loading, deleting: true } });
+    set({loading: {...get().loading, deleting: true}});
 
     try {
       await deleteDescription(id);
       await get().loadDescriptions();
 
-      set({ loading: { ...get().loading, deleting: false } });
+      set({loading: {...get().loading, deleting: false}});
       return true;
     } catch (error: any) {
       set({
-        loading: { ...get().loading, deleting: false },
-        errors: { ...get().errors, deleteDescription: error.message },
+        loading: {...get().loading, deleting: false},
+        errors: {...get().errors, deleteDescription: error.message},
       });
       return false;
     }
@@ -384,34 +368,34 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
         content: description.content,
         type: description.type,
       },
-      ui: { ...get().ui, showForm: true, editMode: true },
+      ui: {...get().ui, showForm: true, editMode: true},
     });
   },
 
   // Flats
   loadFlats: async () => {
-    set({ loading: { ...get().loading, flats: true } });
+    set({loading: {...get().loading, flats: true}});
 
     try {
       // Would load from API
       set({
-        loading: { ...get().loading, flats: false },
+        loading: {...get().loading, flats: false},
         flats: [],
       });
       get().updateStats();
     } catch (error: any) {
       set({
-        loading: { ...get().loading, flats: false },
-        errors: { ...get().errors, flats: error.message },
+        loading: {...get().loading, flats: false},
+        errors: {...get().errors, flats: error.message},
       });
     }
   },
 
   saveFlat: async (data: FlatRequest) => {
-    set({ loading: { ...get().loading, saving: true } });
+    set({loading: {...get().loading, saving: true}});
 
     try {
-      const { selectedFlat } = get();
+      const {selectedFlat} = get();
 
       if (selectedFlat) {
         await updateFlat(selectedFlat.id, data);
@@ -423,30 +407,30 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
       get().resetForms();
       get().setShowForm(false);
 
-      set({ loading: { ...get().loading, saving: false } });
+      set({loading: {...get().loading, saving: false}});
       return true;
     } catch (error: any) {
       set({
-        loading: { ...get().loading, saving: false },
-        errors: { ...get().errors, saveFlat: error.message },
+        loading: {...get().loading, saving: false},
+        errors: {...get().errors, saveFlat: error.message},
       });
       return false;
     }
   },
 
   removeFlat: async (id: number) => {
-    set({ loading: { ...get().loading, deleting: true } });
+    set({loading: {...get().loading, deleting: true}});
 
     try {
       await deleteFlat(id);
       await get().loadFlats();
 
-      set({ loading: { ...get().loading, deleting: false } });
+      set({loading: {...get().loading, deleting: false}});
       return true;
     } catch (error: any) {
       set({
-        loading: { ...get().loading, deleting: false },
-        errors: { ...get().errors, deleteFlat: error.message },
+        loading: {...get().loading, deleting: false},
+        errors: {...get().errors, deleteFlat: error.message},
       });
       return false;
     }
@@ -467,34 +451,34 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
         categoryId: flat.categoryId,
         photos: flat.photos?.map(p => p.id),
       },
-      ui: { ...get().ui, showForm: true, editMode: true },
+      ui: {...get().ui, showForm: true, editMode: true},
     });
   },
 
   // Homes
   loadHomes: async () => {
-    set({ loading: { ...get().loading, homes: true } });
+    set({loading: {...get().loading, homes: true}});
 
     try {
       // Would load from API
       set({
-        loading: { ...get().loading, homes: false },
+        loading: {...get().loading, homes: false},
         homes: [],
       });
       get().updateStats();
     } catch (error: any) {
       set({
-        loading: { ...get().loading, homes: false },
-        errors: { ...get().errors, homes: error.message },
+        loading: {...get().loading, homes: false},
+        errors: {...get().errors, homes: error.message},
       });
     }
   },
 
   saveHome: async (data: HomeRequest) => {
-    set({ loading: { ...get().loading, saving: true } });
+    set({loading: {...get().loading, saving: true}});
 
     try {
-      const { selectedHome } = get();
+      const {selectedHome} = get();
 
       if (selectedHome) {
         await updateHome(selectedHome.id, data);
@@ -506,30 +490,30 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
       get().resetForms();
       get().setShowForm(false);
 
-      set({ loading: { ...get().loading, saving: false } });
+      set({loading: {...get().loading, saving: false}});
       return true;
     } catch (error: any) {
       set({
-        loading: { ...get().loading, saving: false },
-        errors: { ...get().errors, saveHome: error.message },
+        loading: {...get().loading, saving: false},
+        errors: {...get().errors, saveHome: error.message},
       });
       return false;
     }
   },
 
   removeHome: async (id: number) => {
-    set({ loading: { ...get().loading, deleting: true } });
+    set({loading: {...get().loading, deleting: true}});
 
     try {
       await deleteHome(id);
       await get().loadHomes();
 
-      set({ loading: { ...get().loading, deleting: false } });
+      set({loading: {...get().loading, deleting: false}});
       return true;
     } catch (error: any) {
       set({
-        loading: { ...get().loading, deleting: false },
-        errors: { ...get().errors, deleteHome: error.message },
+        loading: {...get().loading, deleting: false},
+        errors: {...get().errors, deleteHome: error.message},
       });
       return false;
     }
@@ -546,25 +530,25 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
         photos: home.photos?.map(p => p.id),
         amenities: home.amenities,
       },
-      ui: { ...get().ui, showForm: true, editMode: true },
+      ui: {...get().ui, showForm: true, editMode: true},
     });
   },
 
   // Photos
   loadPhotos: async () => {
-    set({ loading: { ...get().loading, photos: true } });
+    set({loading: {...get().loading, photos: true}});
 
     try {
       // Would load from API
       set({
-        loading: { ...get().loading, photos: false },
+        loading: {...get().loading, photos: false},
         photos: [],
       });
       get().updateStats();
     } catch (error: any) {
       set({
-        loading: { ...get().loading, photos: false },
-        errors: { ...get().errors, photos: error.message },
+        loading: {...get().loading, photos: false},
+        errors: {...get().errors, photos: error.message},
       });
     }
   },
@@ -581,95 +565,95 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
       return true;
     } catch (error: any) {
       set({
-        errors: { ...get().errors, updatePhoto: error.message },
+        errors: {...get().errors, updatePhoto: error.message},
       });
       return false;
     }
   },
 
   removePhoto: async (id: number) => {
-    set({ loading: { ...get().loading, deleting: true } });
+    set({loading: {...get().loading, deleting: true}});
 
     try {
       await deletePhoto(id);
       await get().loadPhotos();
 
-      set({ loading: { ...get().loading, deleting: false } });
+      set({loading: {...get().loading, deleting: false}});
       return true;
     } catch (error: any) {
       set({
-        loading: { ...get().loading, deleting: false },
-        errors: { ...get().errors, deletePhoto: error.message },
+        loading: {...get().loading, deleting: false},
+        errors: {...get().errors, deletePhoto: error.message},
       });
       return false;
     }
   },
 
   removeSelectedPhotos: async () => {
-    const { ui } = get();
-    set({ loading: { ...get().loading, deleting: true } });
+    const {ui} = get();
+    set({loading: {...get().loading, deleting: true}});
 
     try {
       await bulkDeletePhotos(ui.selectedPhotoIds);
       await get().loadPhotos();
 
       set({
-        loading: { ...get().loading, deleting: false },
-        ui: { ...ui, selectedPhotoIds: [], bulkActionMode: false },
+        loading: {...get().loading, deleting: false},
+        ui: {...ui, selectedPhotoIds: [], bulkActionMode: false},
       });
       return true;
     } catch (error: any) {
       set({
-        loading: { ...get().loading, deleting: false },
-        errors: { ...get().errors, deletePhotos: error.message },
+        loading: {...get().loading, deleting: false},
+        errors: {...get().errors, deletePhotos: error.message},
       });
       return false;
     }
   },
 
   selectPhoto: (id: number, selected: boolean) => {
-    const { ui } = get();
+    const {ui} = get();
     const selectedIds = selected
       ? [...ui.selectedPhotoIds, id]
       : ui.selectedPhotoIds.filter(photoId => photoId !== id);
 
     set({
-      ui: { ...ui, selectedPhotoIds: selectedIds },
+      ui: {...ui, selectedPhotoIds: selectedIds},
     });
   },
 
   selectAllPhotos: (selected: boolean) => {
-    const { photos, ui } = get();
+    const {photos, ui} = get();
     const selectedIds = selected ? photos.map(p => p.id) : [];
 
     set({
-      ui: { ...ui, selectedPhotoIds: selectedIds },
+      ui: {...ui, selectedPhotoIds: selectedIds},
     });
   },
 
   // Footer
   loadFooter: async () => {
-    set({ loading: { ...get().loading, footer: true } });
+    set({loading: {...get().loading, footer: true}});
 
     try {
       // Would load from API
       set({
-        loading: { ...get().loading, footer: false },
+        loading: {...get().loading, footer: false},
         footer: null,
       });
     } catch (error: any) {
       set({
-        loading: { ...get().loading, footer: false },
-        errors: { ...get().errors, footer: error.message },
+        loading: {...get().loading, footer: false},
+        errors: {...get().errors, footer: error.message},
       });
     }
   },
 
   saveFooter: async (data: FooterRequest) => {
-    set({ loading: { ...get().loading, saving: true } });
+    set({loading: {...get().loading, saving: true}});
 
     try {
-      const { footer } = get();
+      const {footer} = get();
 
       if (footer) {
         await updateFooter(footer.id, data);
@@ -679,12 +663,12 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
 
       get().resetForms();
 
-      set({ loading: { ...get().loading, saving: false } });
+      set({loading: {...get().loading, saving: false}});
       return true;
     } catch (error: any) {
       set({
-        loading: { ...get().loading, saving: false },
-        errors: { ...get().errors, saveFooter: error.message },
+        loading: {...get().loading, saving: false},
+        errors: {...get().errors, saveFooter: error.message},
       });
       return false;
     }
@@ -692,27 +676,27 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
 
   // Content Managers
   loadContentManagers: async () => {
-    set({ loading: { ...get().loading, contentManagers: true } });
+    set({loading: {...get().loading, contentManagers: true}});
 
     try {
       const managers = await getContentManagers();
       set({
-        loading: { ...get().loading, contentManagers: false },
+        loading: {...get().loading, contentManagers: false},
         contentManagers: managers,
       });
     } catch (error: any) {
       set({
-        loading: { ...get().loading, contentManagers: false },
-        errors: { ...get().errors, contentManagers: error.message },
+        loading: {...get().loading, contentManagers: false},
+        errors: {...get().errors, contentManagers: error.message},
       });
     }
   },
 
   saveContentManager: async (data: ContentManagerRequest) => {
-    set({ loading: { ...get().loading, saving: true } });
+    set({loading: {...get().loading, saving: true}});
 
     try {
-      const { selectedContentManager } = get();
+      const {selectedContentManager} = get();
 
       if (selectedContentManager) {
         await updateContentManager(selectedContentManager.id, data);
@@ -724,30 +708,30 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
       get().resetForms();
       get().setShowForm(false);
 
-      set({ loading: { ...get().loading, saving: false } });
+      set({loading: {...get().loading, saving: false}});
       return true;
     } catch (error: any) {
       set({
-        loading: { ...get().loading, saving: false },
-        errors: { ...get().errors, saveContentManager: error.message },
+        loading: {...get().loading, saving: false},
+        errors: {...get().errors, saveContentManager: error.message},
       });
       return false;
     }
   },
 
   removeContentManager: async (id: string) => {
-    set({ loading: { ...get().loading, deleting: true } });
+    set({loading: {...get().loading, deleting: true}});
 
     try {
       await deleteContentManager(id);
       await get().loadContentManagers();
 
-      set({ loading: { ...get().loading, deleting: false } });
+      set({loading: {...get().loading, deleting: false}});
       return true;
     } catch (error: any) {
       set({
-        loading: { ...get().loading, deleting: false },
-        errors: { ...get().errors, deleteContentManager: error.message },
+        loading: {...get().loading, deleting: false},
+        errors: {...get().errors, deleteContentManager: error.message},
       });
       return false;
     }
@@ -762,38 +746,38 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
         role: manager.role,
         // Don't populate password for security
       },
-      ui: { ...get().ui, showForm: true, editMode: true },
+      ui: {...get().ui, showForm: true, editMode: true},
     });
   },
 
   // Forms
   setCategoryForm: (form) => {
     set(state => ({
-      categoryForm: { ...state.categoryForm, ...form },
+      categoryForm: {...state.categoryForm, ...form},
     }));
   },
 
   setDescriptionForm: (form) => {
     set(state => ({
-      descriptionForm: { ...state.descriptionForm, ...form },
+      descriptionForm: {...state.descriptionForm, ...form},
     }));
   },
 
   setFlatForm: (form) => {
     set(state => ({
-      flatForm: { ...state.flatForm, ...form },
+      flatForm: {...state.flatForm, ...form},
     }));
   },
 
   setHomeForm: (form) => {
     set(state => ({
-      homeForm: { ...state.homeForm, ...form },
+      homeForm: {...state.homeForm, ...form},
     }));
   },
 
   setContentManagerForm: (form) => {
     set(state => ({
-      contentManagerForm: { ...state.contentManagerForm, ...form },
+      contentManagerForm: {...state.contentManagerForm, ...form},
     }));
   },
 
@@ -817,13 +801,17 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
   // UI actions
   setActiveTab: (activeTab) => {
     set(state => ({
-      ui: { ...state.ui, activeTab },
+      ui: {...state.ui, activeTab},
     }));
   },
 
   setShowForm: (showForm) => {
     set(state => ({
-      ui: { ...state.ui, showForm, editMode: showForm ? state.ui.editMode : false },
+      ui: {
+        ...state.ui,
+        showForm,
+        editMode: showForm ? state.ui.editMode : false
+      },
     }));
 
     if (!showForm) {
@@ -833,30 +821,30 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
 
   setEditMode: (editMode) => {
     set(state => ({
-      ui: { ...state.ui, editMode },
+      ui: {...state.ui, editMode},
     }));
   },
 
   setBulkActionMode: (bulkActionMode) => {
     set(state => ({
-      ui: { ...state.ui, bulkActionMode, selectedPhotoIds: [] },
+      ui: {...state.ui, bulkActionMode, selectedPhotoIds: []},
     }));
   },
 
   // Error handling
   setError: (key, error) => {
     set(state => ({
-      errors: { ...state.errors, [key]: error },
+      errors: {...state.errors, [key]: error},
     }));
   },
 
   clearErrors: () => {
-    set({ errors: {} });
+    set({errors: {}});
   },
 
   // Stats
   updateStats: () => {
-    const { flats, homes, categories, photos } = get();
+    const {flats, homes, categories, photos} = get();
 
     set({
       stats: {
@@ -872,7 +860,7 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
   // General actions
   setLoading: (key, loading) => {
     set(state => ({
-      loading: { ...state.loading, [key]: loading },
+      loading: {...state.loading, [key]: loading},
     }));
   },
 
@@ -888,16 +876,3 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
     await Promise.all(actions.map(action => action()));
   },
 }));
-
-// Export selectors for easier use
-export const useContentCategories = () => useContentStore(state => state.categories);
-export const useContentDescriptions = () => useContentStore(state => state.descriptions);
-export const useContentFlats = () => useContentStore(state => state.flats);
-export const useContentHomes = () => useContentStore(state => state.homes);
-export const useContentPhotos = () => useContentStore(state => state.photos);
-export const useContentFooter = () => useContentStore(state => state.footer);
-export const useContentManagers = () => useContentStore(state => state.contentManagers);
-export const useContentLoading = () => useContentStore(state => state.loading);
-export const useContentErrors = () => useContentStore(state => state.errors);
-export const useContentUI = () => useContentStore(state => state.ui);
-export const useContentStats = () => useContentStore(state => state.stats);

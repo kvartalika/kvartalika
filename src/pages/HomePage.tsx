@@ -28,13 +28,14 @@ const HomePage = () => {
   const isLoadingHomePageFlats = usePropertiesStore(state => state.isLoadingHomePageFlats);
 
   const fetchCategories = usePropertiesStore(state => state.fetchCategories);
+  const fetchHomes = usePropertiesStore(state => state.fetchHomes);
 
   useEffect(() => {
     const load = async () => {
-      await fetchCategories();
+      await Promise.all([fetchCategories(), fetchHomes()]);
     };
     load();
-  }, [fetchCategories]);
+  }, [fetchCategories, fetchHomes]);
 
   useEffect(() => {
     const loadHomePageFlats = async () => {

@@ -27,7 +27,7 @@ const ApartmentCard = ({apartment, onBookingClick}: ApartmentCardProps) => {
           className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
         />
 
-        {apartment.features.length > 3 && (
+        {apartment.features?.length > 3 && (
           <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-lg text-xs font-semibold">
             🔥 Горячее предложение
           </div>

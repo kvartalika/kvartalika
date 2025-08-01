@@ -1,41 +1,121 @@
-import { apiClient } from './api.config';
+import {apiClient} from './api.config';
 import type {
-  CategoryRequest,
   DescriptionRequest,
   FlatRequest,
   HomeRequest,
   FooterRequest,
   Category,
   Description,
-  Flat,
-  Home,
   Footer,
   Photo,
   ApiResponse,
-  FileUploadResponse,
+  FileUploadResponse, BidRequest,
 } from './api.types';
-import { AxiosError } from 'axios';
+import {AxiosError} from 'axios';
+import type {BidForm} from "../store/ui.store.ts";
 
 export class ContentService {
-  // Categories Management
-  static async createCategory(categoryData: CategoryRequest): Promise<ApiResponse<Category>> {
+  static async createCategory(categoryData: Category): Promise<void> {
     return ContentService.safeRequest(() =>
-      apiClient.post<ApiResponse<Category>, CategoryRequest>('/content/categories', categoryData)
+      apiClient.post<void, Category>('/categories', categoryData)
     );
   }
 
-  static async updateCategory(id: number, categoryData: CategoryRequest): Promise<ApiResponse<Category>> {
+  static async updateCategory(id: number, categoryData: Category): Promise<void> {
     return ContentService.safeRequest(() =>
-        apiClient.put<ApiResponse<Category>, CategoryRequest>(`/content/categories?id=${id}`, categoryData),
+        apiClient.put<void, Category>(`/categories?id=${id}`, categoryData),
       'Category not found',
       404
     );
   }
 
-  static async deleteCategory(id: number): Promise<ApiResponse<void>> {
+  static async deleteCategory(id: number): Promise<void> {
     return ContentService.safeRequest(() =>
-        apiClient.delete<ApiResponse<void>>(`/content/categories?id=${id}`),
+        apiClient.delete<void>(`/categories?id=${id}`),
       'Category not found',
+      404
+    );
+  }
+
+  // === DIRECTORIES ===
+  static async listDirectories(): Promise<string[]> {
+    return this.safeRequest(() => apiClient.get<string[]>('/directories'));
+  }
+
+  static async getDirectory(pathParts: string[]): Promise<string[]> {
+    const path = pathParts.map(encodeURIComponent).join('/');
+    return this.safeRequest(() => apiClient.get<string[]>(`/directories/${path}`));
+  }
+
+  static async createDirectory(pathParts: string[]): Promise<void> {
+    const path = pathParts.map(encodeURIComponent).join('/');
+    return this.safeRequest(() => apiClient.post(`/directories/${path}`));
+  }
+
+  static async deleteDirectory(pathParts: string[]): Promise<void> {
+    const path = pathParts.map(encodeURIComponent).join('/');
+    return this.safeRequest(() => apiClient.delete(`/directories/${path}`));
+  }
+
+  // === FILES ===
+  static async listFilesInDir(dirParts: string[]): Promise<string[]> {
+    const dir = dirParts.map(encodeURIComponent).join('/');
+    return this.safeRequest(() => apiClient.get<string[]>(`/files/list/${dir}`));
+  }
+
+  static async getFile(pathParts: string[]): Promise<Blob> {
+    const path = pathParts.map(encodeURIComponent).join('/');
+    try {
+      const resp = await apiClient.get<Blob>(`/files/${path}`, {responseType: 'blob'});
+      return resp.data;
+    } catch (err) {
+      this.handleError(err, 'Failed to get file');
+    }
+  }
+
+  static async downloadFile(pathParts: string[]): Promise<Blob> {
+    const path = pathParts.map(encodeURIComponent).join('/');
+    try {
+      const resp = await apiClient.get<Blob>(`/files/download/${path}`, {responseType: 'blob'});
+      return resp.data;
+    } catch (err) {
+      this.handleError(err, 'Failed to download file');
+    }
+  }
+
+  static async uploadFile(dirParts: string[], file: File): Promise<void> {
+    const dir = dirParts.map(encodeURIComponent).join('/');
+    const form = new FormData();
+    form.append('file', file);
+    return this.safeRequest(() => apiClient.postForm(`/files/upload/${dir}`, form));
+  }
+
+  static async deleteFile(pathParts: string[]): Promise<void> {
+    const path = pathParts.map(encodeURIComponent).join('/');
+    return this.safeRequest(() => apiClient.delete(`/files/${path}`));
+  }
+
+  // Bids
+  static async getBid(id: string | number): Promise<BidForm> {
+    return this.safeRequest(() =>
+        apiClient.get<BidForm>(`/bids/${id}`),
+      'Bid not found',
+      404
+    );
+  }
+
+  static async updateBid(id: string | number, data: BidRequest): Promise<void> {
+    return this.safeRequest(() =>
+        apiClient.put<void, BidRequest>(`/bids/${id}`, data),
+      'Bid not found',
+      404
+    );
+  }
+
+  static async deleteBid(id: string | number): Promise<void> {
+    return this.safeRequest(() =>
+        apiClient.delete<void>(`/bids/${id}`),
+      'Bid not found',
       404
     );
   }
@@ -43,67 +123,79 @@ export class ContentService {
   // Descriptions Management
   static async createDescription(data: DescriptionRequest): Promise<ApiResponse<Description>> {
     return ContentService.safeRequest(() =>
-      apiClient.post<ApiResponse<Description>, DescriptionRequest>('/content/descriptions', data)
+      apiClient.post<ApiResponse<Description>, DescriptionRequest>('/descriptions', data)
     );
   }
 
   static async updateDescription(id: number, data: DescriptionRequest): Promise<ApiResponse<Description>> {
     return ContentService.safeRequest(() =>
-        apiClient.put<ApiResponse<Description>, DescriptionRequest>(`/content/descriptions?id=${id}`, data),
+        apiClient.put<ApiResponse<Description>, DescriptionRequest>(`/descriptions?id=${id}`, data),
       'Description not found',
       404
     );
   }
 
-  static async deleteDescription(id: number): Promise<ApiResponse<void>> {
+  static async deleteDescription(id: number): Promise<void> {
     return ContentService.safeRequest(() =>
-        apiClient.delete<ApiResponse<void>>(`/content/descriptions?id=${id}`),
+        apiClient.delete<void>(`/descriptions?id=${id}`),
       'Description not found',
       404
     );
   }
 
   // Flats Management
-  static async createFlat(data: FlatRequest): Promise<ApiResponse<Flat>> {
+  static async createFlat(data: FlatRequest): Promise<void> {
     return ContentService.safeRequest(() =>
-      apiClient.post<ApiResponse<Flat>, FlatRequest>('/content/flats', data)
+      apiClient.post<void, FlatRequest>('/flats', data)
     );
   }
 
-  static async updateFlat(id: number, data: FlatRequest): Promise<ApiResponse<Flat>> {
+  static async updateFlat(id: number, data: FlatRequest): Promise<void> {
     return ContentService.safeRequest(() =>
-        apiClient.put<ApiResponse<Flat>, FlatRequest>(`/content/flats?id=${id}`, data),
+        apiClient.put<void, FlatRequest>(`/flats?id=${id}`, data),
       'Flat not found',
       404
     );
   }
 
-  static async deleteFlat(id: number): Promise<ApiResponse<void>> {
+  static async deleteFlat(id: number): Promise<void> {
     return ContentService.safeRequest(() =>
-        apiClient.delete<ApiResponse<void>>(`/content/flats?id=${id}`),
+        apiClient.delete<void>(`/flats?id=${id}`),
       'Flat not found',
       404
+    );
+  }
+
+  static async addCategoryToFlat(flatId: number, categoryId: number): Promise<void> {
+    return this.safeRequest(() =>
+      apiClient.post(`/flats/${flatId}/categories/${categoryId}`)
+    );
+  }
+
+  static async removeCategoryFromFlat(flatId: number, categoryId: number): Promise<void> {
+    return this.safeRequest(() =>
+      apiClient.delete(`/flats/${flatId}/categories/${categoryId}`)
     );
   }
 
   // Homes Management
-  static async createHome(data: HomeRequest): Promise<ApiResponse<Home>> {
+  static async createHome(data: HomeRequest): Promise<void> {
     return ContentService.safeRequest(() =>
-      apiClient.post<ApiResponse<Home>, HomeRequest>('/content/homes', data)
+      apiClient.post<void, HomeRequest>('/homes', data)
     );
   }
 
-  static async updateHome(id: number, data: HomeRequest): Promise<ApiResponse<Home>> {
+  static async updateHome(id: number, data: HomeRequest): Promise<void> {
     return ContentService.safeRequest(() =>
-        apiClient.put<ApiResponse<Home>, HomeRequest>(`/content/homes?id=${id}`, data),
+        apiClient.put<void, HomeRequest>(`/homes?id=${id}`, data),
       'Home not found',
       404
     );
   }
 
-  static async deleteHome(id: number): Promise<ApiResponse<void>> {
+  static async deleteHome(id: number): Promise<void> {
     return ContentService.safeRequest(() =>
-        apiClient.delete<ApiResponse<void>>(`/content/homes?id=${id}`),
+        apiClient.delete<void>(`/homes?id=${id}`),
       'Home not found',
       404
     );
@@ -112,13 +204,13 @@ export class ContentService {
   // Footer Management
   static async createFooter(data: FooterRequest): Promise<ApiResponse<Footer>> {
     return ContentService.safeRequest(() =>
-      apiClient.post<ApiResponse<Footer>, FooterRequest>('/content/footer', data)
+      apiClient.post<ApiResponse<Footer>, FooterRequest>('/footer', data)
     );
   }
 
   static async updateFooter(id: number, data: FooterRequest): Promise<ApiResponse<Footer>> {
     return ContentService.safeRequest(() =>
-        apiClient.put<ApiResponse<Footer>, FooterRequest>(`/content/footer?id=${id}`, data),
+        apiClient.put<ApiResponse<Footer>, FooterRequest>(`/footer?id=${id}`, data),
       'Footer not found',
       404
     );
@@ -131,7 +223,7 @@ export class ContentService {
     if (altText) formData.append('altText', altText);
 
     return ContentService.safeRequest(() =>
-        apiClient.postForm<FileUploadResponse>('/content/photos', formData),
+        apiClient.postForm<FileUploadResponse>('/photos', formData),
       'Photo file is required',
       400
     );
@@ -143,7 +235,7 @@ export class ContentService {
     if (altText) formData.append('altText', altText);
 
     return ContentService.safeRequest(() =>
-        apiClient.putForm<ApiResponse<Photo>>(`/content/photos?id=${id}`, formData),
+        apiClient.putForm<ApiResponse<Photo>>(`/photos?id=${id}`, formData),
       'Photo not found',
       404
     );
@@ -151,7 +243,7 @@ export class ContentService {
 
   static async deletePhoto(id: number): Promise<ApiResponse<void>> {
     return ContentService.safeRequest(() =>
-        apiClient.delete<ApiResponse<void>>(`/content/photos?id=${id}`),
+        apiClient.delete<ApiResponse<void>>(`/photos?id=${id}`),
       'Photo not found',
       404
     );
@@ -190,6 +282,20 @@ export class ContentService {
 }
 
 export const {
+  listDirectories,
+  getDirectory,
+  getBid,
+  createDirectory,
+  deleteDirectory,
+  listFilesInDir,
+  getFile,
+  deleteBid,
+  downloadFile,
+  updateBid,
+  uploadFile,
+  deleteFile,
+  addCategoryToFlat,
+  removeCategoryFromFlat,
   createCategory,
   updateCategory,
   deleteCategory,

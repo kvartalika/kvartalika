@@ -1,7 +1,9 @@
-import {useCallback, type FormEvent} from 'react';
+import {useCallback, type FormEvent, useRef, useState} from 'react';
 import {useNavigate, createSearchParams} from 'react-router-dom';
 import {useSearchStore, type SearchFilters} from '../store/search.store.ts';
 import {useUIStore} from "../store/ui.store.ts";
+import {usePropertiesStore} from "../store/properties.store.ts";
+import {useClickOutside} from "../hooks/useClickOutside.ts";
 
 const serializeFiltersToParams = (filters: SearchFilters): Record<string, string> => {
   const params: Record<string, string> = {};
@@ -36,6 +38,30 @@ const SearchBar = () => {
   const openModal = useUIStore(state => state.openModal);
   const modals = useUIStore(state => state.modals);
   const closeModal = useUIStore(state => state.closeModal);
+
+  const categories = usePropertiesStore(state => state.categories);
+
+  const [isCatOpen, setIsCatOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  useClickOutside(dropdownRef, () => setIsCatOpen(false));
+
+  const homes = usePropertiesStore(state => state.homes);
+
+  const [isHomeOpen, setIsHomeOpen] = useState(false);
+  const homeRef = useRef<HTMLDivElement | null>(null);
+  useClickOutside(homeRef, () => setIsHomeOpen(false));
+
+  const toggleCategory = (id: number) => {
+    const current = filters.categoriesId || [];
+    const updated = current.includes(id)
+      ? current.filter(c => c !== id)
+      : [...current, id];
+    handleFilterChange('categoriesId', updated.length > 0 ? updated : undefined);
+  };
+
+  const selectHome = (homeId?: number) => {
+    handleFilterChange('homeId', homeId);
+  };
 
   const navigate = useNavigate();
 
@@ -249,41 +275,98 @@ const SearchBar = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">Жилой комплекс</label>
-              <input
-                type="number"
-                placeholder="Введите ID"
-                value={filters.homeId ?? ''}
-                onChange={(e) =>
-                  handleFilterChange('homeId', e.target.value ? Number(e.target.value) : undefined)
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                min="1"
-              />
+              <div
+                className="relative"
+                ref={homeRef}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsHomeOpen(o => !o);
+                  }}
+                  className="w-full flex justify-between items-center px-4 py-2 border border-gray-300 rounded-lg text-sm"
+                >
+                  {homes.find(h => h.id === filters.homeId)?.name || 'Выбрать ЖК'}
+                  <span className="ml-2">▾</span>
+                </button>
+
+                {isHomeOpen && (
+                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded shadow max-h-60 overflow-auto">
+                    {homes.map(home => (
+                      <div
+                        key={home.id}
+                        className="px-3 py-2 hover:bg-gray-50 cursor-pointer flex justify-between items-center"
+                        onClick={() => {
+                          selectHome(home.id);
+                          setIsHomeOpen(false);
+                        }}
+                      >
+                        <span className="text-sm">{home.name}</span>
+                        {filters.homeId === home.id &&
+                          <span className="text-blue-600 text-xs">✓</span>}
+                      </div>
+                    ))}
+                    {homes.length === 0 && (
+                      <div className="p-3 text-xs text-gray-500">Жилые комплексы не найдены</div>
+                    )}
+                    {filters.homeId != null && (
+                      <div className="border-t mt-1">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            selectHome(undefined);
+                            setIsHomeOpen(false);
+                          }}
+                          className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-50"
+                        >
+                          Сбросить выбор
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">Категории</label>
-              <div className="space-y-2">
-                {[1, 2, 3, 4].map(id => (
-                  <label
-                    key={id}
-                    className="flex items-center"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={filters.categoriesId?.includes(id) || false}
-                      onChange={(e) => {
-                        const current = filters.categoriesId || [];
-                        const updated = e.target.checked
-                          ? [...current, id]
-                          : current.filter(cid => cid !== id);
-                        handleFilterChange('categoriesId', updated.length > 0 ? updated : undefined);
-                      }}
-                      className="w-4 h-4"
-                    />
-                    <span className="ml-2 text-sm">Категория {id}</span>
-                  </label>
-                ))}
+              <div
+                className="relative"
+                ref={dropdownRef}
+              >
+                <button
+                  type="button"
+                  onClick={() => setIsCatOpen(o => !o)}
+                  className="w-full flex justify-between items-center px-4 py-2 border border-gray-300 rounded-lg text-sm"
+                >
+                  {filters.categoriesId && filters.categoriesId.length > 0
+                    ? `Выбрано: ${filters.categoriesId.length}`
+                    : 'Выбрать категории'}
+                  <span className="ml-2">▾</span>
+                </button>
+
+                {isCatOpen && (
+                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded shadow max-h-60 overflow-auto">
+                    {categories.map(cat => (
+                      <label
+                        key={cat.id}
+                        className="flex items-center px-3 py-2 hover:bg-gray-50"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={filters.categoriesId?.includes(cat.id) || false}
+                          onChange={() => toggleCategory(cat.id)}
+                          className="mr-2"
+                        />
+                        <span className="text-sm">{cat.name}</span>
+                      </label>
+                    ))}
+
+                    {categories.length === 0 && (
+                      <div className="p-3 text-xs text-gray-500">Категории не найдены</div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
