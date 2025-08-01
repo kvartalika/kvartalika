@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
-import {useAuthStore} from '../store/useAuthStore';
+import {useAuth} from '../store/unified-auth.store';
 import Logo from './Logo';
 import {useUIStore} from "../store/ui.store.ts";
 
@@ -9,7 +9,7 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const {user, isAuthenticated, logout} = useAuthStore();
+  const {user, isAuthenticated, logout} = useAuth();
 
   const openModal = useUIStore(state => state.openModal);
 

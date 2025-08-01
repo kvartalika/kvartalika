@@ -1,29 +1,29 @@
 import { useState, useEffect } from 'react';
-import { useAuthStore } from '../store/useAuthStore';
-import type { FormData, ContentType } from '../types';
+import { useContentManagerAuth } from '../store/unified-auth.store';
+import type { UnifiedFormData, ContentType } from '../types/unified';
 
 interface ContentManagerProps {
   contentType: ContentType;
   contentId: number;
-  onSave: (data: FormData) => void;
+  onSave: (data: UnifiedFormData) => void;
   onCancel: () => void;
   initialData?: any;
 }
 
 const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData }: ContentManagerProps) => {
-  const { user, isAuthenticated } = useAuthStore();
-  const [formData, setFormData] = useState<FormData>(initialData || {} as FormData);
+  const { user, isAuthenticated } = useContentManagerAuth();
+  const [formData, setFormData] = useState<UnifiedFormData>(initialData || {} as UnifiedFormData);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!isAuthenticated || user?.role !== 'CM') {
+    if (!isAuthenticated || (user?.role !== 'CM' && user?.role !== 'CONTENT_MANAGER')) {
       return;
     }
   }, [isAuthenticated, user]);
 
-  const handleInputChange = (field: keyof FormData, value: string | number | boolean) => {
-    setFormData((prev: FormData) => ({
+  const handleInputChange = (field: keyof UnifiedFormData, value: string | number | boolean) => {
+    setFormData((prev: UnifiedFormData) => ({
       ...prev,
       [field]: value
     }));
@@ -75,7 +75,7 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
     }
   };
 
-  if (!isAuthenticated || user?.role !== 'CM') {
+  if (!isAuthenticated || (user?.role !== 'CM' && user?.role !== 'CONTENT_MANAGER')) {
     return null;
   }
 

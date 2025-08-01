@@ -1,81 +1,11 @@
 import {create} from 'zustand';
-
-export interface Apartment {
-  id: number;
-  complex: string;
-  complexId: number;
-  address: string;
-  rooms: number;
-  floor: number;
-  bathroom: string;
-  bathrooms: number;
-  finishing: string;
-  isHot: boolean;
-  image: string;
-  price: number;
-  area: number;
-  description?: string;
-  images?: string[];
-  hasParks?: boolean;
-  hasSchools?: boolean;
-  hasShops?: boolean;
-  distanceFromCenter?: number;
-  layout?: string;
-}
-
-export interface Complex {
-  id: number;
-  name: string;
-  address: string;
-  description: string;
-  image: string;
-  images?: string[];
-  apartments: Apartment[];
-  amenities?: string[];
-  features?: string[];
-  constructionHistory?: {
-    startDate: string;
-    endDate: string;
-    phases: { name: string; date: string; description: string }[];
-  };
-}
-
-export interface SearchFilters {
-  query: string;
-  minPrice?: number;
-  maxPrice?: number;
-  rooms?: number[];
-  bathrooms?: number[];
-  finishing?: string[];
-  category?: string;
-  hasParks?: boolean;
-  hasSchools?: boolean;
-  hasShops?: boolean;
-  sortBy?: 'price' | 'rooms' | 'area' | 'location';
-  sortOrder?: 'asc' | 'desc';
-}
-
-export interface BookingForm {
-  name: string;
-  phone: string;
-  email: string;
-  apartmentId?: number;
-  complexId?: number;
-}
-
-export interface HomepageSection {
-  id: string;
-  title: string;
-  description: string;
-  type: 'hot_deals' | 'rooms' | 'custom';
-  isVisible: boolean;
-  order: number;
-  rooms?: number;
-  customFilter?: (apartments: Apartment[]) => Apartment[];
-  backgroundColor?: 'white' | 'gray';
-  linkText?: string;
-  linkUrl?: string;
-}
+import type {
+  Apartment,
+  Complex,
+  SearchFilters,
+  BookingForm,
+  HomepageSection,
+} from '../types/unified';
 
 interface AppState {
   apartments: Apartment[];
