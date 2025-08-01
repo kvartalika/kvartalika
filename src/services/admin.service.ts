@@ -5,7 +5,7 @@ import {AxiosError} from 'axios';
 export class AdminService {
   static async getContentManagers(params?: PaginationParams): Promise<UserDto[]> {
     try {
-      const response = await apiClient.get<UserDto[]>('/admin/content-managers', { params });
+      const response = await apiClient.get<UserDto[]>('/admin/content-managers', {params});
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -53,7 +53,7 @@ export class AdminService {
 
   static async getAdmins(params?: PaginationParams): Promise<UserDto[]> {
     try {
-      const response = await apiClient.get<UserDto[]>('/admin/admin', { params });
+      const response = await apiClient.get<UserDto[]>('/admin/admin', {params});
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {

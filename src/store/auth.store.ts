@@ -40,9 +40,9 @@ export interface AuthActions {
 export const useAuthStore = create<AuthState & AuthActions>()(
   persist(
     (set) => ({
-      role: null,
+      role: "CONTENT_MANAGER",
       accessToken: null,
-      isAuthenticated: false,
+      isAuthenticated: true,
       isLoading: false,
       error: null,
 

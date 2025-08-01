@@ -1,5 +1,6 @@
 // API Request Types
 import type {UserRole} from "../store";
+import type {TABS} from "./index.ts";
 
 export interface LoginRequest {
   username?: string;
@@ -47,9 +48,9 @@ export interface UserDto {
 }
 
 export interface CategoryRequest {
-  id: number;
-  name: string;
-  isOnMainPage: boolean;
+  id?: number;
+  name?: string;
+  isOnMainPage?: boolean;
 }
 
 export const defaultCategory = {
@@ -64,7 +65,7 @@ export interface DescriptionRequest {
 }
 
 export interface FlatRequest {
-  id: number;
+  id?: number;
   name?: string;
   description?: string;
   images?: string[];
@@ -86,7 +87,7 @@ export interface FlatRequest {
 }
 
 export interface HomeRequest {
-  id: number;
+  id?: number;
   name?: string;
   description?: string;
   images?: string[];
@@ -105,19 +106,6 @@ export interface HomeRequest {
   hasYards?: boolean;
   yardsImages?: string[];
   published?: boolean;
-}
-
-export interface FooterRequest {
-  content: string;
-  links?: Array<{
-    title: string;
-    url: string;
-  }>;
-  contacts?: {
-    phone?: string;
-    email?: string;
-    address?: string;
-  };
 }
 
 export interface RequestCreate {
@@ -232,9 +220,14 @@ export interface FlatWithCategoryRequest {
   categories: Partial<Category>[];
 }
 
+export interface ResolvedFlat extends FlatWithCategoryRequest {
+  imagesResolved?: string[];
+  layoutResolved?: string;
+}
+
 export interface HomePageFlats {
   category: Category;
-  flats: FlatWithCategoryRequest[];
+  flats: ResolvedFlat[];
 }
 
 export interface Home {
@@ -259,39 +252,10 @@ export interface Home {
   published: boolean;
 }
 
-export interface Footer {
-  id: number;
-  content: string;
-  links?: Array<{
-    title: string;
-    url: string;
-  }>;
-  contacts?: {
-    phone?: string;
-    email?: string;
-    address?: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ContentManager {
-  id: string;
-  username: string;
-  email: string;
-  role: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Admin {
-  id: string;
-  username: string;
-  email: string;
-  role: string;
-  createdAt: string;
-  updatedAt: string;
+export interface ResolvedHome extends HomeRequest {
+  imagesResolved?: string[];
+  historyImagesResolved?: string[];
+  yardsImagesResolved?: string[];
 }
 
 export interface AuthResponse {
@@ -333,3 +297,5 @@ export interface SocialMedia {
   image: string;
   link: string;
 }
+
+export type Tab = (typeof TABS)[number];

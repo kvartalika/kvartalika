@@ -1,14 +1,15 @@
 import {useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';
-import type {HomeRequest} from "../services";
+import type {ResolvedHome} from "../services";
 import {useFlatsStore} from "../store";
+import {safeImage} from "../utils/safeImage.ts";
 
 const ComplexesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const {isLoadingHomes, error, loadHomes, homes} = useFlatsStore();
 
-  const [filteredComplexes, setFilteredComplexes] = useState<HomeRequest[]>([]);
+  const [filteredComplexes, setFilteredComplexes] = useState<ResolvedHome[]>([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -90,7 +91,7 @@ const ComplexesPage = () => {
           <div className="mb-6 text-gray-500 font-medium">Загрузка ЖК...</div>
         )}
 
-        {error && (
+        {!isLoadingHomes && error && (
           <div className="mb-6 text-red-600 font-medium">{error}</div>
         )}
 
@@ -104,18 +105,18 @@ const ComplexesPage = () => {
               >
                 <div className="relative h-64 overflow-hidden">
                   <img
-                    src={complex?.images?.[0] || '/images/complex-placeholder.jpg'}
+                    src={[...safeImage(complex.imagesResolved, 'home')][0]}
                     alt={complex.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                    {complex.numberOfFloors} этажей
+                    {complex.numberOfFloors ?? "Неизвестно"} этажей
                   </div>
                 </div>
 
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                    {complex.name}
+                    {complex.name ?? "Нет данных"}
                   </h3>
 
                   <div className="flex items-center text-gray-600 mb-3">
@@ -138,11 +139,11 @@ const ComplexesPage = () => {
                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                       />
                     </svg>
-                    <span className="text-sm">{complex.address}</span>
+                    <span className="text-sm">{complex.address ?? "Уточняется"}</span>
                   </div>
 
                   <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                    {complex.description}
+                    {complex.description ?? "Описания еще нет..."}
                   </p>
 
                   {complex.features && complex.features.length > 0 && (

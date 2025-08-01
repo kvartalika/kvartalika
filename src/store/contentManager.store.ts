@@ -4,18 +4,18 @@ import {
   createHome,
   deleteFlat,
   deleteHome,
-  type Flat,
+  type FlatWithCategoryRequest,
   getFlats,
   getHomes,
-  type Home,
+  type HomeRequest,
   type PaginationParams,
   updateFlat,
   updateHome,
 } from '../services';
 
 export interface ContentManagerState {
-  flats: Flat[];
-  homes: Home[];
+  flats: FlatWithCategoryRequest[];
+  homes: HomeRequest[];
 
   isLoadingFlats: boolean;
   isLoadingHomes: boolean;
@@ -25,14 +25,14 @@ export interface ContentManagerState {
 
 export interface ContentManagerActions {
   loadFlats: (params?: PaginationParams) => Promise<void>;
-  addFlat: (FlatData: Flat) => Promise<void>;
-  editFlat: (id: number, FlatData: Flat) => Promise<void>;
+  addFlat: (FlatData: FlatWithCategoryRequest) => Promise<void>;
+  editFlat: (id: number, FlatData: FlatWithCategoryRequest) => Promise<void>;
   removeFlat: (id: number) => Promise<void>;
 
   // Homes
   loadHomes: (params?: PaginationParams) => Promise<void>;
-  addHome: (HomeData: Home) => Promise<void>;
-  editHome: (id: number, HomeData: Home) => Promise<void>;
+  addHome: (HomeData: HomeRequest) => Promise<void>;
+  editHome: (id: number, HomeData: HomeRequest) => Promise<void>;
   removeHome: (id: number) => Promise<void>;
 
   // General
@@ -49,9 +49,8 @@ export const useContentManagerStore = create<ContentManagerState & ContentManage
 
   error: null,
 
-  // Flats
   loadFlats: async (params?: PaginationParams) => {
-    set({ isLoadingFlats: true, error: null });
+    set({isLoadingFlats: true, error: null});
 
     try {
       const flats = await getFlats(params);
@@ -67,8 +66,8 @@ export const useContentManagerStore = create<ContentManagerState & ContentManage
     }
   },
 
-  addFlat: async (FlatData: Flat) => {
-    set({ error: null });
+  addFlat: async (FlatData: FlatWithCategoryRequest) => {
+    set({error: null});
 
     try {
       await createFlat(FlatData);
@@ -80,8 +79,8 @@ export const useContentManagerStore = create<ContentManagerState & ContentManage
     }
   },
 
-  editFlat: async (id: number, FlatData: Flat) => {
-    set({ error: null });
+  editFlat: async (id: number, FlatData: FlatWithCategoryRequest) => {
+    set({error: null});
 
     try {
       await updateFlat(id, FlatData);
@@ -94,7 +93,7 @@ export const useContentManagerStore = create<ContentManagerState & ContentManage
   },
 
   removeFlat: async (id: number) => {
-    set({ error: null });
+    set({error: null});
 
     try {
       await deleteFlat(id);
@@ -107,7 +106,7 @@ export const useContentManagerStore = create<ContentManagerState & ContentManage
   },
 
   loadHomes: async (params?: PaginationParams) => {
-    set({ isLoadingHomes: true, error: null });
+    set({isLoadingHomes: true, error: null});
 
     try {
       const Homes = await getHomes(params);
@@ -123,8 +122,8 @@ export const useContentManagerStore = create<ContentManagerState & ContentManage
     }
   },
 
-  addHome: async (HomeData: Home) => {
-    set({ error: null });
+  addHome: async (HomeData: HomeRequest) => {
+    set({error: null});
 
     try {
       await createHome(HomeData);
@@ -136,8 +135,8 @@ export const useContentManagerStore = create<ContentManagerState & ContentManage
     }
   },
 
-  editHome: async (id: number, HomeData: Home) => {
-    set({ error: null });
+  editHome: async (id: number, HomeData: HomeRequest) => {
+    set({error: null});
 
     try {
       await updateHome(id, HomeData);
@@ -150,7 +149,7 @@ export const useContentManagerStore = create<ContentManagerState & ContentManage
   },
 
   removeHome: async (id: number) => {
-    set({ error: null });
+    set({error: null});
 
     try {
       await deleteHome(id);
@@ -162,6 +161,6 @@ export const useContentManagerStore = create<ContentManagerState & ContentManage
     }
   },
 
-  setError: (error: string | null) => set({ error }),
-  clearError: () => set({ error: null }),
+  setError: (error: string | null) => set({error}),
+  clearError: () => set({error: null}),
 }));

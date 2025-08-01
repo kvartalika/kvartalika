@@ -51,7 +51,7 @@ const HomePage = () => {
               <ApartmentCard
                 homeName={homes.find(item => item.id === apartment.flat.homeId)?.name ?? "?"}
                 key={apartment.flat.id}
-                apartment={apartment.flat}
+                apartment={apartment}
                 onBookingClick={() => openModal('bid')}
               />
             ))}
@@ -113,15 +113,23 @@ const HomePage = () => {
           </svg>
         </div>
 
-        {isAuthenticated && role === 'CONTENT_MANAGER' && (
-          <div className="absolute top-32 right-8 z-50">
-            <button
-              onClick={() => openModal('manager')}
-              className="bg-white bg-opacity-20 backdrop-blur-sm text-black px-4 py-2 rounded-lg font-medium hover:bg-opacity-30 transition-all"
+        {isAuthenticated && role && role !== 'CLIENT' && (
+          <>
+            <Link
+              to={`/content`}
+              className="fixed bottom-4 right-4 bg-black text-white px-4 py-2 rounded-lg shadow z-50"
             >
-              ✏️ Редактировать главную
-            </button>
-          </div>
+              Управление контентом
+            </Link>
+            <div className="fixed left-4 bottom-4 z-50 bg-black rounded-lg">
+              <button
+                onClick={() => openModal('manager')}
+                className="backdrop-blur-sm text-white px-4 py-2 font-medium hover:bg-opacity-30 transition-all"
+              >
+                ✏️ Редактировать главную
+              </button>
+            </div>
+          </>
         )}
       </section>
 

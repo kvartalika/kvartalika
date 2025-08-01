@@ -1,19 +1,21 @@
 import React from 'react';
-import type {SocialMedia} from "../../store/ui.store.ts";
+import {type SocialMedia, useUIStore} from "../../store";
 
 interface SocialMediaFormProps {
-  socialMedia: SocialMedia[];
   onSocialMediaChange: (index: number, field: keyof SocialMedia, value: string) => void;
   onAddSocialMedia: () => void;
   onRemoveSocialMedia: (index: number) => void;
 }
 
 const SocialMediaForm: React.FC<SocialMediaFormProps> = ({
-                                                           socialMedia,
+
                                                            onSocialMediaChange,
                                                            onAddSocialMedia,
                                                            onRemoveSocialMedia
                                                          }) => {
+
+  const socialMediaList = useUIStore(state => state.socialMediaList);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -27,9 +29,9 @@ const SocialMediaForm: React.FC<SocialMediaFormProps> = ({
         </button>
       </div>
 
-      {socialMedia.map((item, index) => (
+      {socialMediaList.map((item, index) => (
         <div
-          key={index}
+          key={`${item.id}-${index}`}
           className="border rounded-lg p-4 bg-gray-50"
         >
           <div className="flex justify-between items-center mb-4">

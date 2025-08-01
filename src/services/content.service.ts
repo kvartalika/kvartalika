@@ -3,17 +3,13 @@ import type {
   ApiResponse,
   BidRequest,
   Category,
-  Description,
-  DescriptionRequest,
   FileUploadResponse,
-  FlatRequest,
-  Footer,
-  FooterRequest,
+  FlatWithCategoryRequest,
   HomeRequest,
   Photo,
 } from './api.types';
 import {AxiosError} from 'axios';
-import type {BidForm} from "../store/ui.store.ts";
+import type {BidForm} from "../store";
 
 export class ContentService {
   static async createCategory(categoryData: Category): Promise<void> {
@@ -121,39 +117,17 @@ export class ContentService {
     );
   }
 
-  // Descriptions Management
-  static async createDescription(data: DescriptionRequest): Promise<ApiResponse<Description>> {
-    return ContentService.safeRequest(() =>
-      apiClient.post<ApiResponse<Description>, DescriptionRequest>('/descriptions', data)
-    );
-  }
-
-  static async updateDescription(id: number, data: DescriptionRequest): Promise<ApiResponse<Description>> {
-    return ContentService.safeRequest(() =>
-        apiClient.put<ApiResponse<Description>, DescriptionRequest>(`/descriptions?id=${id}`, data),
-      'Description not found',
-      404
-    );
-  }
-
-  static async deleteDescription(id: number): Promise<void> {
-    return ContentService.safeRequest(() =>
-        apiClient.delete<void>(`/descriptions?id=${id}`),
-      'Description not found',
-      404
-    );
-  }
 
   // Flats Management
-  static async createFlat(data: FlatRequest): Promise<void> {
+  static async createFlat(data: FlatWithCategoryRequest): Promise<void> {
     return ContentService.safeRequest(() =>
-      apiClient.post<void, FlatRequest>('/flats', data)
+      apiClient.post<void, FlatWithCategoryRequest>('/flats', data)
     );
   }
 
-  static async updateFlat(id: number, data: FlatRequest): Promise<void> {
+  static async updateFlat(id: number, data: FlatWithCategoryRequest): Promise<void> {
     return ContentService.safeRequest(() =>
-        apiClient.put<void, FlatRequest>(`/flats?id=${id}`, data),
+        apiClient.put<void, FlatWithCategoryRequest>(`/flats?id=${id}`, data),
       'Flat not found',
       404
     );
@@ -198,21 +172,6 @@ export class ContentService {
     return ContentService.safeRequest(() =>
         apiClient.delete<void>(`/homes?id=${id}`),
       'Home not found',
-      404
-    );
-  }
-
-  // Footer Management
-  static async createFooter(data: FooterRequest): Promise<ApiResponse<Footer>> {
-    return ContentService.safeRequest(() =>
-      apiClient.post<ApiResponse<Footer>, FooterRequest>('/footer', data)
-    );
-  }
-
-  static async updateFooter(id: number, data: FooterRequest): Promise<ApiResponse<Footer>> {
-    return ContentService.safeRequest(() =>
-        apiClient.put<ApiResponse<Footer>, FooterRequest>(`/footer?id=${id}`, data),
-      'Footer not found',
       404
     );
   }
@@ -300,17 +259,12 @@ export const {
   createCategory,
   updateCategory,
   deleteCategory,
-  createDescription,
-  updateDescription,
-  deleteDescription,
   createFlat,
   updateFlat,
   deleteFlat,
   createHome,
   updateHome,
   deleteHome,
-  createFooter,
-  updateFooter,
   uploadPhoto,
   updatePhoto,
   deletePhoto,

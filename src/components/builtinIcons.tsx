@@ -1,5 +1,6 @@
-import type {FC, ReactNode} from "react";
+import {useEffect, useState, type FC, type ReactNode} from "react";
 import type {SocialMedia} from "../store";
+import {usePhotoStore} from "../store/usePhotoStore.ts";
 
 const builtinIcons: Record<string, ReactNode> = {
   "vk.com": (
@@ -47,42 +48,59 @@ const getHostname = (link: string) => {
 };
 
 const SocialIcon: FC<{ media: SocialMedia }> = ({media}) => {
-  const href = normalizeLink(media.link);
+  const photoStore = usePhotoStore();
+  const [customSrc, setCustomSrc] = useState<string | null>(null);
+
+  const href = normalizeLink(media?.link ?? '');
   const hostname = getHostname(href);
 
-  let icon: ReactNode | null = null;
+  const isVK = hostname.includes("vk.com");
+  const isTelegram = hostname.includes("t.me");
+  const isWhatsApp = hostname.includes("wa.me") || hostname.includes("whatsapp");
 
-  if (hostname.includes('vk.com')) {
-    icon = builtinIcons['vk.com'];
-  } else if (hostname.includes('t.me')) {
-    icon = builtinIcons['t.me'];
-  } else if (hostname.includes('wa.me') || hostname.includes('whatsapp')) {
-    icon = builtinIcons['wa.me'];
-  } else if (media.image) {
+  useEffect(() => {
+    let mounted = true;
+    if (!isVK && !isTelegram && !isWhatsApp && media.image) {
+      void photoStore.loadPhoto(media.image).then((url) => {
+        if (mounted && url) setCustomSrc(url);
+      });
+    }
+    return () => {
+      mounted = false;
+    };
+  }, [media.image, isVK, isTelegram, isWhatsApp, photoStore]);
+
+  let icon: ReactNode;
+  if (isVK) {
+    icon = builtinIcons["vk.com"];
+  } else if (isTelegram) {
+    icon = builtinIcons["t.me"];
+  } else if (isWhatsApp) {
+    icon = builtinIcons["wa.me"];
+  } else if (customSrc) {
     icon = (
       <img
-        src={media.image}
+        src={customSrc}
         alt={hostname}
         className="w-5 h-5 object-contain"
         onError={(e) => {
           e.currentTarget.onerror = null;
-          e.currentTarget.style.display = 'none';
+          e.currentTarget.style.display = "none";
         }}
       />
     );
   } else {
     icon =
-      <span className="font-semibold text-sm">{hostname[0]?.toUpperCase() || '?'}</span>;
+      <span className="font-semibold text-sm">{hostname[0]?.toUpperCase() || "?"}</span>;
   }
 
-  const bgClass =
-    hostname.includes('vk.com')
-      ? 'hover:bg-blue-600'
-      : hostname.includes('t.me')
-        ? 'hover:bg-blue-500'
-        : hostname.includes('wa.me') || hostname.includes('whatsapp')
-          ? 'hover:bg-green-600'
-          : 'hover:bg-gray-700';
+  const bgClass = isVK
+    ? "hover:bg-blue-600"
+    : isTelegram
+      ? "hover:bg-blue-500"
+      : isWhatsApp
+        ? "hover:bg-green-600"
+        : "hover:bg-gray-700";
 
   return (
     <a

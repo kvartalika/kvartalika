@@ -2,28 +2,29 @@ import {create} from 'zustand';
 import {persist} from 'zustand/middleware';
 import {
   type Category,
-  type FlatWithCategoryRequest,
   getCategories,
   getFlats,
   getFlatsByCategory, getFlatsByHome,
   getHomes,
-  type HomePageFlats, type HomeRequest,
+  type HomePageFlats, type ResolvedFlat, type ResolvedHome,
   searchFlats,
   type SearchRequest
 } from '../services';
+import {usePhotoStore} from "./usePhotoStore.ts";
+import {publishChecker} from "../utils/publishChecker.ts";
 
 export interface flatsState {
-  flats: FlatWithCategoryRequest[];
-  homes: HomeRequest[];
+  flats: ResolvedFlat[];
+  homes: ResolvedHome[];
   categories: Category[];
-  searchResults: FlatWithCategoryRequest[];
+  searchResults: ResolvedFlat[];
 
   homePageFlats: HomePageFlats[];
-  flatsByHome: FlatWithCategoryRequest[];
+  flatsByHome: ResolvedFlat[];
 
   selectedCategory: Category | null;
-  selectedFlat: FlatWithCategoryRequest | null;
-  selectedHome: HomeRequest | null;
+  selectedFlat: ResolvedFlat | null;
+  selectedHome: ResolvedHome | null;
 
   isLoadingFlats: boolean;
   isLoadingHomes: boolean;
@@ -60,14 +61,14 @@ export interface flatsActions {
   loadHomePageFlats: (force?: boolean) => Promise<void>;
   loadAllData: (force?: boolean) => Promise<void>;
 
-  loadFlatsByHome: (homeId: number) => Promise<FlatWithCategoryRequest[]>;
-  loadFlatsByCategory: (categoryId: number) => Promise<FlatWithCategoryRequest[]>;
+  loadFlatsByHome: (homeId: number) => Promise<ResolvedFlat[]>;
+  loadFlatsByCategory: (categoryId: number) => Promise<ResolvedFlat[]>;
 
-  getFlatById: (id: number) => Promise<FlatWithCategoryRequest | null>;
-  getHomeById: (id: number) => Promise<HomeRequest | null>;
+  getFlatById: (id: number) => Promise<ResolvedFlat | null>;
+  getHomeById: (id: number) => Promise<ResolvedHome | null>;
 
-  setSelectedFlat: (flat: FlatWithCategoryRequest | null) => void;
-  setSelectedHome: (home: HomeRequest | null) => void;
+  setSelectedFlat: (flat: ResolvedFlat | null) => void;
+  setSelectedHome: (home: ResolvedHome | null) => void;
   setSelectedCategory: (category: Category | null) => void;
 
   setFilters: (filters: Partial<SearchRequest>) => void;
@@ -145,11 +146,13 @@ export const useFlatsStore = create<flatsState & flatsActions>()(persist((set, g
       set({isLoadingFlats: true, error: null});
       try {
         const flats = await getFlats();
+        const published = flats.filter(publishChecker);
+        const resolved = await Promise.all(published.map(usePhotoStore.getState().processFlat));
         set(state => ({
-          flats: flats.filter((flat) => flat.flat.published),
+          flats: resolved,
           isLoadingFlats: false,
           lastFetch: {...state.lastFetch, flats: Date.now()},
-          ...(get().hasSearched ? {} : {searchResults: flats.filter((flat) => flat.flat.published)})
+          ...(get().hasSearched ? {} : {searchResults: resolved})
         }));
       } catch (error) {
         set({
@@ -166,8 +169,10 @@ export const useFlatsStore = create<flatsState & flatsActions>()(persist((set, g
       set({isLoadingHomes: true, error: null});
       try {
         const homes = await getHomes();
+        const published = homes.filter(publishChecker);
+        const resolved = await Promise.all(published.map(usePhotoStore.getState().processHome));
         set(state => ({
-          homes: homes.filter((home) => home.published),
+          homes: resolved,
           isLoadingHomes: false,
           lastFetch: {...state.lastFetch, homes: Date.now()}
         }));
@@ -209,21 +214,18 @@ export const useFlatsStore = create<flatsState & flatsActions>()(persist((set, g
       set({isLoadingHomePageFlats: true, error: null});
 
       try {
-        const results = await Promise.allSettled(
-          homePageCategories.map(category =>
-            getFlatsByCategory(category.id).then(flats => ({
-              category,
-              flats,
-            }))
-          )
+        const resolved = await Promise.allSettled(
+          homePageCategories.map(async category => {
+            const flats = await getFlatsByCategory(category.id);
+            const published = flats.filter(publishChecker);
+            const resolved = await Promise.all(published.map(usePhotoStore.getState().processFlat));
+            return { category, flats: resolved };
+          })
         );
 
-        const homePageFlats: HomePageFlats[] = [];
-        results.forEach(result => {
-          if (result.status === 'fulfilled') {
-            homePageFlats.push(result.value);
-          }
-        });
+        const homePageFlats: HomePageFlats[] = resolved
+          .filter(r => r.status === 'fulfilled')
+          .map(r => (r as PromiseFulfilledResult<HomePageFlats>).value);
 
         set(state => ({
           homePageFlats,
@@ -272,7 +274,9 @@ export const useFlatsStore = create<flatsState & flatsActions>()(persist((set, g
     loadFlatsByHome: async (homeId: number) => {
       try {
         const flats = await getFlatsByHome(homeId);
-        set({flatsByHome: flats});
+        const published = flats.filter(publishChecker);
+        const resolved = await Promise.all(published.map(usePhotoStore.getState().processFlat));
+        set({flatsByHome: resolved});
 
         return flats;
       } catch {
@@ -286,10 +290,11 @@ export const useFlatsStore = create<flatsState & flatsActions>()(persist((set, g
     loadFlatsByCategory: async (categoryId: number) => {
       try {
         const flats = await getFlatsByCategory(categoryId);
-
+        const published = flats.filter(publishChecker);
+        const resolved = await Promise.all(published.map(usePhotoStore.getState().processFlat));
         set(state => {
           const updatedFlats = [...state.flats];
-          flats.forEach(flat => {
+          resolved.forEach(flat => {
             const existingIndex = updatedFlats.findIndex(h => h.flat.id === flat.flat.id);
             if (existingIndex >= 0) {
               updatedFlats[existingIndex] = flat;
@@ -301,7 +306,7 @@ export const useFlatsStore = create<flatsState & flatsActions>()(persist((set, g
           return {flats: updatedFlats};
         });
 
-        return flats;
+        return resolved;
       } catch {
         set({error: 'Failed to fetch flats by category'});
         return [];
@@ -327,8 +332,10 @@ export const useFlatsStore = create<flatsState & flatsActions>()(persist((set, g
 
       try {
         const searchResults = await searchFlats(currentSearchParams);
+        const published = searchResults.filter(publishChecker);
+        const resolved = await Promise.all(published.map(usePhotoStore.getState().processFlat));
 
-        const totalResults = searchResults.length;
+        const totalResults = resolved.length;
         const totalPages = Math.max(1, Math.ceil(totalResults / limit));
         const normalizedPage = Math.min(Math.max(1, pageToUse), totalPages);
 
@@ -336,7 +343,7 @@ export const useFlatsStore = create<flatsState & flatsActions>()(persist((set, g
           currentPage: normalizedPage,
           totalResults,
           totalPages,
-          searchResults,
+          searchResults: resolved,
           isSearching: false,
         });
       } catch (error) {
@@ -362,11 +369,11 @@ export const useFlatsStore = create<flatsState & flatsActions>()(persist((set, g
       });
     },
 
-    setSelectedFlat: (flat: FlatWithCategoryRequest | null) => {
+    setSelectedFlat: (flat: ResolvedFlat | null) => {
       set({selectedFlat: flat});
     },
 
-    setSelectedHome: (home: HomeRequest | null) => {
+    setSelectedHome: (home: ResolvedHome | null) => {
       set({selectedHome: home});
     },
 

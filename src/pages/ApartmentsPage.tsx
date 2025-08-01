@@ -118,7 +118,10 @@ const ApartmentsPage = () => {
 
   const getPageDescription = () => {
     if (currentSearchParams.categoriesId && currentSearchParams.categoriesId.length === 1) {
-      return `Подборка квартир из категории ${currentSearchParams.categoriesId[0]}`;
+      const curCat = currentSearchParams.categoriesId;
+      const cat = searchResults[0].categories.find((c) => c.id === curCat[0])
+      if (cat)
+        return `Подборка квартир из категории ${cat.name}`;
     }
     if (currentSearchParams.rooms) {
       return `Подберите идеальную ${currentSearchParams.rooms}-комнатную квартиру`;
@@ -247,7 +250,7 @@ const ApartmentsPage = () => {
               <ApartmentCard
                 homeName={homes.find(home => home.id === apartment.flat.homeId)?.name ?? '?'}
                 key={apartment.flat.id}
-                apartment={apartment.flat}
+                apartment={apartment}
                 onBookingClick={() => openModal('bid')}
               />
             ))}

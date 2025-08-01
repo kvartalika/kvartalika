@@ -4,9 +4,14 @@ import {useAuthStore, type UserRole} from "../store";
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  requiredRole?: UserRole;
+  requiredRole?: UserRole | UserRole[];
   redirectTo?: string;
 }
+
+const normalizeRoles = (r?: UserRole | UserRole[]): UserRole[] | undefined => {
+  if (!r) return undefined;
+  return Array.isArray(r) ? r : [r];
+};
 
 const ProtectedRoute = ({
                           children,
@@ -15,28 +20,29 @@ const ProtectedRoute = ({
                         }: ProtectedRouteProps) => {
   const {isAuthenticated, role} = useAuthStore();
   const navigate = useNavigate();
+  const roles = normalizeRoles(requiredRole);
 
   useEffect(() => {
+
     if (!isAuthenticated) {
-      navigate(redirectTo);
+      navigate(redirectTo, {replace: true});
       return;
     }
 
-    if (requiredRole && role !== requiredRole) {
+    if (roles && !roles.includes(role as UserRole)) {
       if (role === 'ADMIN') {
-        navigate('/admin');
+        navigate('/admin', {replace: true});
       } else {
-        navigate('/');
+        navigate('/', {replace: true});
       }
-      return;
     }
-  }, [isAuthenticated, role, requiredRole, navigate, redirectTo]);
+  }, [isAuthenticated, role, roles, navigate, redirectTo]);
 
   if (!isAuthenticated) {
     return null;
   }
 
-  if (requiredRole && role !== requiredRole) {
+  if (roles && !roles.includes(role as UserRole)) {
     return null;
   }
 

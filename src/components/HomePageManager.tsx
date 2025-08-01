@@ -1,12 +1,12 @@
 import {type FormEvent, useState} from 'react';
 import ContactForm from './forms/ContactForm';
 import SocialMediaForm from './forms/SocialMediaForm';
-import {useAuthStore} from "../store/auth.store.ts";
 import {
   type PageInfo,
   type SocialMedia,
+  useAuthStore,
   useUIStore
-} from "../store/ui.store.ts";
+} from "../store";
 
 interface HomePageManagerProps {
   onCancel: () => void;
@@ -73,12 +73,12 @@ const HomePageManager = ({onCancel}: HomePageManagerProps) => {
     }
   };
 
-  if (!isAuthenticated || role !== 'CONTENT_MANAGER') {
+  if (!isAuthenticated || !role || role === "CLIENT") {
     return null;
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">
@@ -94,7 +94,8 @@ const HomePageManager = ({onCancel}: HomePageManagerProps) => {
 
         {notifications.length && (
           <div className="mb-4 bg-red-50 border text-black px-4 py-3 rounded">
-            {notifications[0].message}
+            {notifications.map((notification) => (
+              <p>{notification.message}</p>))}
           </div>
         )}
 
@@ -111,7 +112,6 @@ const HomePageManager = ({onCancel}: HomePageManagerProps) => {
 
           <div className="bg-gray-50 p-6 rounded-lg">
             <SocialMediaForm
-              socialMedia={draftedSocialMediaList}
               onSocialMediaChange={handleSocialMediaChange}
               onAddSocialMedia={addSocialMedia}
               onRemoveSocialMedia={removeSocialMedia}

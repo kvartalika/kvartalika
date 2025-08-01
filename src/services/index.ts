@@ -10,3 +10,4 @@ export * from './content.service';
 
 export * from './public.service';
 
+export const TABS = ['managers', 'admins', 'files', 'directories'];

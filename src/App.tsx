@@ -14,9 +14,11 @@ import ComplexesPage from './pages/ComplexesPage';
 import ComplexPage from './pages/ComplexPage';
 import ApartmentPage from './pages/ApartmentPage';
 import AuthPage from './pages/AuthPage';
-import AdminPage from './pages/AdminPage';
+import AdminPage from './components/admin/AdminPage.tsx';
 
 import {useAuthStore, useFlatsStore, useUIStore} from "./store";
+import ContentManagementPage
+  from "./components/content/ContentManagementPage.tsx";
 
 function ScrollToTop() {
   const {pathname} = useLocation();
@@ -100,6 +102,14 @@ const InnerApp = () => {
               element={
                 <ProtectedRoute requiredRole="ADMIN">
                   <AdminPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/content"
+              element={
+                <ProtectedRoute requiredRole={["CONTENT_MANAGER", "ADMIN"]}>
+                  <ContentManagementPage />
                 </ProtectedRoute>
               }
             />

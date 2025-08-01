@@ -2,7 +2,6 @@ import {apiClient} from './api.config';
 import type {
   Category,
   Description, FlatWithCategoryRequest,
-  Footer,
   HomeRequest,
   PaginatedResponse,
   PaginationParams,
@@ -252,20 +251,6 @@ export class PublicService {
     }
   }
 
-  static async getFooter(): Promise<Footer | null> {
-    try {
-      const response = await apiClient.get<Footer>('/footer');
-      return response.data;
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 404) {
-          return null;
-        }
-        throw new Error(error.response?.data?.message || 'Failed to get footer');
-      }
-      throw error;
-    }
-  }
 
   static async searchFlats(searchParams: SearchRequest): Promise<FlatWithCategoryRequest[]> {
     try {
@@ -350,7 +335,6 @@ export const {
   getFlatsByCategory,
   getPhotos,
   getPhotoById,
-  getFooter,
   searchFlats,
   updatePageInfo,
   advancedSearch,

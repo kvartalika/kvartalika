@@ -1,0 +1,20 @@
+export const safeImage = (data: string[] | string | undefined, type: "layout" | 'flat' | 'history' | 'home') => {
+  let safe;
+
+  switch (type) {
+    case 'layout':
+      safe = '/imagesFallback/layout-test.png';
+      break;
+    case 'history':
+      safe = '/imagesFallback/history.png';
+      break;
+    case 'flat':
+      safe = '/imagesFallback/flat.png';
+      break;
+    case 'home':
+      safe = '/imagesFallback/home.png';
+      break;
+  }
+  if (data) return data;
+  return safe;
+}

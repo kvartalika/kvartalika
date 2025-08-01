@@ -106,14 +106,14 @@ const Header = () => {
           </nav>
 
           <div className="hidden lg:flex items-center space-x-4">
-            <button
+            {!isAuthenticated && <button
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
               onClick={() => {
-                openModal('bid');
+                openModal("bid");
               }}
             >
               Записаться на осмотр
-            </button>
+            </button>}
 
             {isAuthenticated && (
               <div className="flex items-center space-x-4">
@@ -136,7 +136,7 @@ const Header = () => {
                 )}
                 <button
                   onClick={async () => {
-                    await logout();
+                    logout();
                     navigate('/');
                   }}
                   className={`text-sm font-medium transition-colors hover:text-blue-600 ${
@@ -213,15 +213,15 @@ const Header = () => {
                 О нас
               </button>
               <div className="px-4 py-2 border-t border-gray-200">
-                <button
+                {!isAuthenticated && <button
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full"
                   onClick={() => {
-                    openModal('bid');
+                    openModal("bid");
                     setIsMobileMenuOpen(false);
                   }}
                 >
                   Записаться на осмотр
-                </button>
+                </button>}
 
                 {isAuthenticated && (
                   <div className="mt-4 space-y-2">
@@ -239,7 +239,7 @@ const Header = () => {
                     )}
                     <button
                       onClick={async () => {
-                        await logout();
+                        logout();
                         navigate('/');
                         setIsMobileMenuOpen(false);
                       }}

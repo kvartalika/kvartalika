@@ -1,14 +1,14 @@
 import {create} from 'zustand';
 import {
   addAdmin,
-  addContentManager,
+  addContentManager, createDirectory,
   deleteAdmin,
-  deleteContentManager,
+  deleteContentManager, deleteDirectory, deleteFile, downloadFile,
   getAdmins,
-  getContentManagers,
+  getContentManagers, getDirectory, getFile, listDirectories, listFilesInDir,
   type PaginationParams,
   updateAdmin,
-  updateContentManager,
+  updateContentManager, uploadFile,
   type UserDto,
 } from '../services';
 
@@ -19,7 +19,19 @@ export interface AdminState {
   isLoadingContentManagers: boolean;
   isLoadingAdmins: boolean;
 
+  directories: string[];
+
+  currentDirectoryDirs: string[];
+  currentDirectoryFiles: string[];
+
+  isLoadingDirectories: boolean;
+  isLoadingFiles: boolean;
+  isUploadingFile: boolean;
+  isManagingDirectory: boolean;
+
   error: string | null;
+  fileError: string | null;
+  directoryError: string | null;
 }
 
 export interface AdminActions {
@@ -33,8 +45,21 @@ export interface AdminActions {
   editAdmin: (email: string, adminData: Partial<UserDto>) => Promise<void>;
   removeAdmin: (email: string) => Promise<void>;
 
+  listDirectories: () => Promise<void>;
+  getDirectory: (pathParts: string[]) => Promise<void>;
+  createDirectory: (path: string[]) => Promise<void>;
+  deleteDirectory: (pathParts: string[]) => Promise<void>;
+
+  listFilesInDir: (dirParts: string[]) => Promise<void>;
+  uploadFile: (dirParts: string[], file: File) => Promise<void>;
+  downloadFile: (pathParts: string[]) => Promise<Blob | null>;
+  getFile: (pathParts: string[]) => Promise<Blob | null>;
+  deleteFile: (pathParts: string[]) => Promise<void>;
+
   setError: (error: string | null) => void;
   clearError: () => void;
+  clearFileError: () => void;
+  clearDirectoryError: () => void;
 }
 
 export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
@@ -44,7 +69,17 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
   isLoadingContentManagers: false,
   isLoadingAdmins: false,
 
+  directories: [],
+  currentDirectoryDirs: [],
+  currentDirectoryFiles: [],
+  isLoadingDirectories: false,
+  isLoadingFiles: false,
+  isUploadingFile: false,
+  isManagingDirectory: false,
+
   error: null,
+  fileError: null,
+  directoryError: null,
 
   loadContentManagers: async (params?: PaginationParams) => {
     set({isLoadingContentManagers: true, error: null});
@@ -158,6 +193,120 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
     }
   },
 
-  setError: (error: string | null) => set({error}),
+  listDirectories: async () => {
+    set({isLoadingDirectories: true, directoryError: null});
+    try {
+      const dirs = await listDirectories();
+      set({directories: dirs, isLoadingDirectories: false});
+    } catch (e) {
+      set({
+        isLoadingDirectories: false,
+        directoryError: e instanceof Error ? e.message : 'Failed to list directories',
+      });
+    }
+  },
+
+  getDirectory: async (pathParts) => {
+    set({isLoadingDirectories: true, directoryError: null});
+    try {
+      const contents = await getDirectory(pathParts);
+      set({currentDirectoryDirs: contents, isLoadingDirectories: false});
+    } catch (e) {
+      set({
+        isLoadingDirectories: false,
+        directoryError: e instanceof Error ? e.message : 'Failed to get directory',
+      });
+    }
+  },
+
+  createDirectory: async (pathParts: string[]) => {
+    set({isManagingDirectory: true, directoryError: null});
+    try {
+      await createDirectory(pathParts);
+      await get().listDirectories();
+      set({isManagingDirectory: false});
+    } catch (e) {
+      set({
+        isManagingDirectory: false,
+        directoryError: e instanceof Error ? e.message : 'Failed to create directory'
+      });
+    }
+  },
+
+  deleteDirectory: async (pathParts: string[]) => {
+    set({isManagingDirectory: true, directoryError: null});
+    try {
+      await deleteDirectory(pathParts);
+      await get().listDirectories();
+      set({isManagingDirectory: false});
+    } catch (e) {
+      set({
+        isManagingDirectory: false,
+        directoryError: e instanceof Error ? e.message : 'Failed to delete directory'
+      });
+    }
+  },
+
+  listFilesInDir: async (dirParts) => {
+    set({isLoadingFiles: true, fileError: null});
+    try {
+      const files = await listFilesInDir(dirParts);
+      set({currentDirectoryFiles: files, isLoadingFiles: false});
+    } catch (e) {
+      set({
+        isLoadingFiles: false,
+        fileError: e instanceof Error ? e.message : 'Failed to list files',
+      });
+    }
+  },
+
+  uploadFile: async (dirParts, file) => {
+    set({isUploadingFile: true, fileError: null});
+    try {
+      await uploadFile(dirParts, file);
+      await get().listFilesInDir(dirParts);
+      set({isUploadingFile: false});
+    } catch (e) {
+      set({
+        isUploadingFile: false,
+        fileError: e instanceof Error ? e.message : 'Failed to upload file',
+      });
+    }
+  },
+
+  downloadFile: async (pathParts) => {
+    try {
+      return await downloadFile(pathParts);
+    } catch (e) {
+      set({fileError: e instanceof Error ? e.message : 'Failed to download file'});
+      return null;
+    }
+  },
+
+  getFile: async (pathParts) => {
+    try {
+      return await getFile(pathParts);
+    } catch (e) {
+      set({fileError: e instanceof Error ? e.message : 'Failed to get file'});
+      return null;
+    }
+  },
+
+  deleteFile: async (pathParts) => {
+    set({isLoadingFiles: true, fileError: null});
+    try {
+      await deleteFile(pathParts);
+      set({isLoadingFiles: false});
+    } catch (e) {
+      set({
+        isLoadingFiles: false,
+        fileError: e instanceof Error ? e.message : 'Failed to delete file',
+      });
+    }
+  },
+
+  setError: (error) => set({error}),
   clearError: () => set({error: null}),
+  clearFileError: () => set({fileError: null}),
+  clearDirectoryError: () => set({directoryError: null}),
 }));

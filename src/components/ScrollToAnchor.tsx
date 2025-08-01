@@ -6,12 +6,10 @@ const ScrollToAnchor = () => {
 
   useEffect(() => {
     if (location.hash) {
-      // Small delay to ensure the page has rendered
       setTimeout(() => {
         const element = document.getElementById(location.hash.slice(1));
         if (element) {
-          // Calculate offset for fixed header (height + some padding)
-          const headerOffset = 100; // Adjust this value based on your header height
+          const headerOffset = 100;
           const elementPosition = element.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
