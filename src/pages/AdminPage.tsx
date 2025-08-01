@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {type FormEvent, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useAdminStore, useAuthStore} from "../store";
 import type {UserDto} from '../services';
@@ -62,7 +62,7 @@ const AdminPage = () => {
     navigate('/auth');
   };
 
-  const handleCreateOrUpdateManager = async (e: React.FormEvent) => {
+  const handleCreateOrUpdateManager = async (e: FormEvent) => {
     e.preventDefault();
     clearError();
 
@@ -76,7 +76,7 @@ const AdminPage = () => {
       setEditMode(false);
       resetForm();
     } catch (error) {
-      // Error is handled by the store
+      console.log(error);
     }
   };
 
@@ -94,7 +94,7 @@ const AdminPage = () => {
       setEditMode(false);
       resetForm();
     } catch (error) {
-      // Error is handled by the store
+      console.log(error);
     }
   };
 
@@ -118,7 +118,7 @@ const AdminPage = () => {
       patronymic: item.patronymic || '',
       email: item.email,
       phone: item.phone || '',
-      password: '', // Don't populate password for security
+      password: '',
       role: type === 'manager' ? 'CONTENT_MANAGER' : 'ADMIN',
       telegramId: item.telegramId || '',
     });

@@ -19,6 +19,7 @@ const HomePageManager = ({onCancel}: HomePageManagerProps) => {
   const updatePageInfo = useUIStore(state => state.updatePageInfo);
 
   const socialMediaList = useUIStore(state => state.socialMediaList);
+  const loadSocialMediaList = useUIStore(state => state.loadSocialMediaList);
   const updateSocialMediaList = useUIStore(state => state.updateSocialMediaList);
   const addSocialMediaList = useUIStore(state => state.addSocialMediaList);
 
@@ -53,10 +54,12 @@ const HomePageManager = ({onCancel}: HomePageManagerProps) => {
     }
 
     await addSocialMediaList(media);
+    await loadSocialMediaList();
   };
 
   const removeSocialMedia = async (index: number) => {
     await removeSocialMedia(index);
+    await loadSocialMediaList();
   };
 
   const handleSubmit = async (e: FormEvent) => {

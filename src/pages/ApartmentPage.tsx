@@ -65,7 +65,7 @@ const ApartmentPage = () => {
     return new Intl.NumberFormat('ru-RU').format(price);
   };
 
-  const pricePerSqm = Math.round(selectedFlat.flat.price / selectedFlat.flat.area);
+  const pricePerSqm = Math.round((selectedFlat?.flat.price || 0) / (selectedFlat?.flat?.area || 1));
 
   const images = selectedFlat.flat?.images || [
     '/images/apartment-2.jpg',
@@ -118,7 +118,7 @@ const ApartmentPage = () => {
                   className="w-full h-full object-cover"
                 />
 
-                {selectedFlat.flat?.features.length >= 3 && (
+                {selectedFlat.flat?.features?.length && (
                   <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-2 rounded-lg font-semibold">
                     🔥 Горячее предложение
                   </div>
@@ -274,7 +274,7 @@ const ApartmentPage = () => {
                   Особенности квартиры
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {selectedFlat.flat?.features.map((feature) => (
+                  {selectedFlat.flat?.features?.map((feature) => (
                     <div className="flex items-center text-gray-600">
                       <svg
                         className="w-5 h-5 text-green-500 mr-3"
@@ -440,7 +440,7 @@ const ApartmentPage = () => {
               <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
                 <div className="text-center mb-6">
                   <div className="text-3xl font-bold text-gray-900 mb-2">
-                    {formatPrice(selectedFlat.flat.price)} ₽
+                    {formatPrice(selectedFlat.flat?.price || 0)} ₽
                   </div>
                   <div className="text-sm text-gray-600">
                     {formatPrice(pricePerSqm)} ₽ за м²

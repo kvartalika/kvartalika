@@ -1,10 +1,9 @@
 import {apiClient} from './api.config';
 import type {
   Category,
-  Description,
-  FlatWithCategory,
+  Description, FlatWithCategoryRequest,
   Footer,
-  Home,
+  HomeRequest,
   PaginatedResponse,
   PaginationParams,
   Photo,
@@ -147,9 +146,9 @@ export class PublicService {
   }
 
   // Flats - Public Read
-  static async getFlats(params?: PaginationParams): Promise<FlatWithCategory[]> {
+  static async getFlats(params?: PaginationParams): Promise<FlatWithCategoryRequest[]> {
     try {
-      const response = await apiClient.get<FlatWithCategory[]>('/flats', {params});
+      const response = await apiClient.get<FlatWithCategoryRequest[]>('/flats', {params});
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -159,9 +158,9 @@ export class PublicService {
     }
   }
 
-  static async getFlatById(id: number): Promise<FlatWithCategory | null> {
+  static async getFlatById(id: number): Promise<FlatWithCategoryRequest | null> {
     try {
-      const response = await apiClient.get<FlatWithCategory>(`/flats/${id}`);
+      const response = await apiClient.get<FlatWithCategoryRequest>(`/flats/${id}`);
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -174,9 +173,9 @@ export class PublicService {
     }
   }
 
-  static async getFlatsByHome(homeId: number, params?: PaginationParams): Promise<FlatWithCategory[]> {
+  static async getFlatsByHome(homeId: number, params?: PaginationParams): Promise<FlatWithCategoryRequest[]> {
     try {
-      const response = await apiClient.get<FlatWithCategory[]>(`/homes/${homeId}/flats`, {params});
+      const response = await apiClient.get<FlatWithCategoryRequest[]>(`/homes/${homeId}/flats`, {params});
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -187,9 +186,9 @@ export class PublicService {
   }
 
   // Homes - Public Read
-  static async getHomes(params?: PaginationParams): Promise<Home[]> {
+  static async getHomes(params?: PaginationParams): Promise<HomeRequest[]> {
     try {
-      const response = await apiClient.get<Home[]>('/homes', {params});
+      const response = await apiClient.get<HomeRequest[]>('/homes', {params});
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -199,9 +198,9 @@ export class PublicService {
     }
   }
 
-  static async getHomeById(id: number): Promise<Home | null> {
+  static async getHomeById(id: number): Promise<HomeRequest | null> {
     try {
-      const response = await apiClient.get<Home>(`/homes/${id}`);
+      const response = await apiClient.get<HomeRequest>(`/homes/${id}`);
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -214,9 +213,9 @@ export class PublicService {
     }
   }
 
-  static async getFlatsByCategory(categoryId: number, params?: PaginationParams): Promise<FlatWithCategory[]> {
+  static async getFlatsByCategory(categoryId: number, params?: PaginationParams): Promise<FlatWithCategoryRequest[]> {
     try {
-      const response = await apiClient.get<FlatWithCategory[]>(`/flats/categories/${categoryId}`, {params});
+      const response = await apiClient.get<FlatWithCategoryRequest[]>(`/flats/categories/${categoryId}`, {params});
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -268,9 +267,9 @@ export class PublicService {
     }
   }
 
-  static async searchFlats(searchParams: SearchRequest): Promise<FlatWithCategory[]> {
+  static async searchFlats(searchParams: SearchRequest): Promise<FlatWithCategoryRequest[]> {
     try {
-      const response = await apiClient.post<FlatWithCategory[], SearchRequest>('/search', searchParams);
+      const response = await apiClient.post<FlatWithCategoryRequest[], SearchRequest>('/search', searchParams);
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -280,9 +279,9 @@ export class PublicService {
     }
   }
 
-  static async advancedSearch(searchParams: SearchRequest & PaginationParams): Promise<PaginatedResponse<FlatWithCategory>> {
+  static async advancedSearch(searchParams: SearchRequest & PaginationParams): Promise<PaginatedResponse<FlatWithCategoryRequest>> {
     try {
-      const response = await apiClient.post<PaginatedResponse<FlatWithCategory>, SearchRequest & PaginationParams>('/search/advanced', searchParams);
+      const response = await apiClient.post<PaginatedResponse<FlatWithCategoryRequest>, SearchRequest & PaginationParams>('/search/advanced', searchParams);
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {

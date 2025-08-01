@@ -1,21 +1,47 @@
 import {Link, useNavigate} from 'react-router-dom';
-import type {Flat} from "../services";
+import type {FlatRequest} from "../services";
+import {usePhotoStore} from "../store/usePhotoStore.ts";
+import {useEffect, useState} from "react";
 
 interface ApartmentCardProps {
-  apartment: Flat;
+  apartment: FlatRequest;
   homeName: string;
   onBookingClick?: () => void;
 }
 
-const ApartmentCard = ({apartment, onBookingClick, homeName}: ApartmentCardProps) => {
+const ApartmentCard = ({
+                         apartment,
+                         onBookingClick,
+                         homeName
+                       }: ApartmentCardProps) => {
   const navigate = useNavigate();
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ru-RU').format(price);
   };
 
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+  const loadPhoto = usePhotoStore(state => state.loadPhoto);
+
+  useEffect(() => {
+    let mounted = true;
+    const firstImage = apartment.images?.[0];
+    if (firstImage) {
+      void loadPhoto(firstImage).then(url => {
+        if (mounted && url) setLoadedSrc(url);
+      });
+    }
+    return () => {
+      mounted = false;
+    };
+  }, [apartment.images, loadPhoto]);
+
+  const imgSrc = loadedSrc || apartment.images?.[0] || '/images/apartment-placeholder.jpg';
+
+
   const handleCardClick = () => {
     navigate(`/apartment/${apartment.id}`);
   };
+
   return (
     <div
       className="card card-hover cursor-pointer hover:shadow-lg transition-shadow duration-200"
@@ -23,19 +49,19 @@ const ApartmentCard = ({apartment, onBookingClick, homeName}: ApartmentCardProps
     >
       <div className="relative h-48 overflow-hidden">
         <img
-          src={apartment.images?.[0] || '/images/apartment-placeholder.jpg'}
+          src={imgSrc}
           alt={`${apartment.numberOfRooms}-комнатная квартира в ${apartment.homeId}`}
           className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
         />
 
-        {apartment.features?.length > 3 && (
+        {apartment?.features?.length && (
           <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-lg text-xs font-semibold">
             🔥 Горячее предложение
           </div>
         )}
 
         <div className="absolute bottom-3 right-3 bg-black bg-opacity-70 text-white px-3 py-1 rounded-lg font-semibold">
-          {formatPrice(apartment.price)} ₽
+          {formatPrice(apartment?.price || 0)} ₽
         </div>
       </div>
 

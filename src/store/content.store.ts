@@ -430,16 +430,7 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
     set({
       selectedFlat: flat,
       flatForm: {
-        title: flat.title,
-        description: flat.description,
-        price: flat.price,
-        area: flat.area,
-        rooms: flat.rooms,
-        floor: flat.floor,
-        totalFloors: flat.totalFloors,
-        homeId: flat.homeId,
-        categoryId: flat.categoryId,
-        photos: flat.photos?.map(p => p.id),
+        ...flat,
       },
       ui: {...get().ui, showForm: true, editMode: true},
     });

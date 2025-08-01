@@ -1,5 +1,4 @@
 import {Link} from 'react-router-dom';
-import {useEffect} from 'react';
 import SearchBar from '../components/SearchBar';
 import ApartmentCard from '../components/ApartmentCard';
 import BackgroundPattern from "../components/BackgroundPattern.tsx";
@@ -24,14 +23,9 @@ const HomePage = () => {
     isLoadingCategories,
     isLoadingHomePageFlats,
     isLoadingHomes,
-    loadAllData,
     homes,
   } = useFlatsStore();
 
-
-  useEffect(() => {
-    loadAllData();
-  }, [loadAllData]);
 
   const renderSection = (section: HomePageFlats, idx: number) => {
     return (

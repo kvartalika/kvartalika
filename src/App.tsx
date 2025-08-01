@@ -16,7 +16,7 @@ import ApartmentPage from './pages/ApartmentPage';
 import AuthPage from './pages/AuthPage';
 import AdminPage from './pages/AdminPage';
 
-import {useAuthStore, useUIStore} from "./store";
+import {useAuthStore, useFlatsStore, useUIStore} from "./store";
 
 function ScrollToTop() {
   const {pathname} = useLocation();
@@ -37,6 +37,8 @@ const InnerApp = () => {
   const loadSocialMediaList = useUIStore(state => state.loadSocialMediaList);
   const pageInfo = useUIStore(state => state.pageInfo);
 
+  const loadAllData = useFlatsStore(state => state.loadAllData);
+
   const {role, isAuthenticated} = useAuthStore();
   const location = useLocation();
 
@@ -54,6 +56,10 @@ const InnerApp = () => {
 
     loadData();
   }, [loadPageInfo, loadSocialMediaList, setLoading]);
+
+  useEffect(() => {
+    void loadAllData();
+  }, [loadAllData]);
 
   const shouldShowLoader =
     location.pathname !== '/auth' &&
@@ -106,7 +112,7 @@ const InnerApp = () => {
               element={<ComplexesPage />}
             />
             <Route
-              path="/complex/:complexId"
+              path="/complex/:homeId"
               element={<ComplexPage />}
             />
             <Route

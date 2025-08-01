@@ -52,6 +52,11 @@ export interface CategoryRequest {
   isOnMainPage: boolean;
 }
 
+export const defaultCategory = {
+  name: '',
+  isOnMainPage: false,
+}
+
 export interface DescriptionRequest {
   title: string;
   content: string;
@@ -59,7 +64,7 @@ export interface DescriptionRequest {
 }
 
 export interface FlatRequest {
-  id?: number;
+  id: number;
   name?: string;
   description?: string;
   images?: string[];
@@ -81,7 +86,7 @@ export interface FlatRequest {
 }
 
 export interface HomeRequest {
-  id?: number;
+  id: number;
   name?: string;
   description?: string;
   images?: string[];
@@ -162,8 +167,8 @@ export interface RequestsPost201Response {
 
 export interface Category {
   id: number;
-  name: string;
-  isOnMainPage: boolean;
+  name?: string;
+  isOnMainPage?: boolean;
 }
 
 export interface BidRequest {
@@ -222,9 +227,14 @@ export interface FlatWithCategory {
   categories: Category[];
 }
 
+export interface FlatWithCategoryRequest {
+  flat: FlatRequest;
+  categories: Partial<Category>[];
+}
+
 export interface HomePageFlats {
   category: Category;
-  flats: FlatWithCategory[];
+  flats: FlatWithCategoryRequest[];
 }
 
 export interface Home {

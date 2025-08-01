@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';
-import type {Home} from "../services";
+import type {HomeRequest} from "../services";
 import {useFlatsStore} from "../store";
 
 const ComplexesPage = () => {
@@ -8,7 +8,7 @@ const ComplexesPage = () => {
 
   const {isLoadingHomes, error, loadHomes, homes} = useFlatsStore();
 
-  const [filteredComplexes, setFilteredComplexes] = useState<Home[]>([]);
+  const [filteredComplexes, setFilteredComplexes] = useState<HomeRequest[]>([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -31,9 +31,9 @@ const ComplexesPage = () => {
       setFilteredComplexes(homes);
     } else {
       const filtered = homes.filter(complex =>
-        complex.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        complex.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        complex.description.toLowerCase().includes(searchQuery.toLowerCase())
+        complex?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        complex?.address?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        complex?.description?.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredComplexes(filtered);
     }
@@ -104,7 +104,7 @@ const ComplexesPage = () => {
               >
                 <div className="relative h-64 overflow-hidden">
                   <img
-                    src={complex.images[0] || '/images/complex-placeholder.jpg'}
+                    src={complex?.images?.[0] || '/images/complex-placeholder.jpg'}
                     alt={complex.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />

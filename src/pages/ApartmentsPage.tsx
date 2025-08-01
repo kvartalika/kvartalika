@@ -71,7 +71,7 @@ const ApartmentsPage = () => {
       parsed.hasShops = String(raw.hasShops).toLowerCase() === 'true';
     }
 
-    const categoriesParam = searchParams.get('categoriesId') || searchParams.get('category');
+    const categoriesParam = searchParams.get('categoriesId');
     if (categoriesParam) {
       const arr = categoriesParam
         .split(',')
@@ -99,14 +99,19 @@ const ApartmentsPage = () => {
   }, [searchResults, currentPage, limit]);
 
   const getPageTitle = () => {
-    if (currentSearchParams.categoriesId && currentSearchParams.categoriesId.length === 1) {
-      return `Квартиры категории ${currentSearchParams.categoriesId[0]}`;
+    const curCat = currentSearchParams.categoriesId;
+    if (curCat && curCat.length === 1) {
+      const cat = searchResults[0].categories.find((c) => c.id === curCat[0])
+      if (cat)
+        return `Квартиры категории ${cat.name}`;
     }
     if (currentSearchParams.rooms) {
       return `${currentSearchParams.rooms}-комнатные квартиры`;
     }
     if (currentSearchParams.homeId) {
-      return `Квартиры в комплексе ${currentSearchParams.homeId}`;
+      const curHome = homes.find((c) => c.id === currentSearchParams.homeId);
+      if (curHome)
+        return `Квартиры в комплексе ${curHome.name}`;
     }
     return 'Квартиры на любой вкус';
   };

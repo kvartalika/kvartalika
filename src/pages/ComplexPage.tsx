@@ -213,7 +213,7 @@ const ComplexPage = () => {
               {flatsByHome.slice(0, 4).map(apartment => (
                 <ApartmentCard
                   key={apartment.flat.id}
-                  homeName={selectedHome.name}
+                  homeName={selectedHome.name  ?? "ЖК"}
                   apartment={apartment.flat}
                   onBookingClick={() => openModal('bid')}
                 />
