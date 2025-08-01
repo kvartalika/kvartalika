@@ -1,9 +1,26 @@
 export interface User {
-  id: number;
   name: string;
   surname: string;
+  patronymic?: string;
   email: string;
-  role: 'ADMIN' | 'CM';
+  phone?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  role: 'ADMIN' | 'CONTENT_MANAGER' | 'CLIENT';
+  telegramId?: string;
+}
+
+export interface UserDto {
+  name: string;
+  surname: string;
+  patronymic?: string;
+  email: string;
+  phone?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  role: string;
+  password: string;
+  telegramId?: string;
 }
 
 export interface Apartment {

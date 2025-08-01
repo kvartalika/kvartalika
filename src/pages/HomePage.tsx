@@ -8,6 +8,7 @@ import HomePageManager from '../components/HomePageManager';
 import {useUIStore} from "../store/ui.store.ts";
 import {useAuthStore} from "../store/auth.store.ts";
 import {usePropertiesStore} from "../store/properties.store.ts";
+import {useApartmentsStore} from "../store/apartments.store.ts";
 import type {HomePageFlats} from "../services";
 import PageLoader from "../components/PageLoader.tsx";
 
@@ -21,32 +22,27 @@ const HomePage = () => {
   const modals = useUIStore(state => state.modals);
   const closeModal = useUIStore(state => state.closeModal);
 
-  const categories = usePropertiesStore(state => state.categories);
+  // Use optimized apartments store instead of legacy properties store
+  const { 
+    categories, 
+    homePageFlats, 
+    homes,
+    isLoadingCategories,
+    isLoadingHomePageFlats,
+    isLoadingHomes,
+    loadAllData,
+    error 
+  } = useApartmentsStore();
 
-  const homePageFlats = usePropertiesStore(state => state.homePageFlats);
-  const fetchHomePageFlats = usePropertiesStore(state => state.fetchHomePageFlats);
-  const isLoadingHomePageFlats = usePropertiesStore(state => state.isLoadingHomePageFlats);
-
-  const fetchCategories = usePropertiesStore(state => state.fetchCategories);
-  const fetchHomes = usePropertiesStore(state => state.fetchHomes);
+  // Keep legacy store for backward compatibility if needed
+  const legacyCategories = usePropertiesStore(state => state.categories);
+  const legacyHomePageFlats = usePropertiesStore(state => state.homePageFlats);
+  const legacyIsLoadingHomePageFlats = usePropertiesStore(state => state.isLoadingHomePageFlats);
 
   useEffect(() => {
-    const load = async () => {
-      await Promise.all([fetchCategories(), fetchHomes()]);
-    };
-    load();
-  }, [fetchCategories, fetchHomes]);
-
-  useEffect(() => {
-    const loadHomePageFlats = async () => {
-      const homePageCategories = categories.filter(c => c.isOnMainPage);
-      if (homePageCategories.length === 0) return;
-
-      await fetchHomePageFlats(homePageCategories, true);
-    };
-
-    loadHomePageFlats();
-  }, [categories, fetchHomePageFlats]);
+    // Use optimized loadAllData instead of multiple separate calls
+    loadAllData();
+  }, [loadAllData]);
 
   const renderSection = (section: HomePageFlats, idx: number) => {
     return (
@@ -145,8 +141,12 @@ const HomePage = () => {
         )}
       </section>
 
-      {isLoadingHomePageFlats ?
-        <PageLoader /> : homePageFlats.map((section, idx) => renderSection(section, idx))}
+      {/* Use data from optimized store, fallback to legacy if needed */}
+      {(isLoadingCategories || isLoadingHomePageFlats || isLoadingHomes || legacyIsLoadingHomePageFlats) ? (
+        <PageLoader />
+      ) : (
+        (homePageFlats.length > 0 ? homePageFlats : legacyHomePageFlats).map((section, idx) => renderSection(section, idx))
+      )}
 
       <section
         id="about"

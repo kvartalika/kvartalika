@@ -4,6 +4,7 @@ import ApartmentCard from '../components/ApartmentCard';
 import SearchBar from '../components/SearchBar';
 import {type SearchFilters, useSearchStore} from "../store/search.store.ts";
 import {useUIStore} from "../store/ui.store.ts";
+import {useApartmentsStore} from "../store/apartments.store.ts";
 
 const ApartmentsPage = () => {
   const [searchParams] = useSearchParams();
@@ -11,6 +12,19 @@ const ApartmentsPage = () => {
 
   const openModal = useUIStore(state => state.openModal);
 
+  // Use new apartments store for auto-loading apartments
+  const {
+    searchResults: apartmentsFromNewStore,
+    isLoadingApartments,
+    isSearching: isSearchingNewStore,
+    error: apartmentsError,
+    searchError: apartmentsSearchError,
+    loadAllData,
+    searchApartments,
+    clearSearch,
+  } = useApartmentsStore();
+
+  // Keep legacy search store for compatibility
   const {
     filters,
     searchResultsFlats,
@@ -29,7 +43,9 @@ const ApartmentsPage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    // Auto-load apartments when page mounts
+    loadAllData();
+  }, [loadAllData]);
 
   useEffect(() => {
     const raw = Object.fromEntries([...searchParams]);
@@ -99,10 +115,15 @@ const ApartmentsPage = () => {
     setFilters(parsed);
   }, [performSearch, searchParams, setFilters]);
 
+  // Use new apartments store data if available, fallback to legacy search results
+  const currentApartments = apartmentsFromNewStore.length > 0 ? apartmentsFromNewStore : searchResultsFlats;
+  const currentLoading = isLoadingApartments || isSearchingNewStore || isSearching;
+  const currentError = apartmentsError || apartmentsSearchError || searchError;
+
   const pagedFlats = useMemo(() => {
     const start = (currentPage - 1) * limit;
-    return searchResultsFlats.slice(start, start + limit);
-  }, [searchResultsFlats, currentPage, limit]);
+    return currentApartments.slice(start, start + limit);
+  }, [currentApartments, currentPage, limit]);
 
   const getPageTitle = () => {
     if (filters.categoriesId && filters.categoriesId.length === 1) {
@@ -171,7 +192,7 @@ const ApartmentsPage = () => {
           <div>
             <p className="text-gray-600">
               Найдено квартир:{' '}
-              <span className="font-semibold text-gray-900">{totalResults}</span>
+              <span className="font-semibold text-gray-900">{currentApartments.length}</span>
             </p>
           </div>
           <div className="flex gap-4">
@@ -198,15 +219,15 @@ const ApartmentsPage = () => {
           </div>
         </div>
 
-        {isSearching && (
+        {currentLoading && (
           <div className="mb-6 text-gray-500 font-medium">Загрузка квартир...</div>
         )}
 
-        {searchError && (
-          <div className="mb-6 text-red-600 font-medium">{searchError}</div>
+        {currentError && (
+          <div className="mb-6 text-red-600 font-medium">{currentError}</div>
         )}
 
-        {!isSearching && searchResultsFlats.length === 0 && !searchError && (
+        {!currentLoading && currentApartments.length === 0 && !currentError && (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg
@@ -231,6 +252,7 @@ const ApartmentsPage = () => {
               <button
                 onClick={() => {
                   resetFilters();
+                  clearSearch();
                   navigate('/apartments');
                 }}
                 className="text-blue-600 hover:text-blue-700 font-medium"
@@ -253,20 +275,20 @@ const ApartmentsPage = () => {
           </div>
         )}
 
-        {totalPages > 1 && (
+        {Math.ceil(currentApartments.length / limit) > 1 && (
           <div className="flex justify-center items-center gap-4 mt-8">
             <button
-              disabled={currentPage === 1 || isSearching}
+              disabled={currentPage === 1 || currentLoading}
               onClick={() => handlePageChange(currentPage - 1)}
               className="px-4 py-2 bg-gray-100 rounded disabled:opacity-50"
             >
               Назад
             </button>
             <span>
-              {currentPage} / {totalPages}
+              {currentPage} / {Math.max(1, Math.ceil(currentApartments.length / limit))}
             </span>
             <button
-              disabled={currentPage === totalPages || isSearching}
+              disabled={currentPage === Math.ceil(currentApartments.length / limit) || currentLoading}
               onClick={() => handlePageChange(currentPage + 1)}
               className="px-4 py-2 bg-gray-100 rounded disabled:opacity-50"
             >

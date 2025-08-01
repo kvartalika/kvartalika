@@ -5,13 +5,31 @@ import {
   adminRegister,
   contentManagerLogin,
   contentManagerRegister,
-  logout as apiLogout,
-} from '../services';
-import type {
-  LoginRequest,
-  RegisterRequest,
-  AuthResponse
-} from '../services';
+  refreshAuth,
+} from '../services/newApi.service';
+import type { UserDto } from '../types';
+
+// Auth types for the new API
+interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+interface RegisterRequest {
+  name: string;
+  surname: string;
+  patronymic?: string;
+  email: string;
+  phone?: string;
+  password: string;
+  telegramId?: string;
+}
+
+interface AuthResponse {
+  accessToken: string;
+  role: string;
+  user?: UserDto;
+}
 
 export type UserRole = 'CLIENT' | 'ADMIN' | 'CONTENT_MANAGER';
 
@@ -26,6 +44,8 @@ export interface AuthUser {
 
 export interface AuthState {
   role: UserRole | null;
+  user: UserDto | null;
+  accessToken: string | null;
 
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -40,6 +60,7 @@ export interface AuthActions {
   registerAdmin: (userData: RegisterRequest) => Promise<void>;
   registerContentManager: (userData: RegisterRequest) => Promise<void>;
 
+  refreshToken: () => Promise<void>;
   logout: () => void;
 
   setLoading: (loading: boolean) => void;
@@ -49,8 +70,10 @@ export interface AuthActions {
 
 export const useAuthStore = create<AuthState & AuthActions>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       role: null,
+      user: null,
+      accessToken: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
@@ -61,18 +84,25 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         try {
           const response: AuthResponse = await adminLogin(credentials);
 
+          // Store token in localStorage for API calls
+          localStorage.setItem('auth-token', response.accessToken);
+
           set({
-            role: response.role,
+            role: response.role as UserRole,
+            user: response.user || null,
+            accessToken: response.accessToken,
             isAuthenticated: true,
             isLoading: false,
             error: null,
           });
-        } catch {
+        } catch (error: any) {
           set({
             isLoading: false,
-            error: 'Admin login failed',
+            error: error.message || 'Admin login failed',
             isAuthenticated: false,
             role: null,
+            user: null,
+            accessToken: null,
           });
         }
       },
@@ -83,18 +113,25 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         try {
           const response: AuthResponse = await contentManagerLogin(credentials);
 
+          // Store token in localStorage for API calls
+          localStorage.setItem('auth-token', response.accessToken);
+
           set({
-            role: response.role,
+            role: response.role as UserRole,
+            user: response.user || null,
+            accessToken: response.accessToken,
             isAuthenticated: true,
             isLoading: false,
             error: null,
           });
-        } catch {
+        } catch (error: any) {
           set({
             isLoading: false,
-            error: 'Content manager login failed',
+            error: error.message || 'Content manager login failed',
             isAuthenticated: false,
             role: null,
+            user: null,
+            accessToken: null,
           });
         }
       },
@@ -108,10 +145,10 @@ export const useAuthStore = create<AuthState & AuthActions>()(
             isLoading: false,
             error: null,
           });
-        } catch {
+        } catch (error: any) {
           set({
             isLoading: false,
-            error: 'Admin registration failed',
+            error: error.message || 'Admin registration failed',
           });
         }
       },
@@ -125,18 +162,41 @@ export const useAuthStore = create<AuthState & AuthActions>()(
             isLoading: false,
             error: null,
           });
-        } catch {
+        } catch (error: any) {
           set({
             isLoading: false,
-            error: 'Content manager registration failed',
+            error: error.message || 'Content manager registration failed',
           });
         }
       },
 
+      refreshToken: async () => {
+        try {
+          const response: AuthResponse = await refreshAuth();
+          
+          // Update token in localStorage
+          localStorage.setItem('auth-token', response.accessToken);
+
+          set({
+            role: response.role as UserRole,
+            user: response.user || null,
+            accessToken: response.accessToken,
+            isAuthenticated: true,
+            error: null,
+          });
+        } catch (error: any) {
+          // If refresh fails, logout the user
+          get().logout();
+        }
+      },
+
       logout: () => {
-        apiLogout();
+        // Clear token from localStorage
+        localStorage.removeItem('auth-token');
         set({
           role: null,
+          user: null,
+          accessToken: null,
           isAuthenticated: false,
           error: null,
         });
@@ -146,9 +206,12 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       setError: (error: string | null) => set({error}),
 
       clearAuth: () => {
-        apiLogout();
+        // Clear token from localStorage
+        localStorage.removeItem('auth-token');
         set({
           role: null,
+          user: null,
+          accessToken: null,
           isAuthenticated: false,
           error: null,
         });
@@ -158,6 +221,8 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       name: 'auth-storage',
       partialize: (state) => ({
         role: state.role,
+        user: state.user,
+        accessToken: state.accessToken,
         isAuthenticated: state.isAuthenticated,
       }),
     }

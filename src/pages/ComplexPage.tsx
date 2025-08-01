@@ -6,6 +6,7 @@ import ContentManager from '../components/ContentManager';
 import {useAuthStore} from "../store/auth.store.ts";
 import {useUIStore} from "../store/ui.store.ts";
 import {usePropertiesStore} from "../store/properties.store.ts";
+import {useApartmentsStore} from "../store/apartments.store.ts";
 
 const ComplexPage = () => {
   const {homeId} = useParams<{ homeId: string }>();

@@ -2,7 +2,9 @@ import {create} from 'zustand';
 import {
   searchFlats,
 } from '../services';
+import { search as newSearchFlats } from '../services/newApi.service';
 import type {Flat, SearchRequest} from '../services';
+import type { SearchRequest as NewSearchRequest } from '../api/api';
 
 export interface SearchFilters {
   query?: string;
@@ -101,8 +103,32 @@ export const useSearchStore = create<SearchState & SearchActions>((set, get) => 
     set({isSearching: true, searchError: null});
 
     try {
-      const searchParams: SearchRequest = {...filters};
-      const allResults: Flat[] = await searchFlats(searchParams);
+      // Try new API first, fallback to legacy API
+      let allResults: Flat[] = [];
+      
+      try {
+        // Convert filters to new API format
+        const newSearchParams: NewSearchRequest = {
+          query: filters.query,
+          minPrice: filters.minPrice,
+          maxPrice: filters.maxPrice,
+          rooms: filters.rooms,
+          bathrooms: filters.bathrooms,
+          isDecorated: filters.isDecorated,
+          homeId: filters.homeId,
+          hasParks: filters.hasParks,
+          hasSchools: filters.hasSchools,
+          hasShops: filters.hasShops,
+          categoriesId: filters.categoriesId,
+        };
+        
+        allResults = await newSearchFlats(newSearchParams);
+      } catch (newApiError) {
+        // Fallback to legacy API
+        console.warn('New API search failed, falling back to legacy API:', newApiError);
+        const searchParams: SearchRequest = {...filters};
+        allResults = await searchFlats(searchParams);
+      }
 
       const totalResults = allResults.length;
       const totalPages = Math.max(1, Math.ceil(totalResults / limit));
@@ -115,7 +141,7 @@ export const useSearchStore = create<SearchState & SearchActions>((set, get) => 
         totalPages,
         isSearching: false,
       });
-    } catch {
+    } catch (error) {
       set({
         isSearching: false,
         searchError: 'Search failed',
