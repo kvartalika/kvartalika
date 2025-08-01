@@ -14,13 +14,16 @@ const ApartmentsPage = () => {
   const {
     filters,
     searchResultsFlats,
+    allApartments,
     isSearching,
+    isLoadingApartments,
     currentPage,
     totalPages,
     totalResults,
     limit,
     searchError,
     performSearch,
+    loadAllApartments,
     setFilters,
     setPage,
     setLimit,
@@ -30,6 +33,11 @@ const ApartmentsPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Load all apartments on page load
+  useEffect(() => {
+    loadAllApartments();
+  }, [loadAllApartments]);
 
   useEffect(() => {
     const raw = Object.fromEntries([...searchParams]);
@@ -137,6 +145,9 @@ const ApartmentsPage = () => {
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
   };
+
+  const isLoading = isSearching || isLoadingApartments;
+
   return (
     <div className="min-h-screen pt-20">
 
@@ -198,15 +209,17 @@ const ApartmentsPage = () => {
           </div>
         </div>
 
-        {isSearching && (
-          <div className="mb-6 text-gray-500 font-medium">Загрузка квартир...</div>
+        {isLoading && (
+          <div className="mb-6 text-gray-500 font-medium">
+            {isLoadingApartments ? 'Загрузка квартир...' : 'Поиск квартир...'}
+          </div>
         )}
 
         {searchError && (
           <div className="mb-6 text-red-600 font-medium">{searchError}</div>
         )}
 
-        {!isSearching && searchResultsFlats.length === 0 && !searchError && (
+        {!isLoading && searchResultsFlats.length === 0 && !searchError && (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg
@@ -256,7 +269,7 @@ const ApartmentsPage = () => {
         {totalPages > 1 && (
           <div className="flex justify-center items-center gap-4 mt-8">
             <button
-              disabled={currentPage === 1 || isSearching}
+              disabled={currentPage === 1 || isLoading}
               onClick={() => handlePageChange(currentPage - 1)}
               className="px-4 py-2 bg-gray-100 rounded disabled:opacity-50"
             >
@@ -266,7 +279,7 @@ const ApartmentsPage = () => {
               {currentPage} / {totalPages}
             </span>
             <button
-              disabled={currentPage === totalPages || isSearching}
+              disabled={currentPage === totalPages || isLoading}
               onClick={() => handlePageChange(currentPage + 1)}
               className="px-4 py-2 bg-gray-100 rounded disabled:opacity-50"
             >

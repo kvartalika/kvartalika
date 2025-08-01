@@ -1,8 +1,9 @@
 import {create} from 'zustand';
 import {
-  searchFlats,
-} from '../services';
-import type {Flat, SearchRequest} from '../services';
+  search,
+  getApartments,
+} from '../services/newApiService';
+import type {Flat, SearchRequest} from '../services/api.types';
 
 export interface SearchFilters {
   query?: string;
@@ -31,6 +32,7 @@ export interface SearchState {
   filters: SearchFilters;
 
   searchResultsFlats: Flat[];
+  allApartments: Flat[];
 
   currentPage: number;
   totalPages: number;
@@ -38,6 +40,7 @@ export interface SearchState {
   limit: number;
 
   isSearching: boolean;
+  isLoadingApartments: boolean;
   isLoadingFilters: boolean;
 
   searchError: string | null;
@@ -48,6 +51,7 @@ export interface SearchActions {
   resetFilters: () => void;
 
   performSearch: (page?: number) => Promise<void>;
+  loadAllApartments: () => Promise<void>;
 
   setPage: (page: number) => void;
   setLimit: (limit: number) => void;
@@ -65,6 +69,7 @@ export const useSearchStore = create<SearchState & SearchActions>((set, get) => 
   filters: defaultFilters,
 
   searchResultsFlats: [],
+  allApartments: [],
 
   currentPage: 1,
   totalPages: 1,
@@ -72,6 +77,7 @@ export const useSearchStore = create<SearchState & SearchActions>((set, get) => 
   limit: 20,
 
   isSearching: false,
+  isLoadingApartments: false,
   isLoadingFilters: false,
 
   searchError: null,
@@ -94,6 +100,25 @@ export const useSearchStore = create<SearchState & SearchActions>((set, get) => 
     });
   },
 
+  loadAllApartments: async () => {
+    set({isLoadingApartments: true, searchError: null});
+
+    try {
+      const apartments: Flat[] = await getApartments();
+      set({
+        allApartments: apartments,
+        searchResultsFlats: apartments,
+        totalResults: apartments.length,
+        isLoadingApartments: false,
+      });
+    } catch (error) {
+      set({
+        isLoadingApartments: false,
+        searchError: error instanceof Error ? error.message : 'Failed to load apartments',
+      });
+    }
+  },
+
   performSearch: async (page?: number) => {
     const {filters, limit} = get();
     const pageToUse = page ?? get().currentPage;
@@ -102,7 +127,7 @@ export const useSearchStore = create<SearchState & SearchActions>((set, get) => 
 
     try {
       const searchParams: SearchRequest = {...filters};
-      const allResults: Flat[] = await searchFlats(searchParams);
+      const allResults: Flat[] = await search(searchParams);
 
       const totalResults = allResults.length;
       const totalPages = Math.max(1, Math.ceil(totalResults / limit));
@@ -115,10 +140,10 @@ export const useSearchStore = create<SearchState & SearchActions>((set, get) => 
         totalPages,
         isSearching: false,
       });
-    } catch {
+    } catch (error) {
       set({
         isSearching: false,
-        searchError: 'Search failed',
+        searchError: error instanceof Error ? error.message : 'Search failed',
       });
     }
   },

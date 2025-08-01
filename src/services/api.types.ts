@@ -1,6 +1,19 @@
 // API Request Types
 import type {UserRole} from "../store/auth.store.ts";
 
+export interface UserDto {
+  name: string;
+  surname: string;
+  patronymic?: string;
+  email: string;
+  phone?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  role: string;
+  password: string;
+  telegramId?: string;
+}
+
 export interface LoginRequest {
   username?: string;
   email: string;

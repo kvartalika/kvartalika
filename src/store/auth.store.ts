@@ -5,13 +5,13 @@ import {
   adminRegister,
   contentManagerLogin,
   contentManagerRegister,
-  logout as apiLogout,
-} from '../services';
+  refreshToken,
+} from '../services/newApiService';
 import type {
   LoginRequest,
   RegisterRequest,
   AuthResponse
-} from '../services';
+} from '../services/api.types';
 
 export type UserRole = 'CLIENT' | 'ADMIN' | 'CONTENT_MANAGER';
 
@@ -40,6 +40,8 @@ export interface AuthActions {
   registerAdmin: (userData: RegisterRequest) => Promise<void>;
   registerContentManager: (userData: RegisterRequest) => Promise<void>;
 
+  refreshAuth: () => Promise<void>;
+
   logout: () => void;
 
   setLoading: (loading: boolean) => void;
@@ -67,10 +69,10 @@ export const useAuthStore = create<AuthState & AuthActions>()(
             isLoading: false,
             error: null,
           });
-        } catch {
+        } catch (error) {
           set({
             isLoading: false,
-            error: 'Admin login failed',
+            error: error instanceof Error ? error.message : 'Admin login failed',
             isAuthenticated: false,
             role: null,
           });
@@ -89,10 +91,10 @@ export const useAuthStore = create<AuthState & AuthActions>()(
             isLoading: false,
             error: null,
           });
-        } catch {
+        } catch (error) {
           set({
             isLoading: false,
-            error: 'Content manager login failed',
+            error: error instanceof Error ? error.message : 'Content manager login failed',
             isAuthenticated: false,
             role: null,
           });
@@ -108,10 +110,10 @@ export const useAuthStore = create<AuthState & AuthActions>()(
             isLoading: false,
             error: null,
           });
-        } catch {
+        } catch (error) {
           set({
             isLoading: false,
-            error: 'Admin registration failed',
+            error: error instanceof Error ? error.message : 'Admin registration failed',
           });
         }
       },
@@ -125,16 +127,36 @@ export const useAuthStore = create<AuthState & AuthActions>()(
             isLoading: false,
             error: null,
           });
-        } catch {
+        } catch (error) {
           set({
             isLoading: false,
-            error: 'Content manager registration failed',
+            error: error instanceof Error ? error.message : 'Content manager registration failed',
+          });
+        }
+      },
+
+      refreshAuth: async () => {
+        set({isLoading: true, error: null});
+
+        try {
+          const response: AuthResponse = await refreshToken();
+          set({
+            role: response.role,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
+        } catch (error) {
+          set({
+            isLoading: false,
+            error: error instanceof Error ? error.message : 'Token refresh failed',
+            isAuthenticated: false,
+            role: null,
           });
         }
       },
 
       logout: () => {
-        apiLogout();
         set({
           role: null,
           isAuthenticated: false,
@@ -146,7 +168,6 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       setError: (error: string | null) => set({error}),
 
       clearAuth: () => {
-        apiLogout();
         set({
           role: null,
           isAuthenticated: false,
