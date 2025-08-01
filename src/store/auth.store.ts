@@ -1,5 +1,6 @@
 import {create} from 'zustand';
 import {persist} from 'zustand/middleware';
+import type {AuthResponse, LoginRequest, RegisterRequest} from '../services';
 import {
   adminLogin,
   adminRegister,
@@ -7,25 +8,12 @@ import {
   contentManagerRegister,
   logout as apiLogout,
 } from '../services';
-import type {
-  LoginRequest,
-  RegisterRequest,
-  AuthResponse
-} from '../services';
 
 export type UserRole = 'CLIENT' | 'ADMIN' | 'CONTENT_MANAGER';
 
-export interface AuthUser {
-  name?: string;
-  surname?: string;
-  patronymic?: string;
-  email?: string;
-  phone?: string;
-  role: UserRole;
-}
-
 export interface AuthState {
   role: UserRole | null;
+  accessToken: string | null;
 
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -42,6 +30,8 @@ export interface AuthActions {
 
   logout: () => void;
 
+  setAccessToken: (accessToken: string) => void;
+
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearAuth: () => void;
@@ -51,6 +41,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
   persist(
     (set) => ({
       role: null,
+      accessToken: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
@@ -62,6 +53,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           const response: AuthResponse = await adminLogin(credentials);
 
           set({
+            accessToken: response.accessToken,
             role: response.role,
             isAuthenticated: true,
             isLoading: false,
@@ -69,10 +61,11 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           });
         } catch {
           set({
+            role: null,
+            accessToken: null,
             isLoading: false,
             error: 'Admin login failed',
             isAuthenticated: false,
-            role: null,
           });
         }
       },
@@ -84,6 +77,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
           const response: AuthResponse = await contentManagerLogin(credentials);
 
           set({
+            accessToken: response.accessToken,
             role: response.role,
             isAuthenticated: true,
             isLoading: false,
@@ -92,6 +86,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         } catch {
           set({
             isLoading: false,
+            accessToken: null,
             error: 'Content manager login failed',
             isAuthenticated: false,
             role: null,
@@ -137,6 +132,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         apiLogout();
         set({
           role: null,
+          accessToken: null,
           isAuthenticated: false,
           error: null,
         });
@@ -145,10 +141,16 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       setLoading: (isLoading: boolean) => set({isLoading}),
       setError: (error: string | null) => set({error}),
 
+      setAccessToken: (accessToken: string) => set({
+        accessToken,
+        isAuthenticated: true
+      }),
+
       clearAuth: () => {
         apiLogout();
         set({
           role: null,
+          accessToken: null,
           isAuthenticated: false,
           error: null,
         });
@@ -158,6 +160,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       name: 'auth-storage',
       partialize: (state) => ({
         role: state.role,
+        accessToken: state.accessToken,
         isAuthenticated: state.isAuthenticated,
       }),
     }

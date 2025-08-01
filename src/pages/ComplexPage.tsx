@@ -1,21 +1,14 @@
 import {useEffect, useState} from 'react';
-import {useParams, Link} from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 import ApartmentCard from '../components/ApartmentCard';
 
 import ContentManager from '../components/ContentManager';
-import {useAuthStore} from "../store/auth.store.ts";
-import {useUIStore} from "../store/ui.store.ts";
-import {usePropertiesStore} from "../store/properties.store.ts";
+import {useAuthStore, useFlatsStore, useUIStore} from "../store";
 
 const ComplexPage = () => {
   const {homeId} = useParams<{ homeId: string }>();
 
-  const fetchHomeById = usePropertiesStore(state => state.fetchHomeById);
-  const complex = usePropertiesStore(state => state.selectedHome);
-  const setSelectedHome = usePropertiesStore(state => state.setSelectedHome);
-
-  const fetchFlatsByHome = usePropertiesStore(state => state.fetchFlatsByHome);
-  const flatsByHome = usePropertiesStore(state => state.flatsByHome);
+ const {flatsByHome, setSelectedHome, getHomeById, loadFlatsByHome, selectedHome} = useFlatsStore();
 
   const openModal = useUIStore(state => state.openModal);
   const modals = useUIStore(state => state.modals);
@@ -28,32 +21,37 @@ const ComplexPage = () => {
 
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setSelectedHome(await fetchHomeById(Number(homeId)));
-      } catch (error) {
-        console.error('Error loading data:', error);
+    const load = async () => {
+      if (!homeId) return;
+      const id = Number(homeId);
+      if (Number.isNaN(id)) {
+        console.warn('Invalid homeId:', homeId);
+        return;
+      }
+      const home = await getHomeById(id);
+      if (home) {
+        setSelectedHome(home);
+      } else {
         setSelectedHome(null);
       }
     };
-
-    loadData();
-  }, [fetchHomeById, homeId, setSelectedHome]);
+    void load()
+  }, [getHomeById, homeId, setSelectedHome]);
 
   useEffect(() => {
-    if (!complex) return;
+    if (!selectedHome) return;
     const loadData = async () => {
       try {
-        await fetchFlatsByHome(complex.id);
+        await loadFlatsByHome(selectedHome.id);
       } catch (error) {
         console.error('Error loading data:', error);
       }
     };
 
     loadData();
-  }, [complex, fetchFlatsByHome]);
+  }, [loadFlatsByHome, selectedHome]);
 
-  if (!complex) {
+  if (!selectedHome) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center">
         <div className="text-center">
@@ -71,7 +69,7 @@ const ComplexPage = () => {
     );
   }
 
-  const images = complex?.images || ['/images/test.png'];
+  const images = selectedHome?.images || ['/images/test.png'];
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);
@@ -93,7 +91,7 @@ const ComplexPage = () => {
               Главная
             </Link>
             <span className="mx-2 text-gray-400">›</span>
-            <span className="text-gray-600">{complex.name}</span>
+            <span className="text-gray-600">{selectedHome.name}</span>
           </nav>
         </div>
       </section>
@@ -104,7 +102,7 @@ const ComplexPage = () => {
           <img
             key={currentImageIndex}
             src={images[currentImageIndex]}
-            alt={`${complex.name} - фото ${currentImageIndex + 1}`}
+            alt={`${selectedHome.name} - фото ${currentImageIndex + 1}`}
             className="w-full h-full object-cover absolute inset-0"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -162,13 +160,13 @@ const ComplexPage = () => {
           <div className="absolute inset-0 flex items-center justify-center z-10 bg-black/60">
             <div className="text-center text-white max-w-4xl px-4">
               <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
-                {complex.name}
+                {selectedHome.name}
               </h1>
               <p className="text-xl md:text-2xl mb-6 text-gray-100 drop-shadow-md">
-                {complex.description}
+                {selectedHome.description}
               </p>
               <p className="text-lg mb-8 text-gray-200 drop-shadow-md">
-                📍 {complex.address}
+                📍 {selectedHome.address}
               </p>
               <button
                 onClick={() => openModal('bid')}
@@ -203,7 +201,7 @@ const ComplexPage = () => {
             <h2 className="text-2xl font-bold text-gray-900">Доступные квартиры</h2>
             {flatsByHome.length > 4 && (
               <Link
-                to={`/apartments?homeId=${encodeURIComponent(complex.id)}`}
+                to={`/apartments?homeId=${encodeURIComponent(selectedHome.id)}`}
                 className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
               >
                 Показать все квартиры
@@ -255,13 +253,13 @@ const ComplexPage = () => {
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">О жилом комплексе</h2>
             <div className="text-center mb-16">
-              <p className="text-lg text-gray-600 leading-relaxed max-w-4xl mx-auto">{complex.description}</p>
+              <p className="text-lg text-gray-600 leading-relaxed max-w-4xl mx-auto">{selectedHome.description}</p>
             </div>
-            {complex.features && complex.features.length > 0 && (
+            {selectedHome.features && selectedHome.features.length > 0 && (
               <div className="mb-16">
                 <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center">Особенности ЖК</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {complex.features.map((feature, index) => (
+                  {selectedHome.features.map((feature, index) => (
                     <div
                       key={index}
                       className="bg-white rounded-xl p-6 shadow-lg text-center"
@@ -287,15 +285,15 @@ const ComplexPage = () => {
                 </div>
               </div>
             )}
-            {complex.history && (
+            {selectedHome.history && (
               <div className="mb-16">
                 <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center">История строительства</h3>
                 <div className="bg-white rounded-xl p-8 shadow-lg">
                   <div className="text-center mb-8">
-                    <p className="text-gray-600">Год постройки: {complex.yearBuilt}</p>
+                    <p className="text-gray-600">Год постройки: {selectedHome.yearBuilt}</p>
                   </div>
                   <div className="space-y-6">
-                    {complex.history.map((phase, index) => (
+                    {selectedHome.history.map((phase, index) => (
                       <div
                         key={index}
                         className="flex items-start"
@@ -314,11 +312,11 @@ const ComplexPage = () => {
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              {complex.features && complex.features.length > 0 && (
+              {selectedHome.features && selectedHome.features.length > 0 && (
                 <div className="text-center">
                   <h3 className="text-xl font-semibold text-gray-900 mb-6">Удобства и инфраструктура</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 justify-items-center">
-                    {complex.features.map((amenity, index) => (
+                    {selectedHome.features.map((amenity, index) => (
                       <div
                         key={index}
                         className="flex items-center text-gray-600"
@@ -355,7 +353,7 @@ const ComplexPage = () => {
                   </div>
                   <div className="flex justify-between py-2 border-b border-gray-200">
                     <span className="text-gray-600">Адрес:</span>
-                    <span className="font-medium">{complex.address}</span>
+                    <span className="font-medium">{selectedHome.address}</span>
                   </div>
                 </div>
               </div>
@@ -392,7 +390,7 @@ const ComplexPage = () => {
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Интерактивная карта</h3>
               <p className="text-gray-600 mb-4">Здесь будет отображена карта с расположением жилого комплекса</p>
-              <p className="text-sm text-gray-500">📍 {complex.address}</p>
+              <p className="text-sm text-gray-500">📍 {selectedHome.address}</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
@@ -451,7 +449,7 @@ const ComplexPage = () => {
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Инфраструктура района</h3>
                 <ul className="space-y-3 text-gray-600">
-                  {complex.schoolsNearby && <li className="flex items-center">
+                  {selectedHome.schoolsNearby && <li className="flex items-center">
                     <svg
                       className="w-5 h-5 text-red-600 mr-3"
                       fill="none"
@@ -467,7 +465,7 @@ const ComplexPage = () => {
                     </svg>
                     Школы и детские сады поблизости
                   </li>}
-                  {complex.storesNearby && <li className="flex items-center">
+                  {selectedHome.storesNearby && <li className="flex items-center">
                     <svg
                       className="w-5 h-5 text-green-600 mr-3"
                       fill="none"
@@ -483,7 +481,7 @@ const ComplexPage = () => {
                     </svg>
                     Торговые центры и магазины
                   </li>}
-                  {complex.hospitalsNearby && <li className="flex items-center">
+                  {selectedHome.hospitalsNearby && <li className="flex items-center">
                     <svg
                       className="w-5 h-5 text-yellow-600 mr-3"
                       fill="none"
@@ -512,7 +510,7 @@ const ComplexPage = () => {
             Заинтересовались ЖК?
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Запишитесь на персональную экскурсию по жилому комплексу {complex.name}
+            Запишитесь на персональную экскурсию по жилому комплексу {selectedHome.name}
           </p>
           <button
             onClick={() => openModal('bid')}
@@ -535,8 +533,8 @@ const ComplexPage = () => {
       {modals.manager && (
         <ContentManager
           contentType="complex"
-          contentId={complex.id}
-          initialData={complex}
+          contentId={selectedHome.id}
+          initialData={selectedHome}
           onSave={() => {
             closeModal('manager');
             window.location.reload();

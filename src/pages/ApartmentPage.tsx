@@ -1,9 +1,7 @@
 import {useEffect, useState} from 'react';
-import {useParams, Link} from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 import ContentManager from '../components/ContentManager';
-import {useUIStore} from "../store/ui.store.ts";
-import {usePropertiesStore} from "../store/properties.store.ts";
-import {useAuthStore} from "../store/auth.store.ts";
+import {useAuthStore, useFlatsStore, useUIStore} from "../store";
 
 const ApartmentPage = () => {
   const {apartmentId} = useParams<{ apartmentId: string }>();
@@ -12,9 +10,7 @@ const ApartmentPage = () => {
   const modals = useUIStore(state => state.modals);
   const closeModal = useUIStore(state => state.closeModal);
 
-  const fetchFlatById = usePropertiesStore(state => state.fetchFlatById);
-  const selectedFlat = usePropertiesStore(state => state.selectedFlat);
-  const setSelectedFlat = usePropertiesStore(state => state.setSelectedFlat);
+  const {setSelectedFlat, getFlatById, selectedFlat, homes, setSelectedHome, selectedHome} = useFlatsStore();
 
   const role = useAuthStore(state => state.role);
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -22,17 +18,23 @@ const ApartmentPage = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setSelectedFlat(await fetchFlatById(Number(apartmentId)));
-      } catch (error) {
-        console.error('Error loading data:', error);
+    const load = async () => {
+      if (!apartmentId) return;
+      const id = Number(apartmentId);
+      if (Number.isNaN(id)) {
+        console.warn('Invalid apartmentId:', apartmentId);
+        return;
+      }
+      const flat = await getFlatById(id);
+      if (flat) {
+        setSelectedFlat(flat);
+        setSelectedHome(homes.find(home => flat.homeId === home.id) ?? null)
+      } else {
         setSelectedFlat(null);
       }
     };
-
-    loadData();
-  }, [apartmentId, fetchFlatById, setSelectedFlat]);
+    void load()
+  }, [apartmentId, getFlatById, setSelectedFlat]);
 
   if (!selectedFlat) {
     return (
@@ -58,18 +60,18 @@ const ApartmentPage = () => {
 
   const pricePerSqm = Math.round(selectedFlat.price / selectedFlat.area);
 
-  const images = selectedFlat.images || [
+  const images = selectedFlat?.images || [
     '/images/apartment-2.jpg',
     '/images/apartment-3.jpg',
     '/images/apartment-4.jpg'
   ];
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    setCurrentImageIndex((prev) => (prev + 1) % images?.length);
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    setCurrentImageIndex((prev) => (prev - 1 + images?.length) % images?.length);
   };
 
   return (
@@ -85,14 +87,14 @@ const ApartmentPage = () => {
             </Link>
             <span className="mx-2 text-gray-400">›</span>
             <Link
-              to={`/complex/${encodeURIComponent(selectedFlat.homeId)}`}
+              to={`/complex/${encodeURIComponent(selectedFlat?.homeId)}`}
               className="text-blue-600 hover:text-blue-700"
             >
-              {selectedFlat.homeId}
+              {selectedHome?.name ?? selectedFlat.homeId}
             </Link>
             <span className="mx-2 text-gray-400">›</span>
             <span className="text-gray-600">
-              {selectedFlat.numberOfRooms}-комнатная квартира
+              {selectedFlat?.numberOfRooms}-комнатная квартира
             </span>
           </nav>
         </div>
@@ -105,11 +107,11 @@ const ApartmentPage = () => {
               <div className="relative h-96 rounded-xl overflow-hidden bg-gray-200">
                 <img
                   src={images[currentImageIndex]}
-                  alt={`${selectedFlat.numberOfRooms}-комнатная квартира`}
+                  alt={`${selectedFlat?.numberOfRooms}-комнатная квартира`}
                   className="w-full h-full object-cover"
                 />
 
-                {selectedFlat.features.length >= 3 && (
+                {selectedFlat?.features.length >= 3 && (
                   <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-2 rounded-lg font-semibold">
                     🔥 Горячее предложение
                   </div>
@@ -157,11 +159,11 @@ const ApartmentPage = () => {
                 )}
 
                 <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-lg text-sm">
-                  {currentImageIndex + 1} / {images.length}
+                  {currentImageIndex + 1} / {images?.length}
                 </div>
               </div>
 
-              {images.length > 1 && (
+              {images?.length > 1 && (
                 <div className="flex space-x-2 mt-4 overflow-x-auto">
                   {images.map((image, index) => (
                     <button
@@ -208,19 +210,19 @@ const ApartmentPage = () => {
                 <div className="space-y-4">
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Комнат:</span>
-                    <span className="font-medium">{selectedFlat.numberOfRooms}</span>
+                    <span className="font-medium">{selectedFlat?.numberOfRooms}</span>
                   </div>
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Площадь:</span>
-                    <span className="font-medium">{selectedFlat.area} м²</span>
+                    <span className="font-medium">{selectedFlat?.area} м²</span>
                   </div>
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Этаж:</span>
-                    <span className="font-medium">{selectedFlat.floor}</span>
+                    <span className="font-medium">{selectedFlat?.floor}</span>
                   </div>
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Количество санузлов:</span>
-                    <span className="font-medium">{selectedFlat.numberOfBathrooms}</span>
+                    <span className="font-medium">{selectedFlat?.numberOfBathrooms}</span>
                   </div>
                 </div>
 
@@ -239,7 +241,7 @@ const ApartmentPage = () => {
                       to={`/complex/${encodeURIComponent(selectedFlat.homeId)}`}
                       className="font-medium text-blue-600 hover:text-blue-700"
                     >
-                      {selectedFlat.homeId}
+                      {selectedHome?.name ?? selectedFlat.homeId}
                     </Link>
                   </div>
                   <div className="flex justify-between py-3 border-b border-gray-200">
@@ -265,7 +267,7 @@ const ApartmentPage = () => {
                   Особенности квартиры
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {selectedFlat.features.map((feature) => (
+                  {selectedFlat?.features.map((feature) => (
                     <div className="flex items-center text-gray-600">
                       <svg
                         className="w-5 h-5 text-green-500 mr-3"

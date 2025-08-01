@@ -1,4 +1,4 @@
-import {BrowserRouter, Routes, Route, useLocation} from 'react-router-dom';
+import {BrowserRouter, Route, Routes, useLocation} from 'react-router-dom';
 import {useEffect} from 'react';
 
 import Header from './components/Header';
@@ -16,7 +16,7 @@ import ApartmentPage from './pages/ApartmentPage';
 import AuthPage from './pages/AuthPage';
 import AdminPage from './pages/AdminPage';
 
-import {useUIStore} from "./store/ui.store.ts";
+import {useAuthStore, useUIStore} from "./store";
 
 function ScrollToTop() {
   const {pathname} = useLocation();
@@ -36,6 +36,10 @@ function App() {
   const loadPageInfo = useUIStore(state => state.loadPageInfo);
   const loadSocialMediaList = useUIStore(state => state.loadSocialMediaList)
 
+  const pageInfo = useUIStore(state => state.pageInfo)
+
+  const {role, isAuthenticated} = useAuthStore();
+
 
   useEffect(() => {
     const loadData = async () => {
@@ -52,7 +56,16 @@ function App() {
     loadData();
   }, [loadPageInfo, loadSocialMediaList, setLoading]);
 
-  if (loading.global) {
+  if (
+    loading.global ||
+    (
+      !pageInfo?.published &&
+      (
+        !isAuthenticated ||
+        (role !== 'ADMIN' && role !== 'CONTENT_MANAGER')
+      )
+    )
+  ) {
     return <PageLoader />;
   }
 

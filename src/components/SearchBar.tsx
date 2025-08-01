@@ -1,11 +1,10 @@
-import {useCallback, type FormEvent, useRef, useState} from 'react';
-import {useNavigate, createSearchParams} from 'react-router-dom';
-import {useSearchStore, type SearchFilters} from '../store/search.store.ts';
-import {useUIStore} from "../store/ui.store.ts";
-import {usePropertiesStore} from "../store/properties.store.ts";
+import {type FormEvent, useCallback, useRef, useState} from 'react';
+import {createSearchParams, useNavigate} from 'react-router-dom';
 import {useClickOutside} from "../hooks/useClickOutside.ts";
+import type {SearchRequest} from "../services";
+import {useFlatsStore, useUIStore} from "../store";
 
-const serializeFiltersToParams = (filters: SearchFilters): Record<string, string> => {
+const serializeFiltersToParams = (filters: SearchRequest): Record<string, string> => {
   const params: Record<string, string> = {};
 
   if (filters.query) params.query = filters.query;
@@ -29,30 +28,28 @@ const serializeFiltersToParams = (filters: SearchFilters): Record<string, string
 
 const SearchBar = () => {
   const {
-    filters,
+    currentSearchParams,
     setFilters,
-    resetFilters,
-    performSearch,
-  } = useSearchStore();
+    clearSearch,
+    searchFlats,
+    categories,
+    homes
+  } = useFlatsStore();
 
   const openModal = useUIStore(state => state.openModal);
   const modals = useUIStore(state => state.modals);
   const closeModal = useUIStore(state => state.closeModal);
 
-  const categories = usePropertiesStore(state => state.categories);
-
   const [isCatOpen, setIsCatOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   useClickOutside(dropdownRef, () => setIsCatOpen(false));
-
-  const homes = usePropertiesStore(state => state.homes);
 
   const [isHomeOpen, setIsHomeOpen] = useState(false);
   const homeRef = useRef<HTMLDivElement | null>(null);
   useClickOutside(homeRef, () => setIsHomeOpen(false));
 
   const toggleCategory = (id: number) => {
-    const current = filters.categoriesId || [];
+    const current = currentSearchParams.categoriesId || [];
     const updated = current.includes(id)
       ? current.filter(c => c !== id)
       : [...current, id];
@@ -69,49 +66,49 @@ const SearchBar = () => {
     e.preventDefault();
     closeModal('filters');
 
-    const params = serializeFiltersToParams(filters);
+    const params = serializeFiltersToParams(currentSearchParams);
     const search = createSearchParams(params).toString();
 
     navigate({pathname: '/apartments', search}, {replace: true});
-    performSearch(1);
+    searchFlats(1);
   };
 
   const handleFilterChange = useCallback(
-    (key: keyof SearchFilters, value: unknown) => {
-      setFilters({[key]: value} as Partial<SearchFilters>);
+    (key: keyof SearchRequest, value: unknown) => {
+      setFilters({[key]: value} as Partial<SearchRequest>);
     },
     [setFilters]
   );
 
   const toggleRoomFilter = (rooms: number) => {
-    const current = filters.rooms ?? 0;
+    const current = currentSearchParams.rooms ?? 0;
     handleFilterChange('rooms', current === rooms ? undefined : rooms);
   };
 
   const toggleBathroomFilter = (bathrooms: number) => {
-    const current = filters.bathrooms ?? 0;
+    const current = currentSearchParams.bathrooms ?? 0;
     handleFilterChange('bathrooms', current === bathrooms ? undefined : bathrooms);
   };
 
   const clearAll = () => {
-    resetFilters();
+    clearSearch();
     closeModal('filters');
   };
 
   const anyActive =
-    Boolean(filters.query) ||
-    filters.minPrice !== undefined ||
-    filters.maxPrice !== undefined ||
-    filters.rooms !== undefined ||
-    filters.bathrooms !== undefined ||
-    filters.isDecorated !== undefined ||
-    filters.homeId !== undefined ||
-    filters.hasParks !== undefined ||
-    filters.hasSchools !== undefined ||
-    filters.hasShops !== undefined ||
-    (filters.categoriesId && filters.categoriesId.length > 0) ||
-    Boolean(filters.sortBy) ||
-    Boolean(filters.sortOrder);
+    Boolean(currentSearchParams.query) ||
+    currentSearchParams.minPrice !== undefined ||
+    currentSearchParams.maxPrice !== undefined ||
+    currentSearchParams.rooms !== undefined ||
+    currentSearchParams.bathrooms !== undefined ||
+    currentSearchParams.isDecorated !== undefined ||
+    currentSearchParams.homeId !== undefined ||
+    currentSearchParams.hasParks !== undefined ||
+    currentSearchParams.hasSchools !== undefined ||
+    currentSearchParams.hasShops !== undefined ||
+    (currentSearchParams.categoriesId && currentSearchParams.categoriesId.length > 0) ||
+    Boolean(currentSearchParams.sortBy) ||
+    Boolean(currentSearchParams.sortOrder);
 
   return (
     <div className="w-full">
@@ -124,7 +121,7 @@ const SearchBar = () => {
             <input
               type="text"
               placeholder="Поиск по названию ЖК или адресу..."
-              value={filters.query || ''}
+              value={currentSearchParams.query || ''}
               onChange={(e) => handleFilterChange('query', e.target.value)}
               className="input-field border-0 rounded-xl w-full px-4 py-3"
             />
@@ -198,7 +195,7 @@ const SearchBar = () => {
                 <input
                   type="number"
                   placeholder="От"
-                  value={filters.minPrice ?? ''}
+                  value={currentSearchParams.minPrice ?? ''}
                   onChange={(e) =>
                     handleFilterChange('minPrice', e.target.value ? Number(e.target.value) : undefined)
                   }
@@ -207,7 +204,7 @@ const SearchBar = () => {
                 <input
                   type="number"
                   placeholder="До"
-                  value={filters.maxPrice ?? ''}
+                  value={currentSearchParams.maxPrice ?? ''}
                   onChange={(e) =>
                     handleFilterChange('maxPrice', e.target.value ? Number(e.target.value) : undefined)
                   }
@@ -225,7 +222,7 @@ const SearchBar = () => {
                     type="button"
                     onClick={() => toggleRoomFilter(r)}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      filters.rooms === r ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      currentSearchParams.rooms === r ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
                     {r === 4 ? '4+' : r}
@@ -243,7 +240,7 @@ const SearchBar = () => {
                     type="button"
                     onClick={() => toggleBathroomFilter(b)}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      filters.bathrooms === b
+                      currentSearchParams.bathrooms === b
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
@@ -259,7 +256,7 @@ const SearchBar = () => {
               <div className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={filters.isDecorated || false}
+                  checked={currentSearchParams.isDecorated || false}
                   onChange={(e) => handleFilterChange('isDecorated', e.target.checked || undefined)}
                   className="w-4 h-4"
                   id="decorated-checkbox"
@@ -286,7 +283,7 @@ const SearchBar = () => {
                   }}
                   className="w-full flex justify-between items-center px-4 py-2 border border-gray-300 rounded-lg text-sm"
                 >
-                  {homes.find(h => h.id === filters.homeId)?.name || 'Выбрать ЖК'}
+                  {homes.find(h => h.id === currentSearchParams.homeId)?.name || 'Выбрать ЖК'}
                   <span className="ml-2">▾</span>
                 </button>
 
@@ -302,14 +299,14 @@ const SearchBar = () => {
                         }}
                       >
                         <span className="text-sm">{home.name}</span>
-                        {filters.homeId === home.id &&
+                        {currentSearchParams.homeId === home.id &&
                           <span className="text-blue-600 text-xs">✓</span>}
                       </div>
                     ))}
                     {homes.length === 0 && (
                       <div className="p-3 text-xs text-gray-500">Жилые комплексы не найдены</div>
                     )}
-                    {filters.homeId != null && (
+                    {currentSearchParams.homeId != null && (
                       <div className="border-t mt-1">
                         <button
                           type="button"
@@ -339,8 +336,8 @@ const SearchBar = () => {
                   onClick={() => setIsCatOpen(o => !o)}
                   className="w-full flex justify-between items-center px-4 py-2 border border-gray-300 rounded-lg text-sm"
                 >
-                  {filters.categoriesId && filters.categoriesId.length > 0
-                    ? `Выбрано: ${filters.categoriesId.length}`
+                  {currentSearchParams.categoriesId && currentSearchParams.categoriesId.length > 0
+                    ? `Выбрано: ${currentSearchParams.categoriesId.length}`
                     : 'Выбрать категории'}
                   <span className="ml-2">▾</span>
                 </button>
@@ -354,7 +351,7 @@ const SearchBar = () => {
                       >
                         <input
                           type="checkbox"
-                          checked={filters.categoriesId?.includes(cat.id) || false}
+                          checked={currentSearchParams.categoriesId?.includes(cat.id) || false}
                           onChange={() => toggleCategory(cat.id)}
                           className="mr-2"
                         />
@@ -375,7 +372,7 @@ const SearchBar = () => {
               <label className="block text-sm font-medium text-gray-700 mb-3">Сортировка</label>
               <div className="space-y-2">
                 <select
-                  value={filters.sortBy || 'price'}
+                  value={currentSearchParams.sortBy || 'price'}
                   onChange={(e) => handleFilterChange('sortBy', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                 >
@@ -385,7 +382,7 @@ const SearchBar = () => {
                   <option value="location">По удалённости</option>
                 </select>
                 <select
-                  value={filters.sortOrder || 'asc'}
+                  value={currentSearchParams.sortOrder || 'asc'}
                   onChange={(e) => handleFilterChange('sortOrder', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                 >
@@ -402,7 +399,7 @@ const SearchBar = () => {
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={filters.hasParks || false}
+                    checked={currentSearchParams.hasParks || false}
                     onChange={(e) => handleFilterChange('hasParks', e.target.checked || undefined)}
                     className="w-4 h-4"
                   />
@@ -411,7 +408,7 @@ const SearchBar = () => {
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={filters.hasSchools || false}
+                    checked={currentSearchParams.hasSchools || false}
                     onChange={(e) => handleFilterChange('hasSchools', e.target.checked || undefined)}
                     className="w-4 h-4"
                   />
@@ -420,7 +417,7 @@ const SearchBar = () => {
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={filters.hasShops || false}
+                    checked={currentSearchParams.hasShops || false}
                     onChange={(e) => handleFilterChange('hasShops', e.target.checked || undefined)}
                     className="w-4 h-4"
                   />

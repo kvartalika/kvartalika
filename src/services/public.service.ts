@@ -3,14 +3,15 @@ import type {
   Category,
   Description,
   Flat,
-  Home,
+  FlatWithCategory,
   Footer,
+  Home,
+  PaginatedResponse,
+  PaginationParams,
   Photo,
   RequestCreate,
-  SearchRequest,
   RequestsPost201Response,
-  PaginationParams,
-  PaginatedResponse, FlatWithCategory,
+  SearchRequest,
 } from './api.types';
 import {AxiosError} from "axios";
 import type {PageInfo, SocialMedia} from "../store/ui.store.ts";

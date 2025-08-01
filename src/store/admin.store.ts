@@ -1,9 +1,15 @@
 import {create} from 'zustand';
 import {
   addAdmin,
-  addContentManager, deleteAdmin, deleteContentManager, getAdmins,
+  addContentManager,
+  deleteAdmin,
+  deleteContentManager,
+  getAdmins,
   getContentManagers,
-  type PaginationParams, updateAdmin, updateContentManager, type UserDto,
+  type PaginationParams,
+  updateAdmin,
+  updateContentManager,
+  type UserDto,
 } from '../services';
 
 export interface AdminState {

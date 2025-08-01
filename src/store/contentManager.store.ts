@@ -1,9 +1,16 @@
-import { create } from 'zustand';
+import {create} from 'zustand';
 import {
-  createFlat, createHome, deleteFlat, deleteHome,
-  type Flat, getFlats, getHomes,
+  createFlat,
+  createHome,
+  deleteFlat,
+  deleteHome,
+  type Flat,
+  getFlats,
+  getHomes,
   type Home,
-  type PaginationParams, updateFlat, updateHome,
+  type PaginationParams,
+  updateFlat,
+  updateHome,
 } from '../services';
 
 export interface ContentManagerState {

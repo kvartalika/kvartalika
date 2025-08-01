@@ -1,12 +1,14 @@
 import {create} from 'zustand';
+import type {RequestCreate} from '../services';
 import {
   addSocialMedia,
-  createRequest, deleteSocialMedia,
+  createRequest,
+  deleteSocialMedia,
   getPageInfo,
   getSocialMedia,
-  updatePageInfo, updateSocialMedia
+  updatePageInfo,
+  updateSocialMedia
 } from '../services';
-import type {RequestCreate} from '../services';
 
 export interface BidForm {
   id?: number;
@@ -165,7 +167,7 @@ export const useUIStore = create<UIState & UIActions>((set, get) => ({
     title: '',
     address: '',
     description: '',
-    published: false
+    published: true
   },
   socialMediaList: [],
 

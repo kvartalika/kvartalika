@@ -316,3 +316,9 @@ export interface FileUploadResponse {
   size: number;
   mimeType: string;
 }
+
+export interface SocialMedia {
+  id: number;
+  image: string;
+  link: string;
+}

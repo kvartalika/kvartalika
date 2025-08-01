@@ -1,16 +1,12 @@
-import {useState, useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';
-import {usePropertiesStore} from "../store/properties.store.ts";
 import type {Home} from "../services";
+import {useFlatsStore} from "../store";
 
 const ComplexesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const fetchHomes = usePropertiesStore(state => state.fetchHomes);
-  const complexes = usePropertiesStore(state => state.homes);
-
-  const isLoadingHomes = usePropertiesStore(state => state.isLoadingHomes);
-  const error = usePropertiesStore(state => state.error);
+  const {isLoadingHomes, error, loadHomes, homes, setError} = useFlatsStore();
 
   const [filteredComplexes, setFilteredComplexes] = useState<Home[]>([]);
 
@@ -21,28 +17,28 @@ const ComplexesPage = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        await fetchHomes();
-        setFilteredComplexes(complexes);
+        await loadHomes(homes.length === 0);
+        setFilteredComplexes(homes);
       } catch (error) {
         console.error('Error loading data:', error);
       }
     };
 
     loadData();
-  }, [fetchHomes]);
+  }, [homes, loadHomes, setError]);
 
   useEffect(() => {
     if (searchQuery.trim() === '') {
-      setFilteredComplexes(complexes);
+      setFilteredComplexes(homes);
     } else {
-      const filtered = complexes.filter(complex =>
+      const filtered = homes.filter(complex =>
         complex.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         complex.address.toLowerCase().includes(searchQuery.toLowerCase()) ||
         complex.description.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredComplexes(filtered);
     }
-  }, [searchQuery, complexes]);
+  }, [searchQuery, homes]);
 
   return (
     <div className="min-h-screen pt-20">

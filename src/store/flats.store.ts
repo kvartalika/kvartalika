@@ -1,14 +1,15 @@
 import {create} from 'zustand';
 import {
-  getCategories,
-  getFlatsByCategory,
   type Category,
-  type HomePageFlats,
-  type Flat,
-  type Home,
-  type SearchRequest,
+  type Flat, type FlatWithCategory,
+  getCategories,
   getFlats,
-  getHomes, searchFlats
+  getFlatsByCategory, getFlatsByHome,
+  getHomes,
+  type Home,
+  type HomePageFlats,
+  searchFlats,
+  type SearchRequest
 } from '../services';
 
 export interface flatsState {
@@ -16,19 +17,32 @@ export interface flatsState {
   homes: Home[];
   categories: Category[];
   searchResults: Flat[];
+
   homePageFlats: HomePageFlats[];
+  flatsByHome: FlatWithCategory[];
+
+  selectedCategory: Category | null;
+  selectedFlat: Flat | null;
+  selectedHome: Home | null;
 
   isLoadingFlats: boolean;
   isLoadingHomes: boolean;
   isLoadingCategories: boolean;
   isLoadingHomePageFlats: boolean;
+  isLoadingFilters: boolean;
+
   isSearching: boolean;
 
   error: string | null;
   searchError: string | null;
 
-  currentSearchParams: SearchRequest | null;
+  currentSearchParams: SearchRequest;
   hasSearched: boolean;
+
+  currentPage: number;
+  totalPages: number;
+  totalResults: number;
+  limit: number;
 
   lastFetch: {
     flats: number | null;
@@ -42,20 +56,40 @@ export interface flatsActions {
   loadFlats: (force?: boolean) => Promise<void>;
   loadHomes: (force?: boolean) => Promise<void>;
   loadCategories: (force?: boolean) => Promise<void>;
+
   loadHomePageFlats: (force?: boolean) => Promise<void>;
   loadAllData: (force?: boolean) => Promise<void>;
 
-  getApartmentById: (id: number) => Promise<Flat | null>;
+  loadFlatsByHome: (homeId: number) => Promise<Flat[]>;
+  loadFlatsByCategory: (categoryId: number) => Promise<Flat[]>;
+
+  getFlatById: (id: number) => Promise<Flat | null>;
   getHomeById: (id: number) => Promise<Home | null>;
 
-  searchFlats: (searchParams: SearchRequest) => Promise<void>;
+  setSelectedFlat: (flat: Flat | null) => void;
+  setSelectedHome: (home: Home | null) => void;
+  setSelectedCategory: (category: Category | null) => void;
+
+  setFilters: (filters: Partial<SearchRequest>) => void;
+
+  setPage: (page: number) => void;
+  setLimit: (limit: number) => void;
+
+  searchFlats: (page?: number) => Promise<void>;
   clearSearch: () => void;
 
   setError: (error: string | null) => void;
   setSearchError: (error: string | null) => void;
   clearErrors: () => void;
+
+  invalidateCache: () => void;
   isDataStale: (type: 'flats' | 'homes' | 'categories' | 'homePageFlats') => boolean;
 }
+
+const defaultFilters: SearchRequest = {
+  sortBy: 'price',
+  sortOrder: 'asc',
+};
 
 const CACHE_DURATION = 5 * 60 * 1000;
 
@@ -63,19 +97,32 @@ export const useFlatsStore = create<flatsState & flatsActions>((set, get) => ({
   flats: [],
   homes: [],
   categories: [],
+
   searchResults: [],
+
+  currentPage: 1,
+  totalPages: 1,
+  totalResults: 0,
+  limit: 20,
+
   homePageFlats: [],
+  flatsByHome: [],
+
+  selectedFlat: null,
+  selectedHome: null,
+  selectedCategory: null,
 
   isLoadingFlats: false,
   isLoadingHomes: false,
   isLoadingCategories: false,
   isLoadingHomePageFlats: false,
   isSearching: false,
+  isLoadingFilters: false,
 
   error: null,
   searchError: null,
 
-  currentSearchParams: null,
+  currentSearchParams: defaultFilters,
   hasSearched: false,
 
   lastFetch: {
@@ -99,10 +146,10 @@ export const useFlatsStore = create<flatsState & flatsActions>((set, get) => ({
     try {
       const flats = await getFlats();
       set(state => ({
-        flats,
+        flats: flats.filter((flat) => flat.published),
         isLoadingFlats: false,
         lastFetch: {...state.lastFetch, flats: Date.now()},
-        ...(get().hasSearched ? {} : {searchResults: flats})
+        ...(get().hasSearched ? {} : {searchResults: flats.filter((flat) => flat.published)})
       }));
     } catch (error) {
       set({
@@ -120,7 +167,7 @@ export const useFlatsStore = create<flatsState & flatsActions>((set, get) => ({
     try {
       const homes = await getHomes();
       set(state => ({
-        homes,
+        homes: homes.filter((home) => home.published),
         isLoadingHomes: false,
         lastFetch: {...state.lastFetch, homes: Date.now()}
       }));
@@ -191,7 +238,7 @@ export const useFlatsStore = create<flatsState & flatsActions>((set, get) => ({
     }
   },
 
-  getApartmentById: async (id: number) => {
+  getFlatById: async (id: number) => {
     const {flats} = get();
 
     const flat = flats.find(apt => apt.id === id);
@@ -222,17 +269,73 @@ export const useFlatsStore = create<flatsState & flatsActions>((set, get) => ({
     await get().loadHomePageFlats(force);
   },
 
-  searchFlats: async (searchParams: SearchRequest) => {
+  loadFlatsByHome: async (homeId: number) => {
+    try {
+      const flats = await getFlatsByHome(homeId);
+      set({flatsByHome: flats});
+
+      return flats;
+    } catch {
+      set({error: 'Failed to fetch flats by home'});
+      set({flatsByHome: []});
+
+      return [];
+    }
+  },
+
+  loadFlatsByCategory: async (categoryId: number) => {
+    try {
+      const flats = await getFlatsByCategory(categoryId);
+
+      set(state => {
+        const updatedFlats = [...state.flats];
+        flats.forEach(flat => {
+          const existingIndex = updatedFlats.findIndex(h => h.id === flat.id);
+          if (existingIndex >= 0) {
+            updatedFlats[existingIndex] = flat;
+          } else {
+            updatedFlats.push(flat);
+          }
+        });
+
+        return {flats: updatedFlats};
+      });
+
+      return flats;
+    } catch {
+      set({error: 'Failed to fetch flats by category'});
+      return [];
+    }
+  },
+
+  setFilters: (newFilters: Partial<SearchRequest>) => {
+    set(state => ({
+      currentSearchParams: {...state.currentSearchParams, ...newFilters},
+      currentPage: 1,
+    }));
+  },
+
+  searchFlats: async (page?: number) => {
+    const {currentSearchParams, limit} = get();
+    const pageToUse = page ?? get().currentPage;
+
     set({
       isSearching: true,
       searchError: null,
-      currentSearchParams: searchParams,
       hasSearched: true
     });
 
     try {
-      const searchResults = await searchFlats(searchParams);
+      const searchResults = await searchFlats(currentSearchParams);
+
+      const totalResults = searchResults.length;
+      const totalPages = Math.max(1, Math.ceil(totalResults / limit));
+      const normalizedPage = Math.min(Math.max(1, pageToUse), totalPages);
+
       set({
+        currentPage: normalizedPage,
+        totalResults,
+        totalPages,
         searchResults,
         isSearching: false,
       });
@@ -244,13 +347,54 @@ export const useFlatsStore = create<flatsState & flatsActions>((set, get) => ({
     }
   },
 
+  setPage: (page: number) => {
+    set(state => {
+      const normalized = Math.min(Math.max(1, page), state.totalPages);
+      return {currentPage: normalized};
+    });
+  },
+
+  setLimit: (limit: number) => {
+    set(state => {
+      const totalPages = Math.max(1, Math.ceil(state.totalResults / limit));
+      const currentPage = Math.min(state.currentPage, totalPages);
+      return {limit, totalPages, currentPage};
+    });
+  },
+
+  setSelectedFlat: (flat: Flat | null) => {
+    set({selectedFlat: flat});
+  },
+
+  setSelectedHome: (home: Home | null) => {
+    set({selectedHome: home});
+  },
+
+  setSelectedCategory: (category: Category | null) => {
+    set({selectedCategory: category});
+  },
+
+  invalidateCache: () => {
+    set({
+      lastFetch: {
+        categories: null,
+        flats: null,
+        homes: null,
+        homePageFlats: null,
+      },
+    });
+  },
+
   clearSearch: () => {
     const {flats} = get();
     set({
       searchResults: flats,
-      currentSearchParams: null,
+      currentSearchParams: defaultFilters,
       hasSearched: false,
       searchError: null,
+      currentPage: 1,
+      totalPages: 1,
+      totalResults: 0,
     });
   },
 

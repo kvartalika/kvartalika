@@ -1,15 +1,19 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../store/useAuthStore';
+import {type ReactNode, useEffect} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {useAuthStore, type UserRole} from "../store";
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
-  requiredRole?: 'ADMIN' | 'CM';
+  children: ReactNode;
+  requiredRole?: UserRole;
   redirectTo?: string;
 }
 
-const ProtectedRoute = ({ children, requiredRole, redirectTo = '/auth' }: ProtectedRouteProps) => {
-  const { isAuthenticated, user } = useAuthStore();
+const ProtectedRoute = ({
+                          children,
+                          requiredRole,
+                          redirectTo = '/auth'
+                        }: ProtectedRouteProps) => {
+  const {isAuthenticated, role} = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,22 +22,21 @@ const ProtectedRoute = ({ children, requiredRole, redirectTo = '/auth' }: Protec
       return;
     }
 
-    if (requiredRole && user?.role !== requiredRole) {
-      // Redirect based on user role
-      if (user?.role === 'ADMIN') {
+    if (requiredRole && role !== requiredRole) {
+      if (role === 'ADMIN') {
         navigate('/admin');
       } else {
         navigate('/');
       }
       return;
     }
-  }, [isAuthenticated, user, requiredRole, navigate, redirectTo]);
+  }, [isAuthenticated, role, requiredRole, navigate, redirectTo]);
 
   if (!isAuthenticated) {
     return null;
   }
 
-  if (requiredRole && user?.role !== requiredRole) {
+  if (requiredRole && role !== requiredRole) {
     return null;
   }
 

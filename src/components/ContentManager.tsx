@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useAuthStore } from '../store/useAuthStore';
-import type { FormData, ContentType } from '../types';
+import {useEffect, useState} from 'react';
+import type {ContentType, FormData} from '../types';
+import {useAuthStore} from "../store";
 
 interface ContentManagerProps {
   contentType: ContentType;
@@ -10,17 +10,23 @@ interface ContentManagerProps {
   initialData?: any;
 }
 
-const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData }: ContentManagerProps) => {
-  const { user, isAuthenticated } = useAuthStore();
+const ContentManager = ({
+                          contentType,
+                          contentId,
+                          onSave,
+                          onCancel,
+                          initialData
+                        }: ContentManagerProps) => {
+  const {role, isAuthenticated} = useAuthStore();
   const [formData, setFormData] = useState<FormData>(initialData || {} as FormData);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!isAuthenticated || user?.role !== 'CM') {
+    if (!isAuthenticated || role !== 'CONTENT_MANAGER') {
       return;
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, role]);
 
   const handleInputChange = (field: keyof FormData, value: string | number | boolean) => {
     setFormData((prev: FormData) => ({
@@ -32,7 +38,7 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
   const handleArrayChange = (field: string, index: number, value: string) => {
     setFormData((prev: FormData) => ({
       ...prev,
-      [field]: (prev[field] as string[])?.map((item: string, i: number) => 
+      [field]: (prev[field] as string[])?.map((item: string, i: number) =>
         i === index ? value : item
       ) || []
     }));
@@ -58,15 +64,6 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
     setError('');
 
     try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-      
-      if (contentType === 'apartment') {
-        await mockApi.updateApartment(contentId, formData);
-      } else {
-        await mockApi.updateComplex(contentId, formData);
-      }
-      
       onSave(formData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Update failed');
@@ -75,7 +72,7 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
     }
   };
 
-  if (!isAuthenticated || user?.role !== 'CM') {
+  if (!isAuthenticated || role !== 'CONTENT_MANAGER') {
     return null;
   }
 
@@ -100,30 +97,32 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Basic Information */}
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
+        >
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Name
               </label>
-                              <input
-                  type="text"
-                  value={formData.name || ''}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  className="w-full border rounded px-3 py-2"
-                />
+              <input
+                type="text"
+                value={formData.name || ''}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                className="w-full border rounded px-3 py-2"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Address
               </label>
-                              <input
-                  type="text"
-                  value={formData.address || ''}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
-                  className="w-full border rounded px-3 py-2"
-                />
+              <input
+                type="text"
+                value={formData.address || ''}
+                onChange={(e) => handleInputChange('address', e.target.value)}
+                className="w-full border rounded px-3 py-2"
+              />
             </div>
           </div>
 
@@ -144,7 +143,10 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
               Images
             </label>
             {formData.images?.map((image: string, index: number) => (
-              <div key={index} className="flex items-center space-x-2 mb-2">
+              <div
+                key={index}
+                className="flex items-center space-x-2 mb-2"
+              >
                 <input
                   type="text"
                   value={image}
@@ -176,7 +178,10 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
               Features
             </label>
             {formData.features?.map((feature: string, index: number) => (
-              <div key={index} className="flex items-center space-x-2 mb-2">
+              <div
+                key={index}
+                className="flex items-center space-x-2 mb-2"
+              >
                 <input
                   type="text"
                   value={feature}
@@ -210,34 +215,34 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Number of Rooms
                   </label>
-                                     <input
-                     type="number"
-                     value={formData.numberOfRooms || ''}
-                     onChange={(e) => handleInputChange('numberOfRooms', parseInt(e.target.value))}
-                     className="w-full border rounded px-3 py-2"
-                   />
+                  <input
+                    type="number"
+                    value={formData.numberOfRooms || ''}
+                    onChange={(e) => handleInputChange('numberOfRooms', parseInt(e.target.value))}
+                    className="w-full border rounded px-3 py-2"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Number of Bathrooms
                   </label>
-                                     <input
-                     type="number"
-                     value={formData.numberOfBathrooms || ''}
-                     onChange={(e) => handleInputChange('numberOfBathrooms', parseInt(e.target.value))}
-                     className="w-full border rounded px-3 py-2"
-                   />
+                  <input
+                    type="number"
+                    value={formData.numberOfBathrooms || ''}
+                    onChange={(e) => handleInputChange('numberOfBathrooms', parseInt(e.target.value))}
+                    className="w-full border rounded px-3 py-2"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Floor
                   </label>
-                                     <input
-                     type="number"
-                     value={formData.floor || ''}
-                     onChange={(e) => handleInputChange('floor', parseInt(e.target.value))}
-                     className="w-full border rounded px-3 py-2"
-                   />
+                  <input
+                    type="number"
+                    value={formData.floor || ''}
+                    onChange={(e) => handleInputChange('floor', parseInt(e.target.value))}
+                    className="w-full border rounded px-3 py-2"
+                  />
                 </div>
               </div>
 
@@ -246,24 +251,24 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Price
                   </label>
-                                     <input
-                     type="number"
-                     value={formData.price || ''}
-                     onChange={(e) => handleInputChange('price', parseInt(e.target.value))}
-                     className="w-full border rounded px-3 py-2"
-                   />
+                  <input
+                    type="number"
+                    value={formData.price || ''}
+                    onChange={(e) => handleInputChange('price', parseInt(e.target.value))}
+                    className="w-full border rounded px-3 py-2"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Area (sq.m)
                   </label>
-                                     <input
-                     type="number"
-                     step="0.1"
-                     value={formData.area || ''}
-                     onChange={(e) => handleInputChange('area', parseFloat(e.target.value))}
-                     className="w-full border rounded px-3 py-2"
-                   />
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={formData.area || ''}
+                    onChange={(e) => handleInputChange('area', parseFloat(e.target.value))}
+                    className="w-full border rounded px-3 py-2"
+                  />
                 </div>
               </div>
 
@@ -289,23 +294,23 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Year Built
                   </label>
-                                     <input
-                     type="number"
-                     value={formData.yearBuilt || ''}
-                     onChange={(e) => handleInputChange('yearBuilt', parseInt(e.target.value))}
-                     className="w-full border rounded px-3 py-2"
-                   />
+                  <input
+                    type="number"
+                    value={formData.yearBuilt || ''}
+                    onChange={(e) => handleInputChange('yearBuilt', parseInt(e.target.value))}
+                    className="w-full border rounded px-3 py-2"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Number of Floors
                   </label>
-                                     <input
-                     type="number"
-                     value={formData.numberOfFloors || ''}
-                     onChange={(e) => handleInputChange('numberOfFloors', parseInt(e.target.value))}
-                     className="w-full border rounded px-3 py-2"
-                   />
+                  <input
+                    type="number"
+                    value={formData.numberOfFloors || ''}
+                    onChange={(e) => handleInputChange('numberOfFloors', parseInt(e.target.value))}
+                    className="w-full border rounded px-3 py-2"
+                  />
                 </div>
               </div>
 
@@ -356,25 +361,25 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Latitude
               </label>
-                             <input
-                 type="number"
-                 step="any"
-                 value={formData.latitude || ''}
-                 onChange={(e) => handleInputChange('latitude', parseFloat(e.target.value))}
-                 className="w-full border rounded px-3 py-2"
-               />
+              <input
+                type="number"
+                step="any"
+                value={formData.latitude || ''}
+                onChange={(e) => handleInputChange('latitude', parseFloat(e.target.value))}
+                className="w-full border rounded px-3 py-2"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Longitude
               </label>
-                             <input
-                 type="number"
-                 step="any"
-                 value={formData.longitude || ''}
-                 onChange={(e) => handleInputChange('longitude', parseFloat(e.target.value))}
-                 className="w-full border rounded px-3 py-2"
-               />
+              <input
+                type="number"
+                step="any"
+                value={formData.longitude || ''}
+                onChange={(e) => handleInputChange('longitude', parseFloat(e.target.value))}
+                className="w-full border rounded px-3 py-2"
+              />
             </div>
           </div>
 

@@ -2,8 +2,9 @@ import {useEffect, useMemo} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import ApartmentCard from '../components/ApartmentCard';
 import SearchBar from '../components/SearchBar';
-import {type SearchFilters, useSearchStore} from "../store/search.store.ts";
-import {useUIStore} from "../store/ui.store.ts";
+import {useFlatsStore, useUIStore} from "../store";
+import type {SearchRequest} from "../services";
+
 
 const ApartmentsPage = () => {
   const [searchParams] = useSearchParams();
@@ -12,20 +13,20 @@ const ApartmentsPage = () => {
   const openModal = useUIStore(state => state.openModal);
 
   const {
-    filters,
-    searchResultsFlats,
+    currentSearchParams,
+    searchResults,
     isSearching,
     currentPage,
     totalPages,
     totalResults,
     limit,
     searchError,
-    performSearch,
+    searchFlats,
     setFilters,
     setPage,
     setLimit,
-    resetFilters,
-  } = useSearchStore();
+    clearSearch,
+  } = useFlatsStore();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -34,7 +35,7 @@ const ApartmentsPage = () => {
   useEffect(() => {
     const raw = Object.fromEntries([...searchParams]);
 
-    const parsed: Partial<SearchFilters> = {};
+    const parsed: Partial<SearchRequest> = {};
 
     if (raw.query) {
       parsed.query = String(raw.query);
@@ -89,42 +90,42 @@ const ApartmentsPage = () => {
 
     const sortBy = searchParams.get('sortBy');
     if (sortBy && ['price', 'rooms', 'area', 'location'].includes(sortBy)) {
-      parsed.sortBy = sortBy as SearchFilters['sortBy'];
+      parsed.sortBy = sortBy as SearchRequest['sortBy'];
     }
     const sortOrder = searchParams.get('sortOrder');
     if (sortOrder && ['asc', 'desc'].includes(sortOrder)) {
-      parsed.sortOrder = sortOrder as SearchFilters['sortOrder'];
+      parsed.sortOrder = sortOrder as SearchRequest['sortOrder'];
     }
 
     setFilters(parsed);
-  }, [performSearch, searchParams, setFilters]);
+  }, [searchFlats, searchParams, setFilters]);
 
   const pagedFlats = useMemo(() => {
     const start = (currentPage - 1) * limit;
-    return searchResultsFlats.slice(start, start + limit);
-  }, [searchResultsFlats, currentPage, limit]);
+    return searchResults.slice(start, start + limit);
+  }, [searchResults, currentPage, limit]);
 
   const getPageTitle = () => {
-    if (filters.categoriesId && filters.categoriesId.length === 1) {
-      return `Квартиры категории ${filters.categoriesId[0]}`;
+    if (currentSearchParams.categoriesId && currentSearchParams.categoriesId.length === 1) {
+      return `Квартиры категории ${currentSearchParams.categoriesId[0]}`;
     }
-    if (filters.rooms) {
-      return `${filters.rooms}-комнатные квартиры`;
+    if (currentSearchParams.rooms) {
+      return `${currentSearchParams.rooms}-комнатные квартиры`;
     }
-    if (filters.homeId) {
-      return `Квартиры в комплексе ${filters.homeId}`;
+    if (currentSearchParams.homeId) {
+      return `Квартиры в комплексе ${currentSearchParams.homeId}`;
     }
-    return 'Все квартиры';
+    return 'Квартиры на любой вкус';
   };
 
   const getPageDescription = () => {
-    if (filters.categoriesId && filters.categoriesId.length === 1) {
-      return `Подборка квартир из категории ${filters.categoriesId[0]}`;
+    if (currentSearchParams.categoriesId && currentSearchParams.categoriesId.length === 1) {
+      return `Подборка квартир из категории ${currentSearchParams.categoriesId[0]}`;
     }
-    if (filters.rooms) {
-      return `Подберите идеальную ${filters.rooms}-комнатную квартиру`;
+    if (currentSearchParams.rooms) {
+      return `Подберите идеальную ${currentSearchParams.rooms}-комнатную квартиру`;
     }
-    if (filters.homeId) {
+    if (currentSearchParams.homeId) {
       return `Большой выбор квартир в выбранном комплексе`;
     }
     return 'Большой выбор квартир в лучших жилых комплексах города';
@@ -206,7 +207,7 @@ const ApartmentsPage = () => {
           <div className="mb-6 text-red-600 font-medium">{searchError}</div>
         )}
 
-        {!isSearching && searchResultsFlats.length === 0 && !searchError && (
+        {!isSearching && searchResults.length === 0 && !searchError && (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg
@@ -230,7 +231,7 @@ const ApartmentsPage = () => {
               Попробуйте изменить параметры поиска или{' '}
               <button
                 onClick={() => {
-                  resetFilters();
+                  clearSearch();
                   navigate('/apartments');
                 }}
                 className="text-blue-600 hover:text-blue-700 font-medium"

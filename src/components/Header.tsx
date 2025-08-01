@@ -1,15 +1,14 @@
-import {useState, useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
-import {useAuthStore} from '../store/useAuthStore';
 import Logo from './Logo';
-import {useUIStore} from "../store/ui.store.ts";
+import {useAuthStore, useUIStore} from "../store";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const {user, isAuthenticated, logout} = useAuthStore();
+  const {role, isAuthenticated, logout} = useAuthStore();
 
   const openModal = useUIStore(state => state.openModal);
 
@@ -118,12 +117,14 @@ const Header = () => {
 
             {isAuthenticated && (
               <div className="flex items-center space-x-4">
-                <span className={`text-sm ${
-                  isScrolled || !isHomePage ? 'text-gray-700' : 'text-white'
-                }`}>
-                  {user?.name} {user?.surname}
+                <span
+                  className={`text-sm ${
+                    isScrolled || !isHomePage ? 'text-gray-700' : 'text-white'
+                  }`}
+                >
+                  {role}
                 </span>
-                {user?.role === 'ADMIN' && (
+                {role === 'ADMIN' && (
                   <Link
                     to="/admin"
                     className={`text-sm font-medium transition-colors hover:text-blue-600 ${
@@ -225,9 +226,9 @@ const Header = () => {
                 {isAuthenticated && (
                   <div className="mt-4 space-y-2">
                     <div className="text-sm text-gray-600 px-4 py-2">
-                      {user?.name} {user?.surname}
+                      {role}
                     </div>
-                    {user?.role === 'ADMIN' && (
+                    {role === 'ADMIN' && (
                       <Link
                         to="/admin"
                         className="block text-gray-700 hover:text-blue-600 font-medium px-4 py-2"

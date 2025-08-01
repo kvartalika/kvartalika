@@ -1,8 +1,8 @@
 import {apiClient} from './api.config';
 import type {
+  AuthResponse,
   LoginRequest,
   RegisterRequest,
-  AuthResponse,
   RegisterResponse,
 } from './api.types';
 import {AxiosError} from "axios";

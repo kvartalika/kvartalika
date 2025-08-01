@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useAdminStore} from '../store/admin.store.ts';
-import {useAuthStore} from "../store/auth.store.ts";
+import {useAdminStore, useAuthStore} from "../store";
 import type {UserDto} from '../services';
 
 const AdminPage = () => {
@@ -35,7 +34,6 @@ const AdminPage = () => {
   const [isLoadingLocal, setIsLoadingLocal] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
-  // Form states
   const [showForm, setShowForm] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState<UserDto>({

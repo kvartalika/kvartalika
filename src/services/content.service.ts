@@ -1,15 +1,16 @@
 import {apiClient} from './api.config';
 import type {
-  DescriptionRequest,
-  FlatRequest,
-  HomeRequest,
-  FooterRequest,
+  ApiResponse,
+  BidRequest,
   Category,
   Description,
+  DescriptionRequest,
+  FileUploadResponse,
+  FlatRequest,
   Footer,
+  FooterRequest,
+  HomeRequest,
   Photo,
-  ApiResponse,
-  FileUploadResponse, BidRequest,
 } from './api.types';
 import {AxiosError} from 'axios';
 import type {BidForm} from "../store/ui.store.ts";
