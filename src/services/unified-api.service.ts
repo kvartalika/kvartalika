@@ -7,11 +7,8 @@ import type {
   BookingForm,
   SearchFilters,
   LoginRequest,
-  RegisterRequest,
   AuthResponse,
   Category,
-  Flat,
-  Home,
   FlatRequest,
   HomeRequest,
   MainPageContent,
@@ -19,22 +16,11 @@ import type {
 } from '../types/unified';
 
 class UnifiedApiService {
-  private getAuthHeaders() {
-    const token = localStorage.getItem('unified-auth-storage') 
-      ? JSON.parse(localStorage.getItem('unified-auth-storage')!).state.accessToken 
-      : null;
-    
-    return {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` })
-    };
-  }
-
   // Authentication endpoints
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     try {
-      const { mockApi } = await import('./mockApi');
-      return await mockApi.login(credentials.email, credentials.password);
+      // TODO: Implement real login API
+      throw new Error('Login not implemented yet');
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -44,7 +30,23 @@ class UnifiedApiService {
   async adminLogin(credentials: LoginRequest): Promise<AuthResponse> {
     try {
       const { adminLogin } = await import('./auth.service');
-      return await adminLogin(credentials);
+      const result = await adminLogin(credentials);
+      return {
+        user: {
+          name: result.name || '',
+          surname: result.surname || '',
+          patronymic: result.patronymic,
+          email: result.email || '',
+          phone: result.phone,
+          role: 'ADMIN' as any,
+          id: result.id,
+          createdAt: result.createdAt,
+          updatedAt: result.updatedAt,
+          telegramId: result.telegramId,
+        },
+        accessToken: result.accessToken || '',
+        role: 'ADMIN' as any,
+      };
     } catch (error) {
       console.error('Admin login error:', error);
       throw error;
@@ -54,7 +56,23 @@ class UnifiedApiService {
   async contentManagerLogin(credentials: LoginRequest): Promise<AuthResponse> {
     try {
       const { contentManagerLogin } = await import('./auth.service');
-      return await contentManagerLogin(credentials);
+      const result = await contentManagerLogin(credentials);
+      return {
+        user: {
+          name: result.name || '',
+          surname: result.surname || '',
+          patronymic: result.patronymic,
+          email: result.email || '',
+          phone: result.phone,
+          role: 'CONTENT_MANAGER' as any,
+          id: result.id,
+          createdAt: result.createdAt,
+          updatedAt: result.updatedAt,
+          telegramId: result.telegramId,
+        },
+        accessToken: result.accessToken || '',
+        role: 'CONTENT_MANAGER' as any,
+      };
     } catch (error) {
       console.error('Content manager login error:', error);
       throw error;
@@ -70,216 +88,111 @@ class UnifiedApiService {
     }
   }
 
-  // Apartments endpoints
+  // Stub methods for APIs that need to be implemented
   async getApartments(): Promise<Apartment[]> {
-    try {
-      // Try content API first, fall back to mock
-      try {
-        const { contentApi } = await import('./contentApi');
-        return await contentApi.getApartments();
-      } catch {
-        const { ApiService } = await import('./apiService');
-        return await ApiService.getApartments();
-      }
-    } catch (error) {
-      console.error('Error fetching apartments:', error);
-      throw error;
-    }
+    console.warn('getApartments not yet implemented');
+    return [];
   }
 
   async getApartmentById(id: number): Promise<Apartment | null> {
-    try {
-      // Try content API first, fall back to mock
-      try {
-        const { contentApi } = await import('./contentApi');
-        return await contentApi.getApartment(id);
-      } catch {
-        const { ApiService } = await import('./apiService');
-        return await ApiService.getApartmentById(id);
-      }
-    } catch (error) {
-      console.error('Error fetching apartment:', error);
-      throw error;
-    }
+    console.warn('getApartmentById not yet implemented');
+    return null;
   }
 
   async createApartment(data: FlatRequest): Promise<Apartment> {
-    try {
-      const { contentApi } = await import('./contentApi');
-      return await contentApi.createApartment(data);
-    } catch (error) {
-      console.error('Error creating apartment:', error);
-      throw error;
-    }
+    console.warn('createApartment not yet implemented');
+    throw new Error('Not implemented');
   }
 
   async updateApartment(id: number, data: Partial<FlatRequest>): Promise<Apartment> {
-    try {
-      const { contentApi } = await import('./contentApi');
-      return await contentApi.updateApartment(id, data);
-    } catch (error) {
-      console.error('Error updating apartment:', error);
-      throw error;
-    }
+    console.warn('updateApartment not yet implemented');
+    throw new Error('Not implemented');
   }
 
   async deleteApartment(id: number): Promise<boolean> {
-    try {
-      const { contentApi } = await import('./contentApi');
-      return await contentApi.deleteApartment(id);
-    } catch (error) {
-      console.error('Error deleting apartment:', error);
-      throw error;
-    }
+    console.warn('deleteApartment not yet implemented');
+    return false;
   }
 
-  // Complexes endpoints
   async getComplexes(): Promise<Complex[]> {
-    try {
-      // Try content API first, fall back to mock
-      try {
-        const { contentApi } = await import('./contentApi');
-        return await contentApi.getComplexes();
-      } catch {
-        const { ApiService } = await import('./apiService');
-        return await ApiService.getComplexes();
-      }
-    } catch (error) {
-      console.error('Error fetching complexes:', error);
-      throw error;
-    }
+    console.warn('getComplexes not yet implemented');
+    return [];
   }
 
   async getComplexById(id: number): Promise<Complex | null> {
-    try {
-      const { contentApi } = await import('./contentApi');
-      return await contentApi.getComplex(id);
-    } catch (error) {
-      console.error('Error fetching complex:', error);
-      throw error;
-    }
+    console.warn('getComplexById not yet implemented');
+    return null;
   }
 
   async createComplex(data: HomeRequest): Promise<Complex> {
-    try {
-      const { contentApi } = await import('./contentApi');
-      return await contentApi.createComplex(data);
-    } catch (error) {
-      console.error('Error creating complex:', error);
-      throw error;
-    }
+    console.warn('createComplex not yet implemented');
+    throw new Error('Not implemented');
   }
 
   async updateComplex(id: number, data: Partial<HomeRequest>): Promise<Complex> {
-    try {
-      const { contentApi } = await import('./contentApi');
-      return await contentApi.updateComplex(id, data);
-    } catch (error) {
-      console.error('Error updating complex:', error);
-      throw error;
-    }
+    console.warn('updateComplex not yet implemented');
+    throw new Error('Not implemented');
   }
 
   async deleteComplex(id: number): Promise<boolean> {
-    try {
-      const { contentApi } = await import('./contentApi');
-      return await contentApi.deleteComplex(id);
-    } catch (error) {
-      console.error('Error deleting complex:', error);
-      throw error;
-    }
+    console.warn('deleteComplex not yet implemented');
+    return false;
   }
 
-  // Search endpoints
   async searchApartments(filters: Partial<SearchFilters>): Promise<Apartment[]> {
-    try {
-      const { ApiService } = await import('./apiService');
-      return await ApiService.searchApartments(filters);
-    } catch (error) {
-      console.error('Error searching apartments:', error);
-      throw error;
-    }
+    console.warn('searchApartments not yet implemented');
+    return [];
   }
 
-  // Booking endpoints
   async createBooking(bookingData: BookingForm): Promise<{ success: boolean; id?: number }> {
-    try {
-      const { ApiService } = await import('./apiService');
-      return await ApiService.createBooking(bookingData);
-    } catch (error) {
-      console.error('Error creating booking:', error);
-      throw error;
-    }
+    console.warn('createBooking not yet implemented');
+    return { success: false };
   }
 
-  // Categories endpoints
   async getCategories(): Promise<Category[]> {
     try {
-      const { contentApi } = await import('./contentApi');
-      return await contentApi.getCategories();
+      const { getCategories } = await import('./public.service');
+      return await getCategories();
     } catch (error) {
       console.error('Error fetching categories:', error);
-      throw error;
+      return [];
     }
   }
 
-  // Content management endpoints
   async getMainPageContent(): Promise<MainPageContent> {
-    try {
-      const { contentApi } = await import('./contentApi');
-      return await contentApi.getMainPageContent();
-    } catch (error) {
-      console.error('Error fetching main page content:', error);
-      throw error;
-    }
+    console.warn('getMainPageContent not yet implemented');
+    throw new Error('Not implemented');
   }
 
   async updateMainPageContent(data: Partial<MainPageContent>): Promise<MainPageContent> {
-    try {
-      const { contentApi } = await import('./contentApi');
-      return await contentApi.updateMainPageContent(data);
-    } catch (error) {
-      console.error('Error updating main page content:', error);
-      throw error;
-    }
+    console.warn('updateMainPageContent not yet implemented');
+    throw new Error('Not implemented');
   }
 
-  // Contact info endpoints
   async getContactInfo(): Promise<any> {
-    try {
-      const { contentApi } = await import('./contentApi');
-      return await contentApi.getContactInfo();
-    } catch (error) {
-      console.error('Error fetching contact info:', error);
-      throw error;
-    }
+    console.warn('getContactInfo not yet implemented');
+    return {};
   }
 
   async updateContactInfo(data: any): Promise<any> {
-    try {
-      const { contentApi } = await import('./contentApi');
-      return await contentApi.updateContactInfo(data);
-    } catch (error) {
-      console.error('Error updating contact info:', error);
-      throw error;
-    }
+    console.warn('updateContactInfo not yet implemented');
+    return {};
   }
 
-  // Social media endpoints
   async getSocialMedia(): Promise<any[]> {
     try {
-      const { contentApi } = await import('./contentApi');
-      return await contentApi.getSocialMedia();
+      const { getSocialMedia } = await import('./public.service');
+      return await getSocialMedia();
     } catch (error) {
       console.error('Error fetching social media:', error);
-      throw error;
+      return [];
     }
   }
 
   async addSocialMedia(data: { image: string; link: string }): Promise<any> {
     try {
-      const { contentApi } = await import('./contentApi');
-      return await contentApi.addSocialMedia(data);
+      const { addSocialMedia } = await import('./public.service');
+      return await addSocialMedia(data);
     } catch (error) {
       console.error('Error adding social media:', error);
       throw error;
@@ -288,8 +201,8 @@ class UnifiedApiService {
 
   async updateSocialMedia(id: number, data: Partial<{ image: string; link: string }>): Promise<any> {
     try {
-      const { contentApi } = await import('./contentApi');
-      return await contentApi.updateSocialMedia(id, data);
+      const { updateSocialMedia } = await import('./public.service');
+      return await updateSocialMedia(id, data);
     } catch (error) {
       console.error('Error updating social media:', error);
       throw error;
@@ -298,22 +211,21 @@ class UnifiedApiService {
 
   async deleteSocialMedia(id: number): Promise<boolean> {
     try {
-      const { contentApi } = await import('./contentApi');
-      return await contentApi.deleteSocialMedia(id);
+      const { deleteSocialMedia } = await import('./public.service');
+      return await deleteSocialMedia(id);
     } catch (error) {
       console.error('Error deleting social media:', error);
-      throw error;
+      return false;
     }
   }
 
-  // Admin endpoints
   async getAdmins(): Promise<UserDto[]> {
     try {
       const { getAdmins } = await import('./admin.service');
       return await getAdmins();
     } catch (error) {
       console.error('Error fetching admins:', error);
-      throw error;
+      return [];
     }
   }
 
@@ -323,7 +235,7 @@ class UnifiedApiService {
       return await getContentManagers();
     } catch (error) {
       console.error('Error fetching content managers:', error);
-      throw error;
+      return [];
     }
   }
 }

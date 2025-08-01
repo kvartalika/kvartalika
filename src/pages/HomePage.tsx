@@ -6,14 +6,13 @@ import BackgroundPattern from "../components/BackgroundPattern.tsx";
 import HomePageManager from '../components/HomePageManager';
 
 import {useUIStore} from "../store/ui.store.ts";
-import {useAuthStore} from "../store/auth.store.ts";
+import {useAuth} from "../store/unified-auth.store";
 import {usePropertiesStore} from "../store/properties.store.ts";
 import type {HomePageFlats} from "../services";
 import PageLoader from "../components/PageLoader.tsx";
 
 const HomePage = () => {
-  const role = useAuthStore(state => state.role);
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const { role, isAuthenticated } = useAuth();
 
   const pageInfo = useUIStore(state => state.pageInfo);
 

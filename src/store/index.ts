@@ -7,8 +7,8 @@ export * from '../types/unified';
 // Auth store (unified)
 export * from './unified-auth.store';
 
-// App store (updated to use unified types)
-export { useAppStore } from './useAppStore';
+// App store (deprecated - use unified stores instead)
+// export { useAppStore } from './useAppStore';
 
 // Other specialized stores
 export { useFlatsStore } from './flats.store';
@@ -21,11 +21,11 @@ export { useContentManagerStore } from './contentManager.store';
 
 // Convenience hooks for common use cases
 import { useUnifiedAuthStore } from './unified-auth.store';
-import { useAppStore } from './useAppStore';
+// import { useAppStore } from './useAppStore'; // deprecated
 
 export const useStores = () => ({
   auth: useUnifiedAuthStore(),
-  app: useAppStore(),
+  // app: useAppStore(), // deprecated - use individual stores as needed
 });
 
 // Role-based access hooks

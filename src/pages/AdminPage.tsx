@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useAdminStore} from '../store/admin.store.ts';
-import {useAuthStore} from "../store/auth.store.ts";
-import type {UserDto} from '../services';
+import {useAdminAuth} from "../store/unified-auth.store";
+import type {UserDto} from '../types/unified';
 
 const AdminPage = () => {
-  const {role, isAuthenticated, logout} = useAuthStore();
+  const {role, isAuthenticated, logout} = useAdminAuth();
   const navigate = useNavigate();
 
   const {
@@ -22,22 +22,14 @@ const AdminPage = () => {
     addAdmin,
     editAdmin,
     removeAdmin,
-    setError,
     clearError,
   } = useAdminStore();
 
-  const [activeTab, setActiveTab] = useState<'managers' | 'admins' | 'files' | 'directories'>('managers');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [newDirectoryName, setNewDirectoryName] = useState('');
-  const [files, setFiles] = useState<FileItem[]>([]);
-  const [directories, setDirectories] = useState<Directory[]>([]);
-  const [currentDirectory, setCurrentDirectory] = useState('/');
-  const [isLoadingLocal, setIsLoadingLocal] = useState(false);
-  const [localError, setLocalError] = useState<string | null>(null);
-
-  // Form states
+  const [activeTab, setActiveTab] = useState<'managers' | 'admins'>('managers');
   const [showForm, setShowForm] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
+  const [isLoadingLocal, setIsLoadingLocal] = useState(false);
   const [formData, setFormData] = useState<UserDto>({
     name: '',
     surname: '',
@@ -574,20 +566,7 @@ const AdminPage = () => {
               </div>
             )}
 
-            {/* Files and Directories tabs remain the same for now */}
-            {activeTab === 'files' && (
-              <div className="bg-white shadow rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">File Management</h3>
-                <p className="text-gray-500">File management functionality will be implemented here.</p>
-              </div>
-            )}
-
-            {activeTab === 'directories' && (
-              <div className="bg-white shadow rounded-lg p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Directory Management</h3>
-                <p className="text-gray-500">Directory management functionality will be implemented here.</p>
-              </div>
-            )}
+            {/* TODO: Add more admin features here */}
           </div>
         )}
       </div>
@@ -595,15 +574,6 @@ const AdminPage = () => {
   );
 };
 
-interface FileItem {
-  name: string;
-  size: number;
-  type: string;
-}
-
-interface Directory {
-  name: string;
-  path: string;
-}
+// FileItem and Directory interfaces removed - not currently used
 
 export default AdminPage;

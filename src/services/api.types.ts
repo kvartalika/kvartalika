@@ -1,5 +1,5 @@
 // API Request Types
-import type {UserRole} from "../store/auth.store.ts";
+import type {UserRole} from "../types/unified";
 
 export interface LoginRequest {
   username?: string;

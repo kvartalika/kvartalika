@@ -30,7 +30,7 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
   };
 
   const handleArrayChange = (field: string, index: number, value: string) => {
-    setFormData((prev: FormData) => ({
+    setFormData((prev: UnifiedFormData) => ({
       ...prev,
       [field]: (prev[field] as string[])?.map((item: string, i: number) => 
         i === index ? value : item
@@ -39,14 +39,14 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
   };
 
   const handleAddArrayItem = (field: string) => {
-    setFormData((prev: FormData) => ({
+    setFormData((prev: UnifiedFormData) => ({
       ...prev,
       [field]: [...((prev[field] as string[]) || []), '']
     }));
   };
 
   const handleRemoveArrayItem = (field: string, index: number) => {
-    setFormData((prev: FormData) => ({
+    setFormData((prev: UnifiedFormData) => ({
       ...prev,
       [field]: (prev[field] as string[])?.filter((_: string, i: number) => i !== index) || []
     }));
@@ -58,14 +58,9 @@ const ContentManager = ({ contentType, contentId, onSave, onCancel, initialData 
     setError('');
 
     try {
-      // For testing, use mock API
-      const { mockApi } = await import('../services/mockApi');
-      
-      if (contentType === 'apartment') {
-        await mockApi.updateApartment(contentId, formData);
-      } else {
-        await mockApi.updateComplex(contentId, formData);
-      }
+      // TODO: Implement real API calls
+      // For now, just call onSave directly
+      console.warn('ContentManager save not yet implemented');
       
       onSave(formData);
     } catch (err) {

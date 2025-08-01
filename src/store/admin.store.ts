@@ -1,9 +1,15 @@
 import {create} from 'zustand';
 import {
   addAdmin,
-  addContentManager, deleteAdmin, deleteContentManager, getAdmins,
+  addContentManager, 
+  deleteAdmin, 
+  deleteContentManager,
+  getAdmins,
   getContentManagers,
-  type PaginationParams, updateAdmin, updateContentManager, type UserDto,
+  type PaginationParams, 
+  updateAdmin, 
+  updateContentManager, 
+  type UserDto,
 } from '../services';
 
 export interface AdminState {
@@ -44,7 +50,7 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
     set({isLoadingContentManagers: true, error: null});
 
     try {
-      const managers = await getContentManagers(params);
+      const managers = await getContentManagers();
       set({
         contentManagers: managers,
         isLoadingContentManagers: false,
@@ -100,7 +106,7 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
     set({isLoadingAdmins: true, error: null});
 
     try {
-      const admins = await getAdmins(params);
+      const admins = await getAdmins();
       set({
         admins: admins,
         isLoadingAdmins: false,

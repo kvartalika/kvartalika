@@ -1,6 +1,6 @@
 import {useState, useEffect, type FormEvent} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useAuthStore, type UserRole} from "../store/auth.store.ts";
+import {useAdminAuth, useContentManagerAuth, type UserRole} from "../store/unified-auth.store";
 import type {LoginRequest} from "../api";
 
 const AuthPage = () => {
@@ -9,14 +9,12 @@ const AuthPage = () => {
 
   const [currentRole, setCurrentRole] = useState<UserRole>('ADMIN');
 
-  const {
-    loginAsAdmin,
-    loginAsContentManager,
-    role,
-    isAuthenticated,
-    isLoading: authLoading,
-    error,
-  } = useAuthStore();
+  const adminAuth = useAdminAuth();
+  const cmAuth = useContentManagerAuth();
+  
+  // Use current role to determine which auth store to use
+  const currentAuth = currentRole === 'ADMIN' ? adminAuth : cmAuth;
+  const { role, isAuthenticated, isLoading: authLoading, error } = currentAuth;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,9 +34,9 @@ const AuthPage = () => {
 
     try {
       if (currentRole === 'ADMIN') {
-        await loginAsAdmin(req);
+        await adminAuth.loginAsAdmin(req);
       } else if (currentRole === 'CONTENT_MANAGER') {
-        await loginAsContentManager(req);
+        await cmAuth.loginAsContentManager(req);
       }
     } catch (err) {
       console.log(err);

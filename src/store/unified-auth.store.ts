@@ -9,6 +9,9 @@ import type {
   UserRole 
 } from '../types/unified';
 
+// Re-export UserRole for convenience
+export type { UserRole } from '../types/unified';
+
 interface AuthActions {
   // Login methods
   login: (email: string, password: string) => Promise<void>;
@@ -48,18 +51,24 @@ export const useUnifiedAuthStore = create<AuthState & AuthActions>()(
       login: async (email: string, password: string) => {
         set({ isLoading: true, error: null });
         try {
-          // Dynamic import to avoid circular dependencies
-          const { mockApi } = await import('../services/mockApi');
-          const data = await mockApi.login(email, password);
-          const { user, accessToken } = data;
+          // TODO: Implement real login API
+          // Mock login for now
+          const mockUser = {
+            id: 1,
+            name: 'User',
+            surname: 'Test',
+            email: email,
+            role: 'CLIENT' as any,
+          };
+          const mockToken = 'mock-token';
 
           set({
-            user,
-            accessToken,
+            user: mockUser,
+            accessToken: mockToken,
             isAuthenticated: true,
             isLoading: false,
             error: null,
-            role: user.role,
+            role: mockUser.role,
           });
         } catch (error) {
           set({
@@ -166,13 +175,7 @@ export const useUnifiedAuthStore = create<AuthState & AuthActions>()(
           // Continue with local logout even if API fails
         }
 
-        try {
-          // Try mock API logout
-          const { mockApi } = await import('../services/mockApi');
-          await mockApi.logout();
-        } catch (error) {
-          console.error('Mock API logout error:', error);
-        }
+        // Mock logout completed above
 
         // Always clear local state
         set({
@@ -186,12 +189,13 @@ export const useUnifiedAuthStore = create<AuthState & AuthActions>()(
 
       refreshAccessToken: async () => {
         try {
-          const { mockApi } = await import('../services/mockApi');
-          const { accessToken } = await mockApi.refreshToken();
-
-          set({
-            accessToken,
-          });
+          // TODO: Implement refresh token API
+          // For now, just use existing token
+          const currentToken = get().accessToken;
+          if (!currentToken) {
+            throw new Error('No token to refresh');
+          }
+          // Keep existing token for now
         } catch (error) {
           get().logout();
           throw error;

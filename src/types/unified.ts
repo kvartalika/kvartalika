@@ -290,6 +290,9 @@ export interface UnifiedFormData {
   [key: string]: any; // Index signature for dynamic access
 }
 
+// Content Management Types
+export type ContentType = 'apartment' | 'complex';
+
 // File Management Types
 export interface FileItem {
   id: number;

@@ -1,7 +1,7 @@
 import {type FormEvent, useState} from 'react';
 import ContactForm from './forms/ContactForm';
 import SocialMediaForm from './forms/SocialMediaForm';
-import {useAuthStore} from "../store/auth.store.ts";
+import {useContentManagerAuth} from "../store/unified-auth.store";
 import {
   type PageInfo,
   type SocialMedia,
@@ -13,7 +13,7 @@ interface HomePageManagerProps {
 }
 
 const HomePageManager = ({onCancel}: HomePageManagerProps) => {
-  const {role, isAuthenticated} = useAuthStore();
+  const {role, isAuthenticated} = useContentManagerAuth();
 
   const pageInfo = useUIStore(state => state.pageInfo);
   const updatePageInfo = useUIStore(state => state.updatePageInfo);

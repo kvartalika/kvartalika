@@ -1,4 +1,4 @@
-import type {UserRole} from "../store/auth.store.ts";
+import type {UserRole} from "./unified";
 
 export interface User {
   id: number;

@@ -3,7 +3,7 @@ import {useParams, Link} from 'react-router-dom';
 import ApartmentCard from '../components/ApartmentCard';
 
 import ContentManager from '../components/ContentManager';
-import {useAuthStore} from "../store/auth.store.ts";
+import {useAuth} from "../store/unified-auth.store";
 import {useUIStore} from "../store/ui.store.ts";
 import {usePropertiesStore} from "../store/properties.store.ts";
 
@@ -21,8 +21,7 @@ const ComplexPage = () => {
   const modals = useUIStore(state => state.modals);
   const closeModal = useUIStore(state => state.closeModal);
 
-  const role = useAuthStore(state => state.role);
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const { role, isAuthenticated } = useAuth();
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 

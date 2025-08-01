@@ -3,7 +3,7 @@ import {useParams, Link} from 'react-router-dom';
 import ContentManager from '../components/ContentManager';
 import {useUIStore} from "../store/ui.store.ts";
 import {usePropertiesStore} from "../store/properties.store.ts";
-import {useAuthStore} from "../store/auth.store.ts";
+import {useAuth} from "../store/unified-auth.store";
 
 const ApartmentPage = () => {
   const {apartmentId} = useParams<{ apartmentId: string }>();
@@ -16,8 +16,7 @@ const ApartmentPage = () => {
   const selectedFlat = usePropertiesStore(state => state.selectedFlat);
   const setSelectedFlat = usePropertiesStore(state => state.setSelectedFlat);
 
-  const role = useAuthStore(state => state.role);
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const { role, isAuthenticated } = useAuth();
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
