@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {Link, useParams} from 'react-router-dom';
 import ApartmentCard from '../components/ApartmentCard';
 
@@ -20,7 +20,13 @@ const ComplexPage = () => {
   const openModal = useUIStore(state => state.openModal);
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentHistoryIndex, setCurrentHistoryIndex] = useState(0);
 
+  const [aptSlideIndex, setAptSlideIndex] = useState(0);
+  const APARTMENTS_PER_PAGE = 3;
+
+  const [yardSlideIndex, setYardSlideIndex] = useState(0);
+  const YARDS_PER_PAGE = 3;
 
   useEffect(() => {
     const load = async () => {
@@ -43,16 +49,12 @@ const ComplexPage = () => {
   useEffect(() => {
     const id = selectedHome?.id;
     if (!id) return;
-    const loadData = async () => {
-      try {
-        await loadFlatsByHome(id);
-      } catch (error) {
-        console.error('Error loading data:', error);
-      }
-    };
-
-    loadData();
+    void loadFlatsByHome(id);
   }, [loadFlatsByHome, selectedHome]);
+
+  const flatTypes = useMemo(() => {
+    return Array.from(new Set(flatsByHome.map(apt => `${apt.flat.numberOfRooms}-комн.`))).join(', ');
+  }, [flatsByHome]);
 
   if (!selectedHome) {
     return (
@@ -114,14 +116,13 @@ const ComplexPage = () => {
             src={images[currentImageIndex]}
             alt={`${selectedHome.name} - фото ${currentImageIndex + 1}`}
             className="w-full h-full object-cover absolute inset-0"
-            style={{position: 'absolute'}}
           />
-
 
           {images.length > 1 && (
             <>
               <button
                 onClick={prevImage}
+                aria-label="Предыдущее фото"
                 className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all z-20"
               >
                 <svg
@@ -140,6 +141,7 @@ const ComplexPage = () => {
               </button>
               <button
                 onClick={nextImage}
+                aria-label="Следующее фото"
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all z-20"
               >
                 <svg
@@ -203,27 +205,72 @@ const ComplexPage = () => {
 
       <section className="py-12">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-gray-900">Доступные квартиры</h2>
-            {flatsByHome.length > 4 && (
-              <Link
-                to={`/apartments?homeId=${selectedHome.id}`}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-              >
-                Показать все квартиры
-              </Link>
+          <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center mb-6 gap-2">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Доступные квартиры</h2>
+              <div className="text-sm text-gray-600 mt-1">
+                {flatsByHome.length > 0
+                  ? `${flatsByHome.length} ${flatsByHome.length === 1 ? 'квартира' : 'квартиры'} · ${flatTypes}`
+                  : 'Пока нет доступных квартир'}
+              </div>
+            </div>
+            {flatsByHome.length > APARTMENTS_PER_PAGE && (
+              <div className="flex gap-2 mt-2 md:mt-0">
+                <button
+                  aria-label="Предыдущие квартиры"
+                  onClick={() => setAptSlideIndex(i => Math.max(0, i - 1))}
+                  disabled={aptSlideIndex === 0}
+                  className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 disabled:opacity-40"
+                >
+                  ‹
+                </button>
+                <button
+                  aria-label="Следующие квартиры"
+                  onClick={() =>
+                    setAptSlideIndex(i =>
+                      Math.min(
+                        Math.ceil(Math.min(6, flatsByHome.length) / APARTMENTS_PER_PAGE) - 1,
+                        i + 1
+                      )
+                    )
+                  }
+                  disabled={
+                    aptSlideIndex >=
+                    Math.ceil(Math.min(6, flatsByHome.length) / APARTMENTS_PER_PAGE) - 1
+                  }
+                  className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 disabled:opacity-40"
+                >
+                  ›
+                </button>
+              </div>
             )}
           </div>
+
           {flatsByHome.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {flatsByHome.slice(0, 4).map(apartment => (
-                <ApartmentCard
-                  key={apartment.flat.id}
-                  homeName={selectedHome.name ?? `ЖК №${apartment.flat.homeId}`}
-                  apartment={apartment}
-                  onBookingClick={() => openModal('bid')}
-                />
-              ))}
+            <div className="relative">
+              <div className="overflow-hidden">
+                <div
+                  className="flex gap-6 transition-transform"
+                  style={{
+                    transform: `translateX(-${aptSlideIndex * 100}%)`,
+                    width: `${Math.ceil(Math.min(6, flatsByHome.length) / APARTMENTS_PER_PAGE) * 100}%`,
+                  }}
+                >
+                  {flatsByHome.slice(0, 6).map((apartment) => (
+                    <div
+                      key={apartment.flat.id}
+                      className="flex-shrink-0"
+                      style={{width: `${100 / Math.ceil(Math.min(6, flatsByHome.length) / APARTMENTS_PER_PAGE) / APARTMENTS_PER_PAGE * 100}%`}}
+                    >
+                      <ApartmentCard
+                        homeName={selectedHome.name ?? `ЖК №${apartment.flat.homeId}`}
+                        apartment={apartment}
+                        onBookingClick={() => openModal('bid')}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           ) : (
             <div className="text-center py-12">
@@ -243,7 +290,9 @@ const ComplexPage = () => {
                 </svg>
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Квартиры временно недоступны</h3>
-              <p className="text-gray-600 mb-6">В данный момент в этом комплексе нет доступных квартир. Оставьте заявку, и мы уведомим вас о новых предложениях.</p>
+              <p className="text-gray-600 mb-6">
+                В данный момент в этом комплексе нет доступных квартир. Оставьте заявку, и мы уведомим вас о новых предложениях.
+              </p>
               <button
                 onClick={() => openModal('bid')}
                 className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
@@ -257,10 +306,10 @@ const ComplexPage = () => {
 
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
+          <div className="mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">О жилом комплексе</h2>
             <div className="text-center mb-16">
-              <p className="text-lg text-gray-600 leading-relaxed max-w-4xl mx-auto">{selectedHome.description}</p>
+              <p className="text-lg text-gray-600 leading-relaxed max-w-4xl mx-auto">{selectedHome.about}</p>
             </div>
             {selectedHome.features && selectedHome.features.length > 0 && (
               <div className="mb-16">
@@ -295,76 +344,65 @@ const ComplexPage = () => {
             {selectedHome.history && (
               <div className="mb-16">
                 <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center">История строительства</h3>
-                <div className="bg-white rounded-xl p-8 shadow-lg">
-                  <div className="text-center mb-8">
-                    <p className="text-gray-600">Год постройки: {selectedHome.yearBuilt}</p>
-                  </div>
-                  <div className="space-y-6">
+                <div className="bg-white rounded-xl p-8 shadow-lg flex flex-col lg:flex-row gap-8">
+                  <div className="lg:w-[60%] space-y-6">
+                    <div className="text-center mb-4">
+                      <p className="text-gray-600">Год постройки: {selectedHome.yearBuilt ?? "-"}</p>
+                    </div>
                     {selectedHome.history.map((phase, index) => (
                       <div
-                        key={index}
+                        key={`${phase}-${index}`}
                         className="flex items-start"
                       >
-                        <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-4">{index + 1}</div>
+                        <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-4">
+                          {index + 1}
+                        </div>
                         <div className="flex-grow">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-semibold text-gray-900">{phase}</h4>
-                          </div>
+                          <h4 className="font-semibold text-gray-900 mb-1">{phase}</h4>
                         </div>
                       </div>
                     ))}
                   </div>
+
+                  <div className="lg:w-[40%] flex flex-col items-center justify-center">
+                    {historyImages.length > 0 ? (
+                      <div className="relative rounded overflow-hidden">
+                        <img
+                          src={historyImages[currentHistoryIndex]}
+                          alt={`История ${currentHistoryIndex + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        {historyImages.length > 1 && (
+                          <>
+                            <button
+                              onClick={() => setCurrentHistoryIndex(prev => (prev - 1 + historyImages.length) % historyImages.length)}
+                              aria-label="Предыдущее фото истории"
+                              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+                            >
+                              ‹
+                            </button>
+                            <button
+                              onClick={() => setCurrentHistoryIndex(prev => (prev + 1) % historyImages.length)}
+                              aria-label="Следующее фото истории"
+                              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+                            >
+                              ›
+                            </button>
+                            <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-xs">
+                              {currentHistoryIndex + 1} / {historyImages.length}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex-1 rounded overflow-hidden border bg-gray-100 flex items-center justify-center">
+                        <span className="text-gray-500">Фотографии отсутствуют</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              {selectedHome.features && selectedHome.features.length > 0 && (
-                <div className="text-center">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-6">Удобства и инфраструктура</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 justify-items-center">
-                    {selectedHome.features.map((amenity, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center text-gray-600"
-                      >
-                        <svg
-                          className="w-5 h-5 text-green-500 mr-3 flex-shrink-0"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                        {amenity}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <div className="text-center">
-                <h3 className="text-xl font-semibold text-gray-900 mb-6">Ключевые характеристики</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between py-2 border-b border-gray-200">
-                    <span className="text-gray-600">Всего квартир:</span>
-                    <span className="font-medium">{flatsByHome.length ?? "Неизвестно"}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-gray-200">
-                    <span className="text-gray-600">Тип квартир:</span>
-                    <span className="font-medium">{Array.from(new Set(flatsByHome.map(apt => `${apt.flat.numberOfRooms}-комн.`))).join(', ')}</span>
-                  </div>
-                  <div className="flex justify-between py-2 border-b border-gray-200">
-                    <span className="text-gray-600">Адрес:</span>
-                    <span className="font-medium">{selectedHome.address ?? "Требуется уточнить"}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -372,9 +410,9 @@ const ComplexPage = () => {
       <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            {selectedHome.latitude && selectedHome.longitude && selectedHome.name &&
+            {selectedHome.latitude !== undefined && selectedHome.longitude !== undefined && selectedHome.name &&
               <>
-                <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Расположение ЖК</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">Расположение ЖК</h2>
                 <div className="bg-gray-100 rounded-xl p-8 text-center mb-8">
                   <Map
                     latitude={selectedHome.latitude}
@@ -384,9 +422,9 @@ const ComplexPage = () => {
                 </div>
               </>
             }
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="flex justify-center items-center">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Инфраструктура района</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Инфраструктура района</h3>
                 <ul className="space-y-3 text-gray-600">
                   {selectedHome.schoolsNearby &&
                     <li className="flex items-center">
@@ -446,6 +484,68 @@ const ComplexPage = () => {
           </div>
         </div>
       </section>
+
+      {selectedHome.hasYards && (
+        <div className="mb-16">
+          <h3 className="text-2xl font-semibold text-gray-900 mb-6 text-center">Фотографии дворов</h3>
+
+          <div className="relative">
+            <div className="flex justify-between items-center mb-4">
+              {yardsImages.length > YARDS_PER_PAGE && (
+                <div className="flex gap-2">
+                  <button
+                    aria-label="Назад по дворам"
+                    onClick={() => setYardSlideIndex(i => Math.max(0, i - 1))}
+                    disabled={yardSlideIndex === 0}
+                    className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 disabled:opacity-40"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    aria-label="Вперед по дворам"
+                    onClick={() =>
+                      setYardSlideIndex(i =>
+                        Math.min(
+                          Math.ceil(yardsImages.length / YARDS_PER_PAGE) - 1,
+                          i + 1
+                        )
+                      )
+                    }
+                    disabled={yardSlideIndex >= Math.ceil(yardsImages.length / YARDS_PER_PAGE) - 1}
+                    className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 disabled:opacity-40"
+                  >
+                    ›
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="overflow-hidden">
+              <div
+                className="flex gap-6 transition-transform items-center justify-center"
+                style={{
+                  transform: `translateX(-${yardSlideIndex * (100 / Math.ceil(yardsImages.length / YARDS_PER_PAGE))}%)`,
+                  width: `${Math.ceil(yardsImages.length / YARDS_PER_PAGE) * 100}%`,
+                }}
+              >
+                {yardsImages.map((img, i) => (
+                  <div
+                    key={i}
+                    className="flex-shrink-0 rounded-xl overflow-hidden max-w-[60vw]"
+                    style={{width: `${100 / Math.ceil(yardsImages.length / YARDS_PER_PAGE)}%`}}
+                  >
+                    <img
+                      src={img}
+                      alt={`Двор ${i + 1}`}
+                      className="object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <section className="bg-blue-600 py-16">
         <div className="container mx-auto px-4 text-center">
