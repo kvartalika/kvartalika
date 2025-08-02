@@ -9,7 +9,7 @@ export const safeImage = (data: string[] | string | undefined, type: "layout" | 
       safe = '/imagesFallback/history.png';
       break;
     case 'flat':
-      safe = '/imagesFallback/flat.png';
+      safe = '/imagesFallback/flat.jpg';
       break;
     case 'home':
       safe = '/imagesFallback/home.png';

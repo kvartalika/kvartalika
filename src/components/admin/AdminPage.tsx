@@ -8,18 +8,17 @@ import {
 import {useNavigate} from 'react-router-dom';
 import {useAdminStore, useAuthStore, useUIStore} from '../../store';
 import type {Tab, UserDto} from '../../services';
-import Header from './Header.tsx';
 import TabSwitcher from './TabSwitcher.tsx';
-import Alert from './Alert.tsx';
 import Panel from './Panel.tsx';
 import UserForm from './UserForm.tsx';
 import FileExplorer from '../file-explorer/FileExplorer.tsx';
 import DirectoryBrowser from '../file-explorer/DirectoryBrowser.tsx';
 import {useFileExplorer} from '../file-explorer/hooks/useFileExplorer.ts';
 import UserList from "./UserList.tsx";
+import Alert from './Alert.tsx';
 
 const AdminPage: FC = () => {
-  const {role, isAuthenticated, logout} = useAuthStore();
+  const {role, isAuthenticated} = useAuthStore();
   const navigate = useNavigate();
   const {addNotification} = useUIStore();
 
@@ -202,20 +201,10 @@ const AdminPage: FC = () => {
     }
   };
 
-  const handleLogout = async () => {
-    logout();
-    navigate('/auth');
-  };
-
   if (!isAuthenticated || role !== 'ADMIN') return null;
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Header
-        role={role}
-        onLogout={handleLogout}
-      />
-
+    <div className="min-h-screen bg-gray-100 pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         <TabSwitcher
           activeTab={activeTab}
