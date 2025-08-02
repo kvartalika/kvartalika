@@ -42,7 +42,7 @@ export interface UserDto {
   phone?: string;
   createdAt?: string;
   updatedAt?: string;
-  role: string;
+  role: UserRole;
   password: string;
   telegramId?: string;
 }

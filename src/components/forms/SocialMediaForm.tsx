@@ -1,21 +1,19 @@
 import React from 'react';
-import {type SocialMedia, useUIStore} from "../../store";
+import {type SocialMedia} from "../../store";
 
 interface SocialMediaFormProps {
+  list: SocialMedia[];
   onSocialMediaChange: (index: number, field: keyof SocialMedia, value: string) => void;
   onAddSocialMedia: () => void;
   onRemoveSocialMedia: (index: number) => void;
 }
 
 const SocialMediaForm: React.FC<SocialMediaFormProps> = ({
-
+                                                           list,
                                                            onSocialMediaChange,
                                                            onAddSocialMedia,
                                                            onRemoveSocialMedia
                                                          }) => {
-
-  const socialMediaList = useUIStore(state => state.socialMediaList);
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -29,7 +27,7 @@ const SocialMediaForm: React.FC<SocialMediaFormProps> = ({
         </button>
       </div>
 
-      {socialMediaList.map((item, index) => (
+      {list.map((item, index) => (
         <div
           key={`${item.id}-${index}`}
           className="border rounded-lg p-4 bg-gray-50"
@@ -38,7 +36,7 @@ const SocialMediaForm: React.FC<SocialMediaFormProps> = ({
             <h4 className="font-medium text-gray-900">Социальная сеть {index + 1}</h4>
             <button
               type="button"
-              onClick={() => onRemoveSocialMedia(index)}
+              onClick={() => onRemoveSocialMedia(item?.id ?? 0)}
               className="text-red-600 hover:text-red-800"
             >
               ✕ Удалить
@@ -55,7 +53,7 @@ const SocialMediaForm: React.FC<SocialMediaFormProps> = ({
                 value={item.image ?? ''}
                 onChange={(e) => onSocialMediaChange(index, 'image', e.target.value ?? '')}
                 className="w-full border rounded px-3 py-2"
-                placeholder="https://example.com/icon.png"
+                placeholder="/images/example"
               />
             </div>
             <div>

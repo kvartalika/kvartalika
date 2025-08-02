@@ -15,6 +15,7 @@ export const safeImage = (data: string[] | string | undefined, type: "layout" | 
       safe = '/imagesFallback/home.png';
       break;
   }
-  if (data) return data;
+  if (Array.isArray(data) && data.length > 0) return data;
+  else if (!Array.isArray(data) && data) return data;
   return safe;
 }

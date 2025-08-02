@@ -11,6 +11,7 @@ import {
   updateContentManager, uploadFile,
   type UserDto,
 } from '../services';
+import type {UserRole} from "./auth.store.ts";
 
 export interface AdminState {
   contentManagers: UserDto[];
@@ -101,8 +102,13 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
   addContentManager: async (managerData: UserDto) => {
     set({error: null});
 
+    const formalizedData = {
+      ...managerData,
+      role: 'CONTENT_MANAGER' as UserRole,
+    };
+
     try {
-      await addContentManager(managerData);
+      await addContentManager(formalizedData);
       await get().loadContentManagers();
     } catch (error) {
       set({
@@ -114,8 +120,13 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
   editContentManager: async (email: string, managerData: Partial<UserDto>) => {
     set({error: null});
 
+    const formalizedData = {
+      ...managerData,
+      role: 'CONTENT_MANAGER' as UserRole,
+    };
+
     try {
-      await updateContentManager(email, managerData);
+      await updateContentManager(email, formalizedData);
       await get().loadContentManagers();
     } catch (error) {
       set({
@@ -157,8 +168,13 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
   addAdmin: async (adminData: UserDto) => {
     set({error: null});
 
+    const formalizedData = {
+      ...adminData,
+      role: 'ADMIN' as UserRole,
+    };
+
     try {
-      await addAdmin(adminData);
+      await addAdmin(formalizedData);
       await get().loadAdmins();
     } catch (error) {
       set({
@@ -170,8 +186,13 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
   editAdmin: async (email: string, adminData: Partial<UserDto>) => {
     set({error: null});
 
+    const formalizedData = {
+      ...adminData,
+      role: 'ADMIN' as UserRole,
+    };
+
     try {
-      await updateAdmin(email, adminData);
+      await updateAdmin(email, formalizedData);
       await get().loadAdmins();
     } catch (error) {
       set({

@@ -26,7 +26,8 @@ const ApartmentsPage = () => {
     setLimit,
     clearSearch,
     searchFlats,
-    homes
+    homes,
+    categories
   } = useFlatsStore();
 
   useEffect(() => {
@@ -101,7 +102,7 @@ const ApartmentsPage = () => {
   const getPageTitle = () => {
     const curCat = currentSearchParams.categoriesId;
     if (curCat && curCat.length === 1) {
-      const cat = searchResults[0].categories.find((c) => c.id === curCat[0])
+      const cat = categories?.find((c) => c.id === curCat[0])
       if (cat)
         return `Квартиры категории ${cat.name}`;
     }
@@ -119,7 +120,7 @@ const ApartmentsPage = () => {
   const getPageDescription = () => {
     if (currentSearchParams.categoriesId && currentSearchParams.categoriesId.length === 1) {
       const curCat = currentSearchParams.categoriesId;
-      const cat = searchResults[0].categories.find((c) => c.id === curCat[0])
+      const cat = categories?.find((c) => c.id === curCat[0])
       if (cat)
         return `Подборка квартир из категории ${cat.name}`;
     }

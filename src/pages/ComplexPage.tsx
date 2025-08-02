@@ -71,7 +71,14 @@ const ComplexPage = () => {
     );
   }
 
-  const images = safeImage(selectedHome.imagesResolved, 'home');
+  let images = safeImage(selectedHome.imagesResolved, 'home');
+  images = Array.isArray(images) ? images : [images];
+
+  let historyImages = safeImage(selectedHome.historyImagesResolved, 'history');
+  historyImages = Array.isArray(historyImages) ? historyImages : [historyImages];
+
+  let yardsImages = safeImage(selectedHome.yardsImagesResolved, 'history');
+  yardsImages = Array.isArray(yardsImages) ? yardsImages : [yardsImages];
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images.length);

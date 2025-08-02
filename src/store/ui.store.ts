@@ -61,6 +61,10 @@ export interface UIState {
     register: boolean;
     imagePreview: boolean;
     confirmDialog: boolean;
+
+    mainPage: boolean;
+    social: boolean;
+    bidManager: boolean
   };
 
   modalData: {
@@ -159,6 +163,10 @@ export const useUIStore = create<
         register: false,
         imagePreview: false,
         confirmDialog: false,
+
+        mainPage: false,
+        social: false,
+        bidManager: false
       },
 
       modalData: {},

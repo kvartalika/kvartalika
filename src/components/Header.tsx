@@ -8,7 +8,8 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const {role, isAuthenticated, logout} = useAuthStore();
+
+  const {isAuthenticated, logout} = useAuthStore();
 
   const openModal = useUIStore(state => state.openModal);
 
@@ -43,7 +44,7 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-25 transition-all duration-300 ${
         isScrolled || !isHomePage
           ? 'bg-white shadow-lg'
           : 'bg-transparent'
@@ -93,60 +94,38 @@ const Header = () => {
             >
               Квартиры
             </Link>
-            <button
-              onClick={handleAboutClick}
-              className={`font-medium transition-colors hover:text-blue-600 ${
-                isScrolled || !isHomePage
-                  ? 'text-gray-700'
-                  : 'text-white hover:text-blue-200'
-              }`}
-            >
-              О нас
-            </button>
+            {!isAuthenticated
+              ? <button
+                onClick={handleAboutClick}
+                className={`font-medium transition-colors hover:text-blue-600 ${
+                  isScrolled || !isHomePage
+                    ? "text-gray-700"
+                    : "text-white hover:text-blue-200"
+                }`}
+              >
+                О нас
+              </button>
+              :
+              <div
+                className='rounded-md p-2 z-30 bg-rose-600'
+                onClick={() => {
+                  logout();
+                }}
+              >
+                <p className='text-white'>Выйти</p>
+              </div>
+            }
           </nav>
 
           <div className="hidden lg:flex items-center space-x-4">
-            {!isAuthenticated && <button
+            <button
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
               onClick={() => {
                 openModal("bid");
               }}
             >
-              Записаться на осмотр
-            </button>}
-
-            {isAuthenticated && (
-              <div className="flex items-center space-x-4">
-                <span
-                  className={`text-sm ${
-                    isScrolled || !isHomePage ? 'text-gray-700' : 'text-white'
-                  }`}
-                >
-                  {role}
-                </span>
-                {role === 'ADMIN' && (
-                  <Link
-                    to="/admin"
-                    className={`text-sm font-medium transition-colors hover:text-blue-600 ${
-                      isScrolled || !isHomePage ? 'text-gray-700' : 'text-white'
-                    }`}
-                  >
-                    Админ панель
-                  </Link>
-                )}
-                <button
-                  onClick={async () => {
-                    logout();
-                    navigate('/');
-                  }}
-                  className={`text-sm font-medium transition-colors hover:text-blue-600 ${
-                    isScrolled || !isHomePage ? 'text-gray-700' : 'text-white'
-                  }`}
-                >
-                  Выйти
-                </button>
-              </div>
-            )}
+              Найти квартиру
+            </button>
           </div>
 
           <button
@@ -203,17 +182,29 @@ const Header = () => {
               >
                 Квартиры
               </Link>
-              <button
-                onClick={() => {
-                  handleAboutClick();
-                  setIsMobileMenuOpen(false);
-                }}
-                className="text-gray-700 hover:text-blue-600 font-medium px-4 py-2 text-left w-full"
-              >
-                О нас
-              </button>
+              {!isAuthenticated
+                ? <button
+                  onClick={handleAboutClick}
+                  className={`font-medium transition-colors hover:text-blue-600 ${
+                    isScrolled || !isHomePage
+                      ? "text-gray-700"
+                      : "text-white hover:text-blue-200"
+                  }`}
+                >
+                  О нас
+                </button>
+                :
+                <div
+                  className='rounded-md p-2 z-30 bg-rose-600 mx-4'
+                  onClick={() => {
+                    logout();
+                  }}
+                >
+                  <p className='text-white'>Выйти</p>
+                </div>
+              }
               <div className="px-4 py-2 border-t border-gray-200">
-                {!isAuthenticated && <button
+                <button
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full"
                   onClick={() => {
                     openModal("bid");
@@ -221,34 +212,7 @@ const Header = () => {
                   }}
                 >
                   Записаться на осмотр
-                </button>}
-
-                {isAuthenticated && (
-                  <div className="mt-4 space-y-2">
-                    <div className="text-sm text-gray-600 px-4 py-2">
-                      {role}
-                    </div>
-                    {role === 'ADMIN' && (
-                      <Link
-                        to="/admin"
-                        className="block text-gray-700 hover:text-blue-600 font-medium px-4 py-2"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        Админ панель
-                      </Link>
-                    )}
-                    <button
-                      onClick={async () => {
-                        logout();
-                        navigate('/');
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="block text-gray-700 hover:text-blue-600 font-medium px-4 py-2 w-full text-left"
-                    >
-                      Выйти
-                    </button>
-                  </div>
-                )}
+                </button>
               </div>
             </nav>
           </div>

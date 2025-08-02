@@ -7,8 +7,6 @@ const ContentManagementPage = () => {
   const {role, isAuthenticated} = useAuthStore();
   const navigate = useNavigate();
 
-  console.log('ContentPage render', {isAuthenticated, role});
-
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/auth');

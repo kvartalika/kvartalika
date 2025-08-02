@@ -6,6 +6,7 @@ import type {
   RegisterResponse,
 } from './api.types';
 import {AxiosError} from "axios";
+import {useAuthStore} from "../store";
 
 export class AuthService {
   static async adminLogin(credentials: LoginRequest): Promise<AuthResponse> {
@@ -79,7 +80,12 @@ export class AuthService {
   }
 
   static logout() {
-    apiClient.clearTokens();
+    useAuthStore.setState((state) => ({
+      ...state,
+      accessToken: null,
+      role: null,
+      isAuthenticated: false,
+    }))
   }
 }
 

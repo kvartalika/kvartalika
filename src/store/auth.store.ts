@@ -18,6 +18,8 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
 
+  shouldRedirectTo: string | null;
+
   error: string | null;
 }
 
@@ -34,17 +36,19 @@ export interface AuthActions {
 
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  clearRedirect: () => void;
   clearAuth: () => void;
 }
 
 export const useAuthStore = create<AuthState & AuthActions>()(
   persist(
     (set) => ({
-      role: "CONTENT_MANAGER",
+      role: null,
       accessToken: null,
-      isAuthenticated: true,
+      isAuthenticated: false,
       isLoading: false,
       error: null,
+      shouldRedirectTo: null,
 
       loginAsAdmin: async (credentials: LoginRequest) => {
         set({isLoading: true, error: null});
@@ -131,9 +135,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       logout: () => {
         apiLogout();
         set({
-          role: null,
-          accessToken: null,
-          isAuthenticated: false,
+          shouldRedirectTo: '/auth',
           error: null,
         });
       },
@@ -146,12 +148,11 @@ export const useAuthStore = create<AuthState & AuthActions>()(
         isAuthenticated: true
       }),
 
+      clearRedirect: () => set({shouldRedirectTo: null}),
+
       clearAuth: () => {
         apiLogout();
         set({
-          role: null,
-          accessToken: null,
-          isAuthenticated: false,
           error: null,
         });
       },

@@ -61,6 +61,8 @@ const SocialIcon: FC<{ media: SocialMedia }> = ({media}) => {
   useEffect(() => {
     let mounted = true;
     if (!isVK && !isTelegram && !isWhatsApp && media.image) {
+      if (photoStore.error[media.image]) return;
+
       void photoStore.loadPhoto(media.image).then((url) => {
         if (mounted && url) setCustomSrc(url);
       });

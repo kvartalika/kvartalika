@@ -1,5 +1,6 @@
 import type {AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 import axios from 'axios';
+import {useAuthStore} from "../store";
 
 export interface ApiConfig {
   baseURL: string;
@@ -14,7 +15,6 @@ interface QueueItem {
 class ApiClient {
   private readonly axiosInstance: AxiosInstance;
   private readonly refreshInstance: AxiosInstance;
-  private accessToken: string | null = null;
   private isRefreshing = false;
   private refreshQueue: QueueItem[] = [];
 
@@ -40,9 +40,9 @@ class ApiClient {
   private setupInterceptors() {
     this.axiosInstance.interceptors.request.use(
       (config) => {
-        if (this.accessToken) {
+        if (useAuthStore.getState().accessToken) {
           config.headers = config.headers || {};
-          config.headers.Authorization = `Bearer ${this.accessToken}`;
+          config.headers.Authorization = `Bearer ${useAuthStore.getState().accessToken}`;
         }
         return config;
       },
@@ -64,18 +64,18 @@ class ApiClient {
 
           this.isRefreshing = true;
           try {
-            this.accessToken = await this.refreshAccessToken();
+            useAuthStore.setState({accessToken: await this.refreshAccessToken()});
 
             this.refreshQueue.forEach(({resolve}) => resolve());
             this.refreshQueue = [];
 
             originalRequest.headers = originalRequest.headers || {};
 
-            originalRequest.headers.Authorization = `Bearer ${this.accessToken}`;
+            originalRequest.headers.Authorization = `Bearer ${useAuthStore.getState().accessToken}`;
             return this.axiosInstance(originalRequest);
 
           } catch (refreshError) {
-            this.clearTokens();
+            useAuthStore.getState().logout();
             this.refreshQueue.forEach(({reject}) => reject(refreshError));
             this.refreshQueue = [];
             return Promise.reject(refreshError);
@@ -90,7 +90,6 @@ class ApiClient {
   }
 
   private async refreshAccessToken(): Promise<string> {
-    // POST без тела, сервер возьмёт refresh-token из HttpOnly cookie
     const response = await this.refreshInstance.post<{
       accessToken: string
     }>('/auth/refresh');
@@ -101,13 +100,8 @@ class ApiClient {
     return newToken;
   }
 
-  /** Устанавливаем access-token после логина */
   setAccessToken(token: string) {
-    this.accessToken = token;
-  }
-
-  clearTokens() {
-    this.accessToken = null;
+    useAuthStore.setState({accessToken: token});
   }
 
   async get<T>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {

@@ -16,19 +16,12 @@ const Footer = () => {
             <p className="text-gray-300 mb-6 max-w-md">{pageInfo.footerDescription}</p>
             <div className="flex space-x-4">
               {socialMediaList && socialMediaList.length > 0
-                ? socialMediaList.map(media => (
+                && socialMediaList.map(media => (
                   <SocialIcon
                     key={media.id || media.link}
                     media={media}
                   />
-                ))
-                : (
-                  <>
-                    <SocialIcon media={{link: 't.me/kvartalika'}} />
-                    <SocialIcon media={{link: 'vk.com/kvartalika'}} />
-                    <SocialIcon media={{link: 'wa.me/74951234567'}} />
-                  </>
-                )}
+                ))}
             </div>
           </div>
 

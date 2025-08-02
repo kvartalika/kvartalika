@@ -2,11 +2,13 @@ import {Link} from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 import ApartmentCard from '../components/ApartmentCard';
 import BackgroundPattern from "../components/BackgroundPattern.tsx";
-import HomePageManager from '../components/HomePageManager';
+import HomePageManager from '../components/content/HomePageManager.tsx';
 
 import type {HomePageFlats} from "../services";
 import PageLoader from "../components/PageLoader.tsx";
 import {useAuthStore, useFlatsStore, useUIStore} from "../store";
+import PageInfoEditor from "../components/content/PageInfoEditor.tsx";
+import SocialMediaEditor from "../components/content/SocialMediaEditor.tsx";
 
 const HomePage = () => {
   const role = useAuthStore(state => state.role);
@@ -115,18 +117,32 @@ const HomePage = () => {
 
         {isAuthenticated && role && role !== 'CLIENT' && (
           <>
-            <Link
-              to={`/content`}
-              className="fixed bottom-4 right-4 bg-black text-white px-4 py-2 rounded-lg shadow z-50"
-            >
-              Управление контентом
-            </Link>
-            <div className="fixed left-4 bottom-4 z-50 bg-black rounded-lg">
-              <button
-                onClick={() => openModal('manager')}
-                className="backdrop-blur-sm text-white px-4 py-2 font-medium hover:bg-opacity-30 transition-all"
+            <div className='fixed right-4 bottom-4 flex flex-col gap-2 z-50 text-white '>
+              <Link
+                to={`/admin`}
+                className="bg-black  px-4 py-2 rounded-lg shadow"
               >
-                ✏️ Редактировать главную
+                Админ Панель
+              </Link>
+              <Link
+                to={`/content`}
+                className="bg-black px-4 py-2 rounded-lg shadow"
+              >
+                Управление контентом
+              </Link>
+            </div>
+            <div className='fixed left-4 bottom-4 flex flex-col gap-2 z-50 text-white '>
+              <button
+                onClick={() => openModal('mainPage')}
+                className="px-4 py-2 shadow bg-black rounded-xl  "
+              >
+                Редактировать главную
+              </button>
+              <button
+                onClick={() => openModal('social')}
+                className="px-4 py-2 shadow bg-black rounded-xl"
+              >
+                Редактировать медиа
               </button>
             </div>
           </>
@@ -234,9 +250,16 @@ const HomePage = () => {
         </div>
       </section>
 
-      {modals.manager && (
+      {modals.mainPage && (
         <HomePageManager
-          onCancel={() => closeModal('manager')}
+          children={<PageInfoEditor onSaved={() => closeModal('mainPage')} />}
+          onCancel={() => closeModal('mainPage')}
+        />
+      )}
+      {modals.social && (
+        <HomePageManager
+          children={<SocialMediaEditor onSaved={() => closeModal('social')} />}
+          onCancel={() => closeModal('social')}
         />
       )}
     </div>

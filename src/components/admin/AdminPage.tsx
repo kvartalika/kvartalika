@@ -16,6 +16,7 @@ import UserForm from './UserForm.tsx';
 import FileExplorer from '../file-explorer/FileExplorer.tsx';
 import DirectoryBrowser from '../file-explorer/DirectoryBrowser.tsx';
 import {useFileExplorer} from '../file-explorer/hooks/useFileExplorer.ts';
+import UserList from "./UserList.tsx";
 
 const AdminPage: FC = () => {
   const {role, isAuthenticated, logout} = useAuthStore();
@@ -63,7 +64,7 @@ const AdminPage: FC = () => {
     email: '',
     phone: '',
     password: '',
-    role: 'CONTENT_MANAGER',
+    role: "CONTENT_MANAGER",
     telegramId: '',
   }));
   const [editingType, setEditingType] = useState<'manager' | 'admin'>('manager');
@@ -96,7 +97,7 @@ const AdminPage: FC = () => {
       email: '',
       phone: '',
       password: '',
-      role: 'CONTENT_MANAGER',
+      role: editingType === "admin" ? "ADMIN" : "CONTENT_MANAGER",
       telegramId: '',
     });
     setIsEditMode(false);
@@ -154,6 +155,7 @@ const AdminPage: FC = () => {
   };
 
   const startEdit = (item: UserDto, type: 'manager' | 'admin') => {
+    setEditingType(type);
     setFormData({
       name: item.name || '',
       surname: item.surname || '',
@@ -164,7 +166,6 @@ const AdminPage: FC = () => {
       role: type === 'manager' ? 'CONTENT_MANAGER' : 'ADMIN',
       telegramId: item.telegramId || '',
     });
-    setEditingType(type);
     setIsEditMode(true);
   };
 
@@ -256,7 +257,6 @@ const AdminPage: FC = () => {
               </div>
             )}
 
-            {/* Admins */}
             {activeTab === 'admins' && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Panel title={isEditMode && editingType === 'admin' ? 'Edit Admin' : 'Create Admin'}>
@@ -279,7 +279,6 @@ const AdminPage: FC = () => {
               </div>
             )}
 
-            {/* Files */}
             {activeTab === 'files' && (
               <Panel title="File Management">
                 <div className="flex flex-col gap-4">
@@ -332,7 +331,6 @@ const AdminPage: FC = () => {
               </Panel>
             )}
 
-            {/* Directories */}
             {activeTab === 'directories' && (
               <Panel title="Directory Management">
                 <DirectoryBrowser
@@ -353,43 +351,5 @@ const AdminPage: FC = () => {
     </div>
   );
 };
-
-// Inline UserList (can be moved to its own file)
-const UserList: FC<{
-  items: UserDto[];
-  onEdit: (u: UserDto) => void;
-  onDelete: (u: UserDto) => void;
-}> = ({items, onEdit, onDelete}) => (
-  <div className="space-y-3">
-    {items.map((item) => (
-      <div
-        key={item.email}
-        className="flex justify-between items-center p-3 border rounded"
-      >
-        <div>
-          <div className="font-medium">{item.email}</div>
-          <div className="text-sm text-gray-500">{item.role}</div>
-        </div>
-        <div className="flex space-x-2">
-          <button
-            onClick={() => onEdit(item)}
-            className="text-blue-600 hover:text-blue-800 text-sm"
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => onDelete(item)}
-            className="text-red-600 hover:text-red-800 text-sm"
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-    ))}
-    {items.length === 0 && (
-      <div className="text-gray-500 text-center py-4">No records found</div>
-    )}
-  </div>
-);
 
 export default AdminPage;

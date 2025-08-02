@@ -1,4 +1,9 @@
-import {BrowserRouter, Route, Routes, useLocation} from 'react-router-dom';
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  useLocation,
+} from 'react-router-dom';
 import {useEffect} from 'react';
 
 import Header from './components/Header';
@@ -19,6 +24,7 @@ import AdminPage from './components/admin/AdminPage.tsx';
 import {useAuthStore, useFlatsStore, useUIStore} from "./store";
 import ContentManagementPage
   from "./components/content/ContentManagementPage.tsx";
+import RouterListener from "./components/RouterListener.tsx";
 
 function ScrollToTop() {
   const {pathname} = useLocation();
@@ -64,7 +70,7 @@ const InnerApp = () => {
   }, [loadAllData]);
 
   const shouldShowLoader =
-    location.pathname !== '/auth' &&
+    (!['/auth', '/admin', '/content'].includes(location.pathname)) &&
     (
       loading.global ||
       (
@@ -146,6 +152,7 @@ const InnerApp = () => {
         <Footer />
         {modals.bid && <BookingModal />}
       </div>
+      <RouterListener />
     </>
   );
 };

@@ -24,14 +24,19 @@ const ApartmentCard = ({
     navigate(`/apartment/${apartment.flat.id}`);
   };
 
+  let img = safeImage(apartment?.imagesResolved, 'flat');
+  img = Array.isArray(img) ? img[0] : img;
+
   return (
     <div
       className="card card-hover cursor-pointer hover:shadow-lg transition-shadow duration-200"
-      onClick={handleCardClick}
     >
-      <div className="relative h-48 overflow-hidden">
+      <div
+        className="relative h-48 overflow-hidden"
+        onClick={handleCardClick}
+      >
         <img
-          src={safeImage(apartment?.imagesResolved, 'flat')[0]}
+          src={img}
           alt={`${apartment.flat.numberOfRooms ?? 1}-комнатная квартира в ${homeName}`}
           className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
         />

@@ -62,7 +62,11 @@ const ApartmentPage = () => {
 
   const pricePerSqm = Math.round((selectedFlat.flat.price || 0) / (selectedFlat.flat?.area || 1));
 
-  const images = safeImage(selectedFlat.imagesResolved, 'flat')
+  let images = safeImage(selectedFlat.imagesResolved, 'flat')
+  images = Array.isArray(images) ? images : [images]
+
+  let layoutImg = safeImage(selectedFlat.layoutResolved, 'layout');
+  layoutImg = Array.isArray(layoutImg) ? layoutImg[0] : layoutImg;
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % images?.length);
@@ -191,7 +195,7 @@ const ApartmentPage = () => {
                 </h2>
                 <div className="flex justify-center">
                   <img
-                    src={[...safeImage(selectedFlat.layoutResolved, 'layout')][0]}
+                    src={layoutImg}
                     alt="Планировка квартиры"
                     className="max-w-full h-auto rounded-lg border border-gray-200"
                   />
