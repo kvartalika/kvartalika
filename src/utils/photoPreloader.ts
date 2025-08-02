@@ -30,6 +30,8 @@ export async function preloadPhotos<
 
     if (mode === 'array' && Array.isArray(val)) {
       paths.push(...val.filter((v): v is string => typeof v === 'string'));
+    } else if (mode === 'single' && typeof val === 'string') {
+      paths.push(val);
     }
   }
 
@@ -37,17 +39,17 @@ export async function preloadPhotos<
   const loaded = await photoStore.loadPhotos(uniquePaths);
 
   const result: any = {...item};
-
   for (const key in fieldMap) {
     const mode = fieldMap[key];
     if (!mode) continue;
     const val = item[key as unknown as keyof T];
     const resolvedKey = `${key}Resolved` as keyof ResolvedPhotos<T, M>;
-
     if (mode === 'array' && Array.isArray(val)) {
       result[resolvedKey] = val
         .map((p: string) => loaded[p])
         .filter((u: string | null): u is string => Boolean(u));
+    } else if (mode === 'single' && typeof val === 'string') {
+      result[resolvedKey] = loaded[val] ?? null;
     }
   }
 

@@ -219,7 +219,7 @@ export const useFlatsStore = create<flatsState & flatsActions>()(persist((set, g
             const flats = await getFlatsByCategory(category.id);
             const published = flats.filter(publishChecker);
             const resolved = await Promise.all(published.map(usePhotoStore.getState().processFlat));
-            return { category, flats: resolved };
+            return {category, flats: resolved};
           })
         );
 
@@ -241,23 +241,23 @@ export const useFlatsStore = create<flatsState & flatsActions>()(persist((set, g
     },
 
     getFlatById: async (id: number) => {
-      const {flats} = get();
-
-      const flat = flats.find(apt => apt.flat.id === id);
-      if (flat) return flat;
-
       await get().loadFlats();
-      return get().flats.find(apt => apt.flat.id === id) || null;
+      const loadedFlat = get().flats.find(apt => apt.flat.id === id);
+      if (loadedFlat) {
+        set({selectedFlat: loadedFlat});
+      }
+
+      return loadedFlat || null;
     },
 
     getHomeById: async (id: number) => {
-      const {homes} = get();
-
-      const home = homes.find(h => h.id === id);
-      if (home) return home;
-
       await get().loadHomes();
-      return get().homes.find(h => h.id === id) || null;
+      const loadedHome = get().homes.find(h => h.id === id);
+      if (loadedHome) {
+        set({selectedHome: loadedHome});
+      }
+
+      return loadedHome || null;
     },
 
     loadAllData: async (force = false) => {
@@ -424,9 +424,6 @@ export const useFlatsStore = create<flatsState & flatsActions>()(persist((set, g
       currentPage: state.currentPage,
       limit: state.limit,
       hasSearched: state.hasSearched,
-      selectedFlat: state.selectedFlat ? {flat: {id: state.selectedFlat.flat.id}} : null,
-      selectedHome: state.selectedHome ? {id: state.selectedHome.id} : null,
-      selectedCategory: state.selectedCategory ? {id: state.selectedCategory.id} : null,
     }),
   }
 ));
