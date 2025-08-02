@@ -4,7 +4,7 @@ import {
   type Category,
   getCategories,
   getFlats,
-  getFlatsByCategory, getFlatsByHome,
+  getFlatsByCategory,
   getHomes,
   type HomePageFlats, type ResolvedFlat, type ResolvedHome,
   searchFlats,
@@ -274,9 +274,12 @@ export const useFlatsStore = create<flatsState & flatsActions>()(persist((set, g
 
     loadFlatsByHome: async (homeId: number) => {
       try {
-        const flats = await getFlatsByHome(homeId);
-        const published = flats.filter(publishChecker);
+        await get().loadFlats(true);
+        const {flats} = get();
+
+        const published = flats.filter((item) => publishChecker(item) && item.flat.homeId === homeId);
         const resolved = await Promise.all(published.map(usePhotoStore.getState().processFlat));
+
         set({flatsByHome: resolved});
 
         return flats;

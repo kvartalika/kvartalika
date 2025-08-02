@@ -101,12 +101,6 @@ const ComplexesPage = () => {
               let images = safeImage(complex.imagesResolved, 'home');
               images = Array.isArray(images) ? images : [images];
 
-              let historyImages = safeImage(complex.historyImagesResolved, 'history');
-              historyImages = Array.isArray(historyImages) ? historyImages : [historyImages];
-
-              let yardsImages = safeImage(complex.yardsImagesResolved, 'history');
-              yardsImages = Array.isArray(yardsImages) ? yardsImages : [yardsImages];
-
               return (
                 <Link
                   key={complex.id}

@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Link, useParams} from 'react-router-dom';
 import ApartmentCard from '../components/ApartmentCard';
 
@@ -22,11 +22,7 @@ const ComplexPage = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(0);
 
-  const [aptSlideIndex, setAptSlideIndex] = useState(0);
-  const APARTMENTS_PER_PAGE = 3;
-
   const [yardSlideIndex, setYardSlideIndex] = useState(0);
-  const YARDS_PER_PAGE = 3;
 
   useEffect(() => {
     const load = async () => {
@@ -51,10 +47,6 @@ const ComplexPage = () => {
     if (!id) return;
     void loadFlatsByHome(id);
   }, [loadFlatsByHome, selectedHome]);
-
-  const flatTypes = useMemo(() => {
-    return Array.from(new Set(flatsByHome.map(apt => `${apt.flat.numberOfRooms}-комн.`))).join(', ');
-  }, [flatsByHome]);
 
   if (!selectedHome) {
     return (
@@ -205,72 +197,27 @@ const ComplexPage = () => {
 
       <section className="py-12">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center mb-6 gap-2">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">Доступные квартиры</h2>
-              <div className="text-sm text-gray-600 mt-1">
-                {flatsByHome.length > 0
-                  ? `${flatsByHome.length} ${flatsByHome.length === 1 ? 'квартира' : 'квартиры'} · ${flatTypes}`
-                  : 'Пока нет доступных квартир'}
-              </div>
-            </div>
-            {flatsByHome.length > APARTMENTS_PER_PAGE && (
-              <div className="flex gap-2 mt-2 md:mt-0">
-                <button
-                  aria-label="Предыдущие квартиры"
-                  onClick={() => setAptSlideIndex(i => Math.max(0, i - 1))}
-                  disabled={aptSlideIndex === 0}
-                  className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 disabled:opacity-40"
-                >
-                  ‹
-                </button>
-                <button
-                  aria-label="Следующие квартиры"
-                  onClick={() =>
-                    setAptSlideIndex(i =>
-                      Math.min(
-                        Math.ceil(Math.min(6, flatsByHome.length) / APARTMENTS_PER_PAGE) - 1,
-                        i + 1
-                      )
-                    )
-                  }
-                  disabled={
-                    aptSlideIndex >=
-                    Math.ceil(Math.min(6, flatsByHome.length) / APARTMENTS_PER_PAGE) - 1
-                  }
-                  className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 disabled:opacity-40"
-                >
-                  ›
-                </button>
-              </div>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">Доступные квартиры</h2>
+            {flatsByHome.length > 4 && (
+              <Link
+                to={`/apartments?homeId=${selectedHome.id}`}
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              >
+                Показать все квартиры
+              </Link>
             )}
           </div>
-
           {flatsByHome.length > 0 ? (
-            <div className="relative">
-              <div className="overflow-hidden">
-                <div
-                  className="flex gap-6 transition-transform"
-                  style={{
-                    transform: `translateX(-${aptSlideIndex * 100}%)`,
-                    width: `${Math.ceil(Math.min(6, flatsByHome.length) / APARTMENTS_PER_PAGE) * 100}%`,
-                  }}
-                >
-                  {flatsByHome.slice(0, 6).map((apartment) => (
-                    <div
-                      key={apartment.flat.id}
-                      className="flex-shrink-0"
-                      style={{width: `${100 / Math.ceil(Math.min(6, flatsByHome.length) / APARTMENTS_PER_PAGE) / APARTMENTS_PER_PAGE * 100}%`}}
-                    >
-                      <ApartmentCard
-                        homeName={selectedHome.name ?? `ЖК №${apartment.flat.homeId}`}
-                        apartment={apartment}
-                        onBookingClick={() => openModal('bid')}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {flatsByHome.slice(0, 4).map(apartment => (
+                <ApartmentCard
+                  key={apartment.flat.id}
+                  homeName={selectedHome.name ?? `ЖК №${apartment.flat.homeId}`}
+                  apartment={apartment}
+                  onBookingClick={() => openModal('bid')}
+                />
+              ))}
             </div>
           ) : (
             <div className="text-center py-12">
@@ -290,9 +237,7 @@ const ComplexPage = () => {
                 </svg>
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Квартиры временно недоступны</h3>
-              <p className="text-gray-600 mb-6">
-                В данный момент в этом комплексе нет доступных квартир. Оставьте заявку, и мы уведомим вас о новых предложениях.
-              </p>
+              <p className="text-gray-600 mb-6">В данный момент в этом комплексе нет доступных квартир. Оставьте заявку, и мы уведомим вас о новых предложениях.</p>
               <button
                 onClick={() => openModal('bid')}
                 className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
@@ -489,59 +434,71 @@ const ComplexPage = () => {
         <div className="mb-16">
           <h3 className="text-2xl font-semibold text-gray-900 mb-6 text-center">Фотографии дворов</h3>
 
-          <div className="relative">
-            <div className="flex justify-between items-center mb-4">
-              {yardsImages.length > YARDS_PER_PAGE && (
-                <div className="flex gap-2">
+          <div className="relative w-full max-w-4xl mx-auto">
+
+            <div className="relative overflow-hidden rounded-xl bg-gray-100">
+              {yardsImages.length > 0 ? (
+                <>
+                  <img
+                    src={yardsImages[yardSlideIndex]}
+                    alt={`Двор ${yardSlideIndex + 1}`}
+                    className="w-full h-[400px] object-cover"
+                  />
+
                   <button
-                    aria-label="Назад по дворам"
-                    onClick={() => setYardSlideIndex(i => Math.max(0, i - 1))}
-                    disabled={yardSlideIndex === 0}
-                    className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 disabled:opacity-40"
-                  >
-                    ‹
-                  </button>
-                  <button
-                    aria-label="Вперед по дворам"
+                    aria-label="Предыдущее фото двора"
                     onClick={() =>
-                      setYardSlideIndex(i =>
-                        Math.min(
-                          Math.ceil(yardsImages.length / YARDS_PER_PAGE) - 1,
-                          i + 1
-                        )
-                      )
+                      setYardSlideIndex(i => (i - 1 + yardsImages.length) % yardsImages.length)
                     }
-                    disabled={yardSlideIndex >= Math.ceil(yardsImages.length / YARDS_PER_PAGE) - 1}
-                    className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 disabled:opacity-40"
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white shadow-lg rounded-full p-4 flex items-center justify-center"
+                    style={{fontSize: 24, lineHeight: 0}}
                   >
-                    ›
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 19l-7-7 7-7"
+                      />
+                    </svg>
                   </button>
+                  <button
+                    aria-label="Следующее фото двора"
+                    onClick={() => setYardSlideIndex(i => (i + 1) % yardsImages.length)}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white shadow-lg rounded-full p-4 flex items-center justify-center"
+                    style={{fontSize: 24, lineHeight: 0}}
+                  >
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </button>
+
+                  {yardsImages.length > 1 && (
+                    <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-60 text-white px-3 py-1 rounded-full text-sm">
+                      {yardSlideIndex + 1} / {yardsImages.length}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="h-[400px] flex items-center justify-center text-gray-500">
+                  Фотографии дворов пока отсутствуют.
                 </div>
               )}
-            </div>
-
-            <div className="overflow-hidden">
-              <div
-                className="flex gap-6 transition-transform items-center justify-center"
-                style={{
-                  transform: `translateX(-${yardSlideIndex * (100 / Math.ceil(yardsImages.length / YARDS_PER_PAGE))}%)`,
-                  width: `${Math.ceil(yardsImages.length / YARDS_PER_PAGE) * 100}%`,
-                }}
-              >
-                {yardsImages.map((img, i) => (
-                  <div
-                    key={i}
-                    className="flex-shrink-0 rounded-xl overflow-hidden max-w-[60vw]"
-                    style={{width: `${100 / Math.ceil(yardsImages.length / YARDS_PER_PAGE)}%`}}
-                  >
-                    <img
-                      src={img}
-                      alt={`Двор ${i + 1}`}
-                      className="object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </div>
