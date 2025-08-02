@@ -63,6 +63,7 @@ export const usePhotoStore = create<PhotoState>()(
         images: 'array',
         historyImages: 'array',
         yardsImages: 'array',
+        model3D: 'single',
       });
     },
 

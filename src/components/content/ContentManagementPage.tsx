@@ -20,7 +20,7 @@ const ContentManagementPage = () => {
   }
 
   return (
-    <div className="p-8">
+    <div className="mt-16 p-8 min-h-screen">
       <h1 className="text-2xl font-bold mb-4">Управление контентом</h1>
       <ContentManagementSection />
     </div>

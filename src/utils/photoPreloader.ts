@@ -9,7 +9,7 @@ type ResolvedPhotos<T, M extends PhotoFieldMap<T>> = {
     ? `${string & K}Resolved`
     : M[K] extends 'single'
       ? `${string & K}Resolved`
-      : never]: M[K] extends 'array' ? string[] : M[K] extends 'single' ? string | null : never;
+      : never]: M[K] extends 'array' ? string[] : M[K] extends 'single' ? string | undefined : never;
 };
 
 export async function preloadPhotos<
@@ -47,9 +47,9 @@ export async function preloadPhotos<
     if (mode === 'array' && Array.isArray(val)) {
       result[resolvedKey] = val
         .map((p: string) => loaded[p])
-        .filter((u: string | null): u is string => Boolean(u));
+        .filter((u: string | null | undefined): u is string => Boolean(u));
     } else if (mode === 'single' && typeof val === 'string') {
-      result[resolvedKey] = loaded[val] ?? null;
+      result[resolvedKey] = loaded[val] ?? undefined;
     }
   }
 

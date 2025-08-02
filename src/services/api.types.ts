@@ -257,6 +257,7 @@ export interface ResolvedHome extends HomeRequest {
   imagesResolved?: string[];
   historyImagesResolved?: string[];
   yardsImagesResolved?: string[];
+  model3DResolved?: string;
 }
 
 export interface AuthResponse {
