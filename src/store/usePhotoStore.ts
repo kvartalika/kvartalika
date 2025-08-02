@@ -44,16 +44,18 @@ export const usePhotoStore = create<PhotoState>()(
     maxCacheSize: DEFAULT_MAX_CACHE,
     ttl: DEFAULT_TTL,
 
-    processFlat: async (flat: FlatWithCategoryRequest) => {
-      const flatWithResolved = await preloadPhotos(flat.flat, {
+    processFlat: async (flat: FlatWithCategoryRequest): Promise<ResolvedFlat> => {
+      const flatWithResolvedData = await preloadPhotos(flat.flat, {
         images: 'array',
         layout: 'single',
       });
 
       return {
-        flat: flatWithResolved,
-        categories: flat.categories
-      };
+        flat: flat.flat,
+        categories: flat.categories,
+        imagesResolved: flatWithResolvedData.imagesResolved,
+        layoutResolved: flatWithResolvedData.layoutResolved
+      } as ResolvedFlat;
     },
 
     processHome: async (home: HomeRequest) => {
