@@ -5,6 +5,7 @@ import ApartmentCard from '../components/ApartmentCard';
 import {useFlatsStore, useUIStore} from "../store";
 import {safeImage} from "../utils/safeImage.ts";
 import Map from '../components/Map.tsx';
+import { Scene3D } from '../components/Scene3D.tsx';
 
 const ComplexPage = () => {
   const {homeId} = useParams<{ homeId: string }>();
@@ -351,6 +352,16 @@ const ComplexPage = () => {
           </div>
         </div>
       </section>
+      {selectedHome.model3DResolved && 
+        <section className="py-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">3D-панорама</h2>
+          <div className="lg:w-[100%] flex flex-col items-center justify-center">
+            <Scene3D
+              model={selectedHome.model3DResolved}
+            />
+          </div>
+        </section>
+      }
 
       <section className="py-12">
         <div className="container mx-auto px-4">
