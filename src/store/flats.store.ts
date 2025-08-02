@@ -262,6 +262,7 @@ export const useFlatsStore = create<flatsState & flatsActions>()(persist((set, g
 
     loadAllData: async (force = false) => {
       const {loadFlats, loadHomes, loadCategories} = get();
+
       await Promise.allSettled([
         loadFlats(force),
         loadHomes(force),

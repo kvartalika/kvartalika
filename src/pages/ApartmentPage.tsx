@@ -292,18 +292,19 @@ const ApartmentPage = () => {
               </div>
             </div>
 
-            <div className="mt-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Расположение квартиры</h3>
-              {selectedFlat.flat.latitude && selectedFlat.flat.longitude && selectedFlat.flat.address &&
-              <div className="bg-gray-100 rounded-xl p-8 text-center mb-8">
-                  <Map 
+
+            {selectedFlat.flat.latitude && selectedFlat.flat.longitude && selectedFlat.flat.address &&
+              <div className="mt-8">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">Расположение квартиры</h3>
+                <div className="bg-gray-100 rounded-xl p-8 text-center mb-8">
+                  <Map
                     latitude={selectedFlat.flat.latitude}
                     longitude={selectedFlat.flat.longitude}
                     description={selectedFlat.flat.address}
                   />
                 </div>
-                }
-            </div>
+              </div>
+            }
           </div>
 
           <div className="lg:col-span-1">

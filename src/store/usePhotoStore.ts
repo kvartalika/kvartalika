@@ -54,8 +54,8 @@ export const usePhotoStore = create<PhotoState>()(
         flat: flat.flat,
         categories: flat.categories,
         imagesResolved: flatWithResolvedData.imagesResolved,
-        layoutResolved: flatWithResolvedData.layoutResolved
-      } as ResolvedFlat;
+        layoutResolved: flatWithResolvedData.layoutResolved ?? undefined
+      };
     },
 
     processHome: async (home: HomeRequest) => {

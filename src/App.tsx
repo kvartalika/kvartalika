@@ -57,17 +57,14 @@ const InnerApp = () => {
         await Promise.all([loadPageInfo(), loadSocialMediaList()]);
       } catch (error) {
         console.error('Error loading data:', error);
-      } finally {
-        setTimeout(() => setLoading('global', false), 100);
       }
     };
 
-    loadData();
-  }, [loadPageInfo, loadSocialMediaList, setLoading]);
-
-  useEffect(() => {
-    void loadAllData();
-  }, [loadAllData]);
+    loadData().then(() => {
+      void loadAllData();
+      setLoading('global', false);
+    })
+  }, [loadAllData, loadPageInfo, loadSocialMediaList, setLoading]);
 
   const shouldShowLoader =
     (!['/auth', '/admin', '/content'].includes(location.pathname)) &&

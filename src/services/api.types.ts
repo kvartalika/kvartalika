@@ -105,6 +105,7 @@ export interface HomeRequest {
   hospitalsNearby?: boolean;
   hasYards?: boolean;
   yardsImages?: string[];
+  model3D?: string;
   published?: boolean;
 }
 

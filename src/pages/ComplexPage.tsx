@@ -372,16 +372,18 @@ const ComplexPage = () => {
       <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Расположение ЖК</h2>
             {selectedHome.latitude && selectedHome.longitude && selectedHome.name &&
-              <div className="bg-gray-100 rounded-xl p-8 text-center mb-8">
-                  <Map 
+              <>
+                <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Расположение ЖК</h2>
+                <div className="bg-gray-100 rounded-xl p-8 text-center mb-8">
+                  <Map
                     latitude={selectedHome.latitude}
                     longitude={selectedHome.longitude}
                     description={selectedHome.name}
                   />
-              </div>
-              }
+                </div>
+              </>
+            }
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Инфраструктура района</h3>
@@ -402,7 +404,8 @@ const ComplexPage = () => {
                         />
                       </svg>
                       Школы и детские сады поблизости
-                    </li>}
+                    </li>
+                  }
                   {selectedHome.storesNearby &&
                     <li className="flex items-center">
                       <svg
@@ -461,7 +464,8 @@ const ComplexPage = () => {
         </div>
       </section>
     </div>
-  );
+  )
+    ;
 };
 
 export default ComplexPage;
