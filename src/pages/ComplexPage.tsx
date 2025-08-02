@@ -4,6 +4,7 @@ import ApartmentCard from '../components/ApartmentCard';
 
 import {useFlatsStore, useUIStore} from "../store";
 import {safeImage} from "../utils/safeImage.ts";
+import Map from '../components/Map.tsx';
 
 const ComplexPage = () => {
   const {homeId} = useParams<{ homeId: string }>();
@@ -371,33 +372,16 @@ const ComplexPage = () => {
       <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Расположение и транспорт</h2>
-            <div className="bg-gray-100 rounded-xl p-8 text-center mb-8">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+            <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Расположение ЖК</h2>
+            {selectedHome.latitude && selectedHome.longitude && selectedHome.name &&
+              <div className="bg-gray-100 rounded-xl p-8 text-center mb-8">
+                  <Map 
+                    latitude={selectedHome.latitude}
+                    longitude={selectedHome.longitude}
+                    description={selectedHome.name}
                   />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Интерактивная карта</h3>
-              <p className="text-gray-600 mb-4">Здесь будет отображена карта с расположением жилого комплекса</p>
-              <p className="text-sm text-gray-500">📍 {selectedHome.address ?? "Требуется уточнить адрес"}</p>
-            </div>
+              }
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Инфраструктура района</h3>
