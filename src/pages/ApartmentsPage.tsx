@@ -1,4 +1,4 @@
-import {useEffect, useMemo} from 'react';
+import {useEffect, useMemo, useCallback} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import ApartmentCard from '../components/ApartmentCard';
 import SearchBar from '../components/SearchBar';
@@ -99,7 +99,7 @@ const ApartmentsPage = () => {
     return searchResults.slice(start, start + limit);
   }, [searchResults, currentPage, limit]);
 
-  const getPageTitle = () => {
+  const getPageTitle = useCallback(() => {
     const curCat = currentSearchParams.categoriesId;
     if (curCat && curCat.length === 1) {
       const cat = categories?.find((c) => c.id === curCat[0])
@@ -115,9 +115,9 @@ const ApartmentsPage = () => {
         return `Квартиры в комплексе ${curHome.name}`;
     }
     return 'Квартиры на любой вкус';
-  };
+  }, [currentSearchParams, categories, homes]);
 
-  const getPageDescription = () => {
+  const getPageDescription = useCallback(() => {
     if (currentSearchParams.categoriesId && currentSearchParams.categoriesId.length === 1) {
       const curCat = currentSearchParams.categoriesId;
       const cat = categories?.find((c) => c.id === curCat[0])
@@ -131,15 +131,27 @@ const ApartmentsPage = () => {
       return `Большой выбор квартир в выбранном комплексе`;
     }
     return 'Большой выбор квартир в лучших жилых комплексах города';
-  };
+  }, [currentSearchParams, categories]);
 
-  const handlePageChange = (newPage: number) => {
+  const handlePageChange = useCallback((newPage: number) => {
     setPage(newPage);
-  };
+  }, [setPage]);
 
-  const handleLimitChange = (newLimit: number) => {
+  const handleLimitChange = useCallback((newLimit: number) => {
     setLimit(newLimit);
-  };
+  }, [setLimit]);
+
+  const handleBookingClick = useCallback(() => {
+    openModal('bid');
+  }, [openModal]);
+
+  const handleClearSearch = useCallback(() => {
+    clearSearch();
+    navigate('/apartments');
+  }, [clearSearch, navigate]);
+
+  const pageTitle = useMemo(() => getPageTitle(), [getPageTitle]);
+  const pageDescription = useMemo(() => getPageDescription(), [getPageDescription]);
 
   return (
     <div className="min-h-screen pt-16">
@@ -147,8 +159,8 @@ const ApartmentsPage = () => {
       <section className="bg-gradient-to-r from-blue-600 to-blue-800 py-16">
         <div className="container mx-auto px-4">
           <div className="text-center text-white mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">{getPageTitle()}</h1>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">{getPageDescription()}</p>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{pageTitle}</h1>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto">{pageDescription}</p>
           </div>
 
           <div className="max-w-4xl mx-auto">
@@ -233,10 +245,7 @@ const ApartmentsPage = () => {
             <p className="text-gray-600 mb-6">
               Попробуйте изменить параметры поиска или{' '}
               <button
-                onClick={() => {
-                  clearSearch();
-                  navigate('/apartments');
-                }}
+                onClick={handleClearSearch}
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
                 посмотреть все квартиры
@@ -252,7 +261,7 @@ const ApartmentsPage = () => {
                 homeName={homes.find(home => home.id === apartment.flat.homeId)?.name ?? '?'}
                 key={apartment.flat.id}
                 apartment={apartment}
-                onBookingClick={() => openModal('bid')}
+                onBookingClick={handleBookingClick}
               />
             ))}
           </div>
@@ -289,7 +298,7 @@ const ApartmentsPage = () => {
               Наши специалисты помогут подобрать идеальный вариант под ваши требования и бюджет
             </p>
             <button
-              onClick={() => openModal('bid')}
+              onClick={handleBookingClick}
               className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-medium transition-colors"
             >
               Получить персональную подборку

@@ -1,5 +1,4 @@
 import {create} from 'zustand';
-import {persist} from 'zustand/middleware';
 import {
   type Category,
   getCategories,
@@ -94,7 +93,7 @@ const defaultFilters: SearchRequest = {
 
 const CACHE_DURATION = 5 * 60 * 1000;
 
-export const useFlatsStore = create<flatsState & flatsActions>()(persist((set, get) => ({
+export const useFlatsStore = create<flatsState & flatsActions>()((set, get) => ({
     flats: [],
     homes: [],
     categories: [],

@@ -110,6 +110,22 @@ const SearchBar = () => {
     Boolean(currentSearchParams.sortBy) ||
     Boolean(currentSearchParams.sortOrder);
 
+  const getActiveFiltersCount = () => {
+    let count = 0;
+    if (currentSearchParams.query) count++;
+    if (currentSearchParams.minPrice !== undefined) count++;
+    if (currentSearchParams.maxPrice !== undefined) count++;
+    if (currentSearchParams.rooms !== undefined) count++;
+    if (currentSearchParams.bathrooms !== undefined) count++;
+    if (currentSearchParams.isDecorated !== undefined) count++;
+    if (currentSearchParams.homeId !== undefined) count++;
+    if (currentSearchParams.hasParks !== undefined) count++;
+    if (currentSearchParams.hasSchools !== undefined) count++;
+    if (currentSearchParams.hasShops !== undefined) count++;
+    if (currentSearchParams.categoriesId && currentSearchParams.categoriesId.length > 0) count++;
+    return count;
+  };
+
   return (
     <div className="w-full">
       <form
@@ -152,6 +168,11 @@ const SearchBar = () => {
               />
             </svg>
             Фильтры
+            {getActiveFiltersCount() > 0 && (
+              <span className="bg-white text-blue-600 text-xs font-bold px-2 py-1 rounded-full">
+                {getActiveFiltersCount()}
+              </span>
+            )}
           </button>
 
           <button
@@ -180,12 +201,19 @@ const SearchBar = () => {
         <div className="bg-white rounded-2xl shadow-xl border border-gray-200 mt-4 p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Расширенные фильтры</h3>
-            <button
-              onClick={clearAll}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-            >
-              Очистить все
-            </button>
+            <div className="flex items-center gap-3">
+              {getActiveFiltersCount() > 0 && (
+                <span className="text-sm text-gray-500">
+                  Активных фильтров: {getActiveFiltersCount()}
+                </span>
+              )}
+              <button
+                onClick={clearAll}
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Очистить все
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 text-gray-700 ">
@@ -199,7 +227,7 @@ const SearchBar = () => {
                   onChange={(e) =>
                     handleFilterChange('minPrice', e.target.value ? Number(e.target.value) : undefined)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 <input
                   type="number"
@@ -208,7 +236,7 @@ const SearchBar = () => {
                   onChange={(e) =>
                     handleFilterChange('maxPrice', e.target.value ? Number(e.target.value) : undefined)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
             </div>
@@ -222,7 +250,7 @@ const SearchBar = () => {
                     type="button"
                     onClick={() => toggleRoomFilter(r)}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      currentSearchParams.rooms === r ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      currentSearchParams.rooms === r ? 'bg-blue-600 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
                     {r === 4 ? '4+' : r}
@@ -241,7 +269,7 @@ const SearchBar = () => {
                     onClick={() => toggleBathroomFilter(b)}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       currentSearchParams.bathrooms === b
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-blue-600 text-white shadow-md'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
@@ -258,7 +286,7 @@ const SearchBar = () => {
                   type="checkbox"
                   checked={currentSearchParams.isDecorated || false}
                   onChange={(e) => handleFilterChange('isDecorated', e.target.checked || undefined)}
-                  className="w-4 h-4"
+                  className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   id="decorated-checkbox"
                 />
                 <label
@@ -281,14 +309,14 @@ const SearchBar = () => {
                   onClick={() => {
                     setIsHomeOpen(o => !o);
                   }}
-                  className="w-full flex justify-between items-center px-4 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="w-full flex justify-between items-center px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   {homes.find(h => h.id === currentSearchParams.homeId)?.name || 'Выбрать ЖК'}
                   <span className="ml-2">▾</span>
                 </button>
 
                 {isHomeOpen && (
-                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded shadow max-h-60 overflow-auto">
+                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded shadow-lg max-h-60 overflow-auto">
                     {homes.map(home => (
                       <div
                         key={home.id}
@@ -334,7 +362,7 @@ const SearchBar = () => {
                 <button
                   type="button"
                   onClick={() => setIsCatOpen(o => !o)}
-                  className="w-full flex justify-between items-center px-4 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="w-full flex justify-between items-center px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   {currentSearchParams.categoriesId && currentSearchParams.categoriesId.length > 0
                     ? `Выбрано: ${currentSearchParams.categoriesId.length}`
@@ -343,7 +371,7 @@ const SearchBar = () => {
                 </button>
 
                 {isCatOpen && (
-                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded shadow max-h-60 overflow-auto">
+                  <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded shadow-lg max-h-60 overflow-auto">
                     {categories.map(cat => (
                       <label
                         key={cat.id}
@@ -353,7 +381,7 @@ const SearchBar = () => {
                           type="checkbox"
                           checked={currentSearchParams.categoriesId?.includes(cat.id) || false}
                           onChange={() => toggleCategory(cat.id)}
-                          className="mr-2"
+                          className="mr-2 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
                         <span className="text-sm">{cat.name}</span>
                       </label>
@@ -374,7 +402,7 @@ const SearchBar = () => {
                 <select
                   value={currentSearchParams.sortBy || 'price'}
                   onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="price">По цене</option>
                   <option value="rooms">По комнатам</option>
@@ -384,7 +412,7 @@ const SearchBar = () => {
                 <select
                   value={currentSearchParams.sortOrder || 'asc'}
                   onChange={(e) => handleFilterChange('sortOrder', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="asc">По возрастанию</option>
                   <option value="desc">По убыванию</option>
@@ -401,7 +429,7 @@ const SearchBar = () => {
                     type="checkbox"
                     checked={currentSearchParams.hasParks || false}
                     onChange={(e) => handleFilterChange('hasParks', e.target.checked || undefined)}
-                    className="w-4 h-4"
+                    className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <span className="ml-2 text-sm">Парки</span>
                 </label>
@@ -410,7 +438,7 @@ const SearchBar = () => {
                     type="checkbox"
                     checked={currentSearchParams.hasSchools || false}
                     onChange={(e) => handleFilterChange('hasSchools', e.target.checked || undefined)}
-                    className="w-4 h-4"
+                    className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <span className="ml-2 text-sm">Школы</span>
                 </label>
@@ -419,7 +447,7 @@ const SearchBar = () => {
                     type="checkbox"
                     checked={currentSearchParams.hasShops || false}
                     onChange={(e) => handleFilterChange('hasShops', e.target.checked || undefined)}
-                    className="w-4 h-4"
+                    className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <span className="ml-2 text-sm">Магазины</span>
                 </label>

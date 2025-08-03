@@ -15,6 +15,7 @@ import FileExplorer from '../file-explorer/FileExplorer.tsx';
 import DirectoryBrowser from '../file-explorer/DirectoryBrowser.tsx';
 import UserList from "./UserList.tsx";
 import Alert from './Alert.tsx';
+import UnifiedFileManager from '../file-explorer/UnifiedFileManager.tsx';
 
 const AdminPage: FC = () => {
   const {role, isAuthenticated} = useAuthStore();
@@ -80,18 +81,8 @@ const AdminPage: FC = () => {
   const [prevTab, setPrevTab] = useState<Tab | null>(null);
 
   useEffect(() => {
-    if (activeTab === 'directories') {
-      void listDirectories();
-
-
-      if (prevTab !== 'directories') {
-        void setCurrentPath([]);
-        void getDirectory([]);
-        void listFilesInDir([]);
-      }
-    }
-
     if (activeTab === 'files') {
+      void listDirectories();
       void listFilesInDir(currentPath);
       void getDirectory(currentPath);
     }
@@ -323,47 +314,65 @@ const AdminPage: FC = () => {
 
             {activeTab === 'files' && (
               <Panel title="File Management">
-                <div className="flex flex-col gap-4">
-                  <div className="flex flex-wrap gap-4 items-center mb-4">
-                    <div className="flex gap-2">
-                      <input
-                        type="file"
-                        onChange={handleUpload}
-                        className="border rounded px-2 py-1"
-                      />
-                    </div>
-                    <div>
-                      <strong>Current directory:</strong> /{currentPath.join('/')}
-                    </div>
-                    <div className="ml-auto flex gap-2">
-                      <button
-                        onClick={() => void listFilesInDir(currentPath)}
-                        className="px-3 py-1 bg-gray-200 rounded"
-                      >
-                        Refresh files
-                      </button>
-                      <button
-                        onClick={() => void getDirectory(currentPath)}
-                        className="px-3 py-1 bg-gray-200 rounded"
-                      >
-                        Refresh dir
-                      </button>
-                    </div>
-                  </div>
-
-                  <FileExplorer
-                    currentDirectory={currentPath}
-                    files={currentDirectoryFiles}
-                    loading={isLoadingFiles}
-                    onRefresh={async () => {
-                      await listFilesInDir(currentPath);
-                    }}
-                    onDownload={handleDownload}
-                    onDelete={async (path) => {
-                      await handleDeleteFile(path);
-                    }}
-                  />
-                </div>
+                <UnifiedFileManager
+                  currentPath={currentPath}
+                  directories={directories}
+                  files={currentDirectoryFiles}
+                  isLoadingDirectories={isLoadingDirectories}
+                  isLoadingFiles={isLoadingFiles}
+                  newDirectoryName={newDirectoryName}
+                  setNewDirectoryName={setNewDirectoryName}
+                  onNavigate={async (nextPath: string[]) => {
+                    setCurrentPath(nextPath);
+                    await getDirectory(nextPath);
+                    await listFilesInDir(nextPath);
+                  }}
+                  onCreateDirectory={async () => {
+                    if (!newDirectoryName.trim()) return;
+                    try {
+                      await createDirectory([...currentPath, newDirectoryName.trim()]);
+                      setNewDirectoryName('');
+                      await getDirectory(currentPath);
+                      await listDirectories();
+                    } catch {
+                      // handled in store
+                    }
+                  }}
+                  onDeleteDirectory={async (name: string) => {
+                    await deleteDirectory([...currentPath, name]);
+                    await getDirectory(currentPath);
+                    await listDirectories();
+                  }}
+                  onUpload={async (e: React.ChangeEvent<HTMLInputElement>) => {
+                    const f = e.target.files?.[0];
+                    if (!f) return;
+                    await uploadFile(currentPath, f);
+                    await listFilesInDir(currentPath);
+                  }}
+                  onDownload={async (path: string[]) => {
+                    try {
+                      const blob = await downloadFile(path);
+                      if (!blob) return;
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = path[path.length - 1];
+                      a.click();
+                      setTimeout(() => URL.revokeObjectURL(url), 1000);
+                    } catch (e) {
+                      console.error("Download failed", e);
+                    }
+                  }}
+                  onDeleteFile={async (path: string[]) => {
+                    await deleteFile(path);
+                    await listFilesInDir(currentPath);
+                  }}
+                  onRefresh={async () => {
+                    await listDirectories();
+                    await listFilesInDir(currentPath);
+                    await getDirectory(currentPath);
+                  }}
+                />
               </Panel>
             )}
 
