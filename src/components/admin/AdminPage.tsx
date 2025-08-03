@@ -11,7 +11,6 @@ import type {Tab, UserDto} from '../../services';
 import TabSwitcher from './TabSwitcher.tsx';
 import Panel from './Panel.tsx';
 import UserForm from './UserForm.tsx';
-import FileExplorer from '../file-explorer/FileExplorer.tsx';
 import DirectoryBrowser from '../file-explorer/DirectoryBrowser.tsx';
 import UserList from "./UserList.tsx";
 import Alert from './Alert.tsx';
@@ -41,6 +40,7 @@ const AdminPage: FC = () => {
     currentPath,
     setCurrentPath,
     directories,
+    currentDirectoryDirs,
     currentDirectoryFiles,
     isLoadingDirectories,
     isLoadingFiles,
@@ -218,33 +218,6 @@ const AdminPage: FC = () => {
     await listFilesInDir(nextPath);
   };
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    await uploadFile(currentPath, f);
-    await listFilesInDir(currentPath);
-  };
-
-  const handleDownload = async (path: string[]) => {
-    try {
-      const blob = await downloadFile(path);
-      if (!blob) return;
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = path[path.length - 1];
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    } catch (e) {
-      console.error("Download failed", e);
-    }
-  };
-
-  const handleDeleteFile = async (path: string[]) => {
-    await deleteFile(path);
-    await listFilesInDir(currentPath);
-  };
-
   if (!isAuthenticated || role !== 'ADMIN') return null;
 
   return (
@@ -316,7 +289,7 @@ const AdminPage: FC = () => {
               <Panel title="File Management">
                 <UnifiedFileManager
                   currentPath={currentPath}
-                  directories={directories}
+                  directories={currentDirectoryDirs}
                   files={currentDirectoryFiles}
                   isLoadingDirectories={isLoadingDirectories}
                   isLoadingFiles={isLoadingFiles}

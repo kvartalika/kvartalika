@@ -1,43 +1,38 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { useEffect, useRef } from 'react';
 
 interface MapProps {
   latitude: number;
   longitude: number;
-  description: string;
+  className?: string;
 }
 
-const DefaultIcon = new L.Icon({
-  iconRetinaUrl: '/images/marker-icon-2x.png',
-  iconUrl: '/images/marker-icon.png',
-  shadowUrl: '/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+const Map: React.FC<MapProps> = ({ latitude, longitude, className = '' }) => {
+  const mapRef = useRef<HTMLDivElement>(null);
 
-const Map = ({ latitude, longitude, description }: MapProps) => {
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Initialize map here
+    // This is a placeholder for actual map implementation
+    console.log(`Map initialized at ${latitude}, ${longitude}`);
+  }, [latitude, longitude]);
+
   return (
-    <MapContainer
-      center={[latitude, longitude]}
-      zoom={13}
-      scrollWheelZoom={false}
-      className="z-10 h-[400px] w-full rounded-2xl shadow-lg"
+    <div
+      ref={mapRef}
+      className={`w-full h-64 bg-gray-200 rounded-lg ${className}`}
     >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <Marker position={[latitude, longitude]} icon={DefaultIcon}>
-        <Popup>
-          {description}
-        </Popup>
-      </Marker>
-    </MapContainer>
+      <div className="flex items-center justify-center h-full text-gray-500">
+        <div className="text-center">
+          <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+          </svg>
+          <p>Карта</p>
+          <p className="text-sm">Координаты: {latitude}, {longitude}</p>
+        </div>
+      </div>
+    </div>
   );
-}
+};
 
 export default Map;

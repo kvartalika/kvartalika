@@ -20,9 +20,9 @@ const ApartmentCard: FC<ApartmentCardProps> = memo(({ apartment, homeName, onBoo
   return (
     <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
       <div className="relative">
-        {apartment.photos && apartment.photos.length > 0 ? (
+        {apartment.imagesResolved && apartment.imagesResolved.length > 0 ? (
           <img
-            src={apartment.photos[0]}
+            src={apartment.imagesResolved[0]}
             alt={apartment.flat.name}
             className="w-full h-48 object-cover"
           />
@@ -36,7 +36,7 @@ const ApartmentCard: FC<ApartmentCardProps> = memo(({ apartment, homeName, onBoo
         
         <div className="absolute top-2 right-2">
           <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium">
-            {apartment.flat.rooms} комн.
+            {apartment.flat.numberOfRooms || 1} комн.
           </span>
         </div>
       </div>
@@ -52,16 +52,16 @@ const ApartmentCard: FC<ApartmentCardProps> = memo(({ apartment, homeName, onBoo
         <div className="space-y-2 mb-4">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Площадь:</span>
-            <span className="font-medium">{formatArea(apartment.flat.area)}</span>
+            <span className="font-medium">{formatArea(apartment.flat.area || 0)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Этаж:</span>
-            <span className="font-medium">{apartment.flat.floor}/{apartment.flat.totalFloors}</span>
+            <span className="font-medium">{apartment.flat.floor || 0}</span>
           </div>
-          {apartment.flat.bathrooms && (
+          {apartment.flat.numberOfBathrooms && (
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">Санузлы:</span>
-              <span className="font-medium">{apartment.flat.bathrooms}</span>
+              <span className="font-medium">{apartment.flat.numberOfBathrooms}</span>
             </div>
           )}
         </div>
@@ -69,9 +69,9 @@ const ApartmentCard: FC<ApartmentCardProps> = memo(({ apartment, homeName, onBoo
         <div className="border-t pt-4">
           <div className="flex justify-between items-center mb-3">
             <span className="text-2xl font-bold text-gray-900">
-              {formatPrice(apartment.flat.price)} ₽
+              {formatPrice(apartment.flat.price || 0)} ₽
             </span>
-            {apartment.flat.isDecorated && (
+            {apartment.flat.hasDecoration && (
               <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
                 С отделкой
               </span>

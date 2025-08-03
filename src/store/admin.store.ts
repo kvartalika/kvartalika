@@ -245,11 +245,10 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
     }
   },
 
-  getDirectory: async () => {
+  getDirectory: async (pathParts: string[]) => {
     set({isLoadingDirectories: true, directoryError: null});
     try {
-
-      const contents = await getDirectory(get().currentPath);
+      const contents = await getDirectory(pathParts);
       const children = contents.children;
 
       set({currentDirectoryDirs: children, isLoadingDirectories: false});

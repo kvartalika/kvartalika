@@ -39,10 +39,6 @@ const ComplexPage = () => {
     );
   }
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('ru-RU').format(price);
-  };
-
   return (
     <div className="min-h-screen pt-16">
       {/* Hero Section */}
@@ -66,7 +62,7 @@ const ComplexPage = () => {
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-blue-200 mb-2">
-                    {home.totalFloors || 'Много'}
+                    {home.numberOfFloors || 'Много'}
                   </div>
                   <div className="text-sm text-blue-100">Этажей</div>
                 </div>
@@ -83,7 +79,7 @@ const ComplexPage = () => {
             {/* Complex Photos Slider */}
             <div className="relative">
               <ImageSlider
-                images={home.photos || []}
+                images={home.imagesResolved || []}
                 title="Фотографии комплекса"
                 className="h-80"
                 showThumbnails={true}
@@ -163,7 +159,7 @@ const ComplexPage = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Этажность:</span>
-                    <span className="font-medium">{home.totalFloors || 'Многоэтажный'}</span>
+                    <span className="font-medium">{home.numberOfFloors || 'Многоэтажный'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Квартир в продаже:</span>
@@ -211,7 +207,7 @@ const ComplexPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {complexFlats.map((apartment) => (
                 <ApartmentCard
-                  homeName={home.name}
+                  homeName={home.name || 'Жилой комплекс'}
                   key={apartment.flat.id}
                   apartment={apartment}
                   onBookingClick={() => openModal('bid')}

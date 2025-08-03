@@ -61,7 +61,7 @@ const ApartmentShowcase: React.FC<ApartmentShowcaseProps> = ({
               {/* Image Slider */}
               <div className="relative">
                 <ImageSlider
-                  images={apartment.photos || []}
+                  images={apartment.imagesResolved || []}
                   className="h-64"
                   showThumbnails={false}
                   autoPlay={true}
@@ -70,12 +70,12 @@ const ApartmentShowcase: React.FC<ApartmentShowcaseProps> = ({
                 
                 {/* Price Badge */}
                 <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-lg">
-                  {formatPrice(apartment.flat.price)} ₽
+                  {formatPrice(apartment.flat.price || 0)} ₽
                 </div>
                 
                 {/* Rooms Badge */}
                 <div className="absolute top-4 left-4 bg-white bg-opacity-90 text-gray-900 px-3 py-1 rounded-full text-sm font-medium">
-                  {apartment.flat.rooms} комн.
+                  {apartment.flat.numberOfRooms || 1} комн.
                 </div>
               </div>
 
@@ -86,7 +86,7 @@ const ApartmentShowcase: React.FC<ApartmentShowcaseProps> = ({
                     {apartment.flat.name}
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    {apartment.home?.name || 'Жилой комплекс'}
+                    Жилой комплекс
                   </p>
                 </div>
 
@@ -96,22 +96,22 @@ const ApartmentShowcase: React.FC<ApartmentShowcaseProps> = ({
                     <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                     </svg>
-                    {formatArea(apartment.flat.area)}
+                    {formatArea(apartment.flat.area || 0)}
                   </div>
                   
                   <div className="flex items-center text-sm text-gray-600">
                     <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
-                    {apartment.flat.floor}/{apartment.flat.totalFloors} этаж
+                    {apartment.flat.floor || 0} этаж
                   </div>
                   
-                  {apartment.flat.bathrooms && (
+                  {apartment.flat.numberOfBathrooms && (
                     <div className="flex items-center text-sm text-gray-600">
                       <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
                       </svg>
-                      {apartment.flat.bathrooms} санузла
+                      {apartment.flat.numberOfBathrooms} санузла
                     </div>
                   )}
                   
@@ -125,7 +125,7 @@ const ApartmentShowcase: React.FC<ApartmentShowcaseProps> = ({
                 </div>
 
                 {/* Decorated Badge */}
-                {apartment.flat.isDecorated && (
+                {apartment.flat.hasDecoration && (
                   <div className="mb-4">
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                       <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">

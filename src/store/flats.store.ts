@@ -5,7 +5,7 @@ import {
   getFlats,
   getFlatsByCategory,
   getHomes,
-  type HomePageFlats, type ResolvedFlat, type ResolvedHome,
+  type ResolvedFlat, type ResolvedHome,
   searchFlats,
   type SearchRequest
 } from '../services';
@@ -18,7 +18,7 @@ export interface flatsState {
   categories: Category[];
   searchResults: ResolvedFlat[];
 
-  homePageFlats: HomePageFlats[];
+  homePageFlats: ResolvedFlat[];
   flatsByHome: ResolvedFlat[];
 
   selectedCategory: Category | null;
@@ -97,7 +97,6 @@ export const useFlatsStore = create<flatsState & flatsActions>()((set, get) => (
     flats: [],
     homes: [],
     categories: [],
-
     searchResults: [],
 
     currentPage: 1,
@@ -204,30 +203,16 @@ export const useFlatsStore = create<flatsState & flatsActions>()((set, get) => (
     },
 
     loadHomePageFlats: async (force = false) => {
-      const {isDataStale, categories} = get();
+      const {isDataStale} = get();
       if (!force && !isDataStale('homePageFlats')) return;
 
-      const homePageCategories = categories.filter(c => c.isOnMainPage);
-      if (homePageCategories.length === 0) return;
-
       set({isLoadingHomePageFlats: true, error: null});
-
       try {
-        const resolved = await Promise.allSettled(
-          homePageCategories.map(async category => {
-            const flats = await getFlatsByCategory(category.id);
-            const published = flats.filter(publishChecker);
-            const resolved = await Promise.all(published.map(usePhotoStore.getState().processFlat));
-            return {category, flats: resolved};
-          })
-        );
-
-        const homePageFlats: HomePageFlats[] = resolved
-          .filter(r => r.status === 'fulfilled')
-          .map(r => (r as PromiseFulfilledResult<HomePageFlats>).value);
-
+        const homePageFlats = await getFlats();
+        const published = homePageFlats.filter(publishChecker);
+        const resolved = await Promise.all(published.map(usePhotoStore.getState().processFlat));
         set(state => ({
-          homePageFlats,
+          homePageFlats: resolved,
           isLoadingHomePageFlats: false,
           lastFetch: {...state.lastFetch, homePageFlats: Date.now()}
         }));
@@ -239,53 +224,27 @@ export const useFlatsStore = create<flatsState & flatsActions>()((set, get) => (
       }
     },
 
-    getFlatById: async (id: number) => {
-      await get().loadFlats();
-      const loadedFlat = get().flats.find(apt => apt.flat.id === id);
-      if (loadedFlat) {
-        set({selectedFlat: loadedFlat});
-      }
-
-      return loadedFlat || null;
-    },
-
-    getHomeById: async (id: number) => {
-      await get().loadHomes();
-      const loadedHome = get().homes.find(h => h.id === id);
-      if (loadedHome) {
-        set({selectedHome: loadedHome});
-      }
-
-      return loadedHome || null;
-    },
-
     loadAllData: async (force = false) => {
-      const {loadFlats, loadHomes, loadCategories} = get();
-
-      await Promise.allSettled([
-        loadFlats(force),
-        loadHomes(force),
-        loadCategories(force)
+      await Promise.all([
+        get().loadFlats(force),
+        get().loadHomes(force),
+        get().loadCategories(force),
+        get().loadHomePageFlats(force),
       ]);
-
-      await get().loadHomePageFlats(force);
     },
 
     loadFlatsByHome: async (homeId: number) => {
       try {
-        await get().loadFlats(true);
-        const {flats} = get();
-
-        const published = flats.filter((item) => publishChecker(item) && item.flat.homeId === homeId);
+        const flats = await getFlats();
+        const published = flats.filter(publishChecker);
         const resolved = await Promise.all(published.map(usePhotoStore.getState().processFlat));
-
-        set({flatsByHome: resolved});
-
-        return flats;
-      } catch {
-        set({error: 'Failed to fetch flats by home'});
-        set({flatsByHome: []});
-
+        const filtered = resolved.filter(flat => flat.flat.homeId === homeId);
+        set({flatsByHome: filtered});
+        return filtered;
+      } catch (error) {
+        set({
+          error: (error instanceof Error) ? error.message : 'Failed to load flats by home',
+        });
         return [];
       }
     },
@@ -295,37 +254,34 @@ export const useFlatsStore = create<flatsState & flatsActions>()((set, get) => (
         const flats = await getFlatsByCategory(categoryId);
         const published = flats.filter(publishChecker);
         const resolved = await Promise.all(published.map(usePhotoStore.getState().processFlat));
-        set(state => {
-          const updatedFlats = [...state.flats];
-          resolved.forEach(flat => {
-            const existingIndex = updatedFlats.findIndex(h => h.flat.id === flat.flat.id);
-            if (existingIndex >= 0) {
-              updatedFlats[existingIndex] = flat;
-            } else {
-              updatedFlats.push(flat);
-            }
-          });
-
-          return {flats: updatedFlats};
-        });
-
         return resolved;
-      } catch {
-        set({error: 'Failed to fetch flats by category'});
+      } catch (error) {
+        set({
+          error: (error instanceof Error) ? error.message : 'Failed to load flats by category',
+        });
         return [];
       }
     },
 
-    setFilters: (newFilters: Partial<SearchRequest>) => {
+    getFlatById: async (id: number) => {
+      const {flats} = get();
+      return flats.find(flat => flat.flat.id === id) || null;
+    },
+
+    getHomeById: async (id: number) => {
+      const {homes} = get();
+      return homes.find(home => home.id === id) || null;
+    },
+
+    setFilters: (filters: Partial<SearchRequest>) => {
       set(state => ({
-        currentSearchParams: {...state.currentSearchParams, ...newFilters},
-        currentPage: 1,
+        currentSearchParams: {...state.currentSearchParams, ...filters}
       }));
     },
 
-    searchFlats: async (page?: number) => {
+    searchFlats: async (page = 1) => {
       const {currentSearchParams, limit} = get();
-      const pageToUse = page ?? get().currentPage;
+      const pageToUse = page || 1;
 
       set({
         isSearching: true,
@@ -411,22 +367,4 @@ export const useFlatsStore = create<flatsState & flatsActions>()((set, get) => (
     setError: (error: string | null) => set({error}),
     setSearchError: (searchError: string | null) => set({searchError}),
     clearErrors: () => set({error: null, searchError: null}),
-  }),
-  {
-    name: 'flats-store',
-    version: 1,
-    partialize: (state) => ({
-      flats: state.flats,
-      homes: state.homes,
-      homePageFlats: state.homePageFlats,
-      categories: state.categories,
-      searchResults: state.searchResults,
-      flatsByHome: state.flatsByHome,
-
-      currentSearchParams: state.currentSearchParams,
-      currentPage: state.currentPage,
-      limit: state.limit,
-      hasSearched: state.hasSearched,
-    }),
-  }
-));
+  }));

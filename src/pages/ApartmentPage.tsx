@@ -301,9 +301,8 @@ const ApartmentPage = () => {
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">Расположение квартиры</h3>
                 <div className="bg-gray-100 rounded-xl p-8 text-center mb-8">
                   <Map
-                    latitude={selectedFlat.flat.latitude}
-                    longitude={selectedFlat.flat.longitude}
-                    description={selectedFlat.flat.address}
+                    latitude={selectedFlat.flat.latitude || 0}
+                    longitude={selectedFlat.flat.longitude || 0}
                   />
                 </div>
               </div>
