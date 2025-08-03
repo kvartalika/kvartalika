@@ -48,8 +48,7 @@ const ApartmentCard = ({
       >
         <ImageSlider
           images={apartment.imagesResolved || []}
-          className="w-full"
-          showThumbnails={false}
+          className="h-48 w-full"
           autoPlay={false}
         />
 

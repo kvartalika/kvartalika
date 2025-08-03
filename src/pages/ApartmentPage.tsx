@@ -104,7 +104,6 @@ const ApartmentPage = () => {
                   <ImageSlider
                     images={images || []}
                     className="h-full"
-                    showThumbnails={true}
                     autoPlay={true}
                   />
                 </div>

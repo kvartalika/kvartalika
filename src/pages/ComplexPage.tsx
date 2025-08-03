@@ -101,7 +101,6 @@ const ComplexPage = () => {
             <ImageSlider
               images={images || []}
               className="h-full w-full"
-              showThumbnails={false}
               autoPlay={true}
             />
           </div>

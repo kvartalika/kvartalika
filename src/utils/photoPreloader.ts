@@ -38,18 +38,18 @@ export async function preloadPhotos<
   const uniquePaths = Array.from(new Set(paths));
   const loaded = await photoStore.loadPhotos(uniquePaths);
 
-  const result: any = {...item};
+  const result = {...item} as T & Record<string, unknown>;
   for (const key in fieldMap) {
     const mode = fieldMap[key];
     if (!mode) continue;
     const val = item[key as unknown as keyof T];
     const resolvedKey = `${key}Resolved` as keyof ResolvedPhotos<T, M>;
     if (mode === 'array' && Array.isArray(val)) {
-      result[resolvedKey] = val
+      (result as any)[resolvedKey] = val
         .map((p: string) => loaded[p])
         .filter((u: string | null | undefined): u is string => Boolean(u));
     } else if (mode === 'single' && typeof val === 'string') {
-      result[resolvedKey] = loaded[val] ?? undefined;
+      (result as any)[resolvedKey] = loaded[val] ?? undefined;
     }
   }
 

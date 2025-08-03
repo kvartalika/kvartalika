@@ -55,19 +55,26 @@ const SearchBar = memo(() => {
   const homeRef = useRef<HTMLDivElement | null>(null);
   useClickOutside(homeRef, () => setIsHomeOpen(false));
 
+  const navigate = useNavigate();
+
+  const handleFilterChange = useCallback(
+    (key: keyof SearchRequest, value: unknown) => {
+      setFilters({[key]: value} as Partial<SearchRequest>);
+    },
+    [setFilters]
+  );
+
   const toggleCategory = useCallback((id: number) => {
     const current = currentSearchParams.categoriesId || [];
     const updated = current.includes(id)
       ? current.filter(c => c !== id)
       : [...current, id];
     handleFilterChange('categoriesId', updated.length > 0 ? updated : undefined);
-  }, [currentSearchParams.categoriesId]);
+  }, [currentSearchParams.categoriesId, handleFilterChange]);
 
   const selectHome = useCallback((homeId?: number) => {
     handleFilterChange('homeId', homeId);
-  }, []);
-
-  const navigate = useNavigate();
+  }, [handleFilterChange]);
 
   const handleSearchSubmit = useCallback((e: FormEvent) => {
     e.preventDefault();
@@ -78,14 +85,7 @@ const SearchBar = memo(() => {
 
     navigate({pathname: '/apartments', search}, {replace: true});
     void searchFlats(1);
-  }, [currentSearchParams, closeModal, navigate, searchFlats]);
-
-  const handleFilterChange = useCallback(
-    (key: keyof SearchRequest, value: unknown) => {
-      setFilters({[key]: value} as Partial<SearchRequest>);
-    },
-    [setFilters]
-  );
+  }, [currentSearchParams, closeModal, searchFlats]);
 
   const toggleRoomFilter = useCallback((rooms: number) => {
     const current = currentSearchParams.rooms ?? 0;

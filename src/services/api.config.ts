@@ -9,7 +9,7 @@ export interface ApiConfig {
 
 interface QueueItem {
   resolve: () => void;
-  reject: (err: any) => void;
+  reject: (error: Error) => void;
 }
 
 class ApiClient {
@@ -56,9 +56,9 @@ class ApiClient {
       (response: AxiosResponse) => {
         return response;
       },
-      async (error: any) => {
+      async (error: Error & { response?: { status: number }, config?: AxiosRequestConfig & { _retry?: boolean } }) => {
         const originalRequest = error.config;
-        if (error.response?.status === 401 && !originalRequest?._retry) {
+        if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
           originalRequest._retry = true;
 
           if (this.isRefreshing) {
@@ -74,14 +74,15 @@ class ApiClient {
             this.refreshQueue.forEach(({resolve}) => resolve());
             this.refreshQueue = [];
 
-            originalRequest.headers = originalRequest.headers || {};
-
-            originalRequest.headers.Authorization = `Bearer ${useAuthStore.getState().accessToken}`;
-            return this.axiosInstance(originalRequest);
+            if (originalRequest) {
+              originalRequest.headers = originalRequest.headers || {};
+              originalRequest.headers.Authorization = `Bearer ${useAuthStore.getState().accessToken}`;
+              return this.axiosInstance(originalRequest);
+            }
 
           } catch (refreshError) {
             useAuthStore.getState().logout();
-            this.refreshQueue.forEach(({reject}) => reject(refreshError));
+            this.refreshQueue.forEach(({reject}) => reject(refreshError as Error));
             this.refreshQueue = [];
             return Promise.reject(refreshError);
           } finally {
