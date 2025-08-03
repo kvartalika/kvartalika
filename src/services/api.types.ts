@@ -167,6 +167,7 @@ export interface BidRequest {
   phone?: string;
   email?: string;
   isChecked: boolean;
+  createdAt?: number;
 }
 
 export interface Description {
@@ -282,7 +283,7 @@ export interface PaginationParams {
 }
 
 export interface FileUploadRequest {
-  file: File;
+  file: Blob;
   altText?: string;
 }
 
@@ -301,3 +302,20 @@ export interface SocialMedia {
 }
 
 export type Tab = (typeof TABS)[number];
+
+export interface DirectoriesResponse {
+  directories: string[];
+}
+
+export interface DirectoriesChildrenResponse {
+  children: string[];
+}
+
+export interface FilesResponse {
+  files: Blob[];
+}
+
+export interface FileEntry {
+  name: string;
+  blob: Blob;
+}

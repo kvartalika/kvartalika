@@ -1,14 +1,24 @@
 import {create} from 'zustand';
 import {
   addAdmin,
-  addContentManager, createDirectory,
+  addContentManager,
+  createDirectory,
   deleteAdmin,
-  deleteContentManager, deleteDirectory, deleteFile, downloadFile,
+  deleteContentManager,
+  deleteDirectory,
+  deleteFile,
+  downloadFile,
+  type FileEntry,
   getAdmins,
-  getContentManagers, getDirectory, getFile, listDirectories, listFilesInDir,
+  getContentManagers,
+  getDirectory,
+  getFile,
+  listDirectories,
+  listFilesInDir,
   type PaginationParams,
   updateAdmin,
-  updateContentManager, uploadFile,
+  updateContentManager,
+  uploadFile,
   type UserDto,
 } from '../services';
 import type {UserRole} from "./auth.store.ts";
@@ -22,8 +32,9 @@ export interface AdminState {
 
   directories: string[];
 
+  currentPath: string[]
   currentDirectoryDirs: string[];
-  currentDirectoryFiles: string[];
+  currentDirectoryFiles: FileEntry[];
 
   isLoadingDirectories: boolean;
   isLoadingFiles: boolean;
@@ -57,6 +68,8 @@ export interface AdminActions {
   getFile: (pathParts: string[]) => Promise<Blob | null>;
   deleteFile: (pathParts: string[]) => Promise<void>;
 
+  setCurrentPath: (pathParts: string[]) => void;
+
   setError: (error: string | null) => void;
   clearError: () => void;
   clearFileError: () => void;
@@ -71,6 +84,7 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
   isLoadingAdmins: false,
 
   directories: [],
+  currentPath: [],
   currentDirectoryDirs: [],
   currentDirectoryFiles: [],
   isLoadingDirectories: false,
@@ -81,6 +95,8 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
   error: null,
   fileError: null,
   directoryError: null,
+
+  setCurrentPath: (pathParts: string[]) => set({currentPath: pathParts}),
 
   loadContentManagers: async (params?: PaginationParams) => {
     set({isLoadingContentManagers: true, error: null});
@@ -217,7 +233,9 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
   listDirectories: async () => {
     set({isLoadingDirectories: true, directoryError: null});
     try {
-      const dirs = await listDirectories();
+      const dirsResponse = await listDirectories();
+      const dirs = dirsResponse.directories;
+
       set({directories: dirs, isLoadingDirectories: false});
     } catch (e) {
       set({
@@ -227,11 +245,14 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
     }
   },
 
-  getDirectory: async (pathParts) => {
+  getDirectory: async () => {
     set({isLoadingDirectories: true, directoryError: null});
     try {
-      const contents = await getDirectory(pathParts);
-      set({currentDirectoryDirs: contents, isLoadingDirectories: false});
+
+      const contents = await getDirectory(get().currentPath);
+      const children = contents.children;
+
+      set({currentDirectoryDirs: children, isLoadingDirectories: false});
     } catch (e) {
       set({
         isLoadingDirectories: false,
@@ -271,7 +292,12 @@ export const useAdminStore = create<AdminState & AdminActions>((set, get) => ({
   listFilesInDir: async (dirParts) => {
     set({isLoadingFiles: true, fileError: null});
     try {
-      const files = await listFilesInDir(dirParts);
+      const filesResponses = await listFilesInDir(dirParts);
+      const files = filesResponses.files.map(file => ({
+        blob: file,
+        name: file as unknown as string,
+      }));
+
       set({currentDirectoryFiles: files, isLoadingFiles: false});
     } catch (e) {
       set({

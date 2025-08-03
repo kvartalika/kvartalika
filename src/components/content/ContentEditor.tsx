@@ -12,16 +12,18 @@ import type {
   Category,
 } from '../../services';
 import ArrayField from "./ArrayField.tsx";
+import type {BidForm} from "../../store";
 
-export type ContentType = 'flat' | 'home' | 'category';
+export type ContentType = 'flat' | 'home' | 'category' | 'bid';
 
 interface ContentEditorUnifiedProps {
   contentType: ContentType;
   initialFlat?: FlatWithCategoryRequest;
   initialHome?: HomeRequest;
   initialCategory?: Category;
+  initialBid?: BidForm;
   allCategories?: Category[];
-  onSave: (payload: FlatWithCategoryRequest | HomeRequest | CategoryRequest) => Promise<void> | void;
+  onSave: (payload: FlatWithCategoryRequest | HomeRequest | CategoryRequest | BidForm) => Promise<void> | void;
   onDelete?: () => Promise<void> | void;
   onCancel: () => void;
   isEditing?: boolean;
@@ -32,6 +34,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
                                                         initialFlat,
                                                         initialHome,
                                                         initialCategory,
+                                                        initialBid,
                                                         allCategories = [],
                                                         onSave,
                                                         onDelete,
@@ -54,15 +57,20 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
       }
       : {id: 0, name: '', isOnMainPage: false}
   );
+
+  const [bidPayload, setBidPayload] = useState<Partial<BidForm>>(initialBid || {});
+
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (initialFlat) setFlatPayload(initialFlat);
   }, [initialFlat]);
+
   useEffect(() => {
     if (initialHome) setHomePayload(initialHome);
   }, [initialHome]);
+
   useEffect(() => {
     if (initialCategory) {
       setCategoryPayload({
@@ -72,6 +80,10 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
       });
     }
   }, [initialCategory]);
+
+  useEffect(() => {
+    if (initialBid) setBidPayload(initialBid);
+  }, [initialBid]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -87,6 +99,9 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
       } else if (contentType === 'category') {
         if (!categoryPayload.name) throw new Error('Название категории обязательно');
         await onSave(categoryPayload);
+      } else if (contentType === 'bid') {
+        if (!bidPayload.id) throw new Error('Что это?');
+        await onSave(bidPayload);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Неизвестная ошибка');
@@ -115,6 +130,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
       }
     });
   };
+
   const isCategorySelected = (category: Category) =>
     flatPayload.categories.some((c) => c.id === category.id);
 
@@ -125,6 +141,18 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
         onSubmit={handleSubmit}
         className="space-y-6"
       >
+
+        {f.id !== undefined && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">ID</label>
+            <input
+              type="text"
+              value={f.id}
+              disabled
+              className="w-full border rounded px-3 py-2 bg-gray-100"
+            />
+          </div>
+        )}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Название</label>
@@ -172,7 +200,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
         <ArrayField
           label="Изображения"
           values={f.images}
-          placeholder="https://..."
+          placeholder="/images/..."
           onChange={(arr) => setFlatPayload((p) => ({
             ...p,
             flat: {...p.flat, images: arr}
@@ -225,8 +253,53 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
           </div>
         </div>
 
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Количество санузлов</label>
+            <input
+              type="number"
+              value={f.numberOfBathrooms ?? ''}
+              onChange={(e) =>
+                setFlatPayload(p => ({
+                  ...p,
+                  flat: {...p.flat, numberOfBathrooms: Number(e.target.value)}
+                }))
+              }
+              className="w-full border rounded px-3 py-2"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Количество для продажи</label>
+            <input
+              type="number"
+              value={f.numberForSale ?? ''}
+              onChange={(e) =>
+                setFlatPayload(p => ({
+                  ...p,
+                  flat: {...p.flat, numberForSale: Number(e.target.value)}
+                }))
+              }
+              className="w-full border rounded px-3 py-2"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">ID ЖК</label>
+            <input
+              type="number"
+              value={f.homeId ?? ''}
+              onChange={(e) =>
+                setFlatPayload(p => ({
+                  ...p,
+                  flat: {...p.flat, homeId: Number(e.target.value)}
+                }))
+              }
+              className="w-full border rounded px-3 py-2"
+            />
+          </div>
+        </div>
+
         <ArrayField
-          label="Фичи"
+          label="Особенности"
           values={f.features}
           placeholder="например: балкон"
           onChange={(arr) => setFlatPayload((p) => ({
@@ -302,7 +375,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Планировка (URL)</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Планировка</label>
           <input
             type="text"
             value={f.layout || ''}
@@ -313,6 +386,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               }))
             }
             className="w-full border rounded px-3 py-2"
+            placeholder={'/images/...'}
           />
         </div>
 
@@ -332,7 +406,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">О себе</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">О квартире</label>
           <textarea
             value={f.about || ''}
             onChange={(e) =>
@@ -407,6 +481,18 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
         onSubmit={handleSubmit}
         className="space-y-6"
       >
+        {h.id !== undefined && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">ID</label>
+            <input
+              type="text"
+              value={h.id}
+              disabled
+              className="w-full border rounded px-3 py-2 bg-gray-100"
+            />
+          </div>
+        )}
+
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Название</label>
@@ -433,10 +519,35 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               className="w-full border rounded px-3 py-2"
             />
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Год постройки</label>
+            <input
+              type="number"
+              value={h.yearBuilt ?? ''}
+              onChange={(e) => setHomePayload(p => ({
+                ...p,
+                yearBuilt: Number(e.target.value)
+              }))}
+              className="w-full border rounded px-3 py-2"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Количество этажей</label>
+            <input
+              type="number"
+              value={h.numberOfFloors ?? ''}
+              onChange={(e) => setHomePayload(p => ({
+                ...p,
+                numberOfFloors: Number(e.target.value)
+              }))}
+              className="w-full border rounded px-3 py-2"
+            />
+          </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Описание</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Описание под названием</label>
           <textarea
             value={h.description || ''}
             onChange={(e) => setHomePayload((p) => ({
@@ -444,6 +555,32 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               description: e.target.value
             }))}
             className="w-full border rounded px-3 py-2 h-24"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">О комплексе</label>
+          <textarea
+            value={h.about || ''}
+            onChange={(e) => setHomePayload(p => ({
+              ...p,
+              about: e.target.value
+            }))}
+            className="w-full border rounded px-3 py-2 h-20"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">3D модель</label>
+          <input
+            type="text"
+            value={h.model3D || ''}
+            onChange={(e) => setHomePayload(p => ({
+              ...p,
+              model3D: e.target.value
+            }))}
+            className="w-full border rounded px-3 py-2"
+            placeholder={'/images/'}
           />
         </div>
 
@@ -615,6 +752,18 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
       className="space-y-4"
     >
       <div>
+        {categoryPayload.id !== undefined && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">ID</label>
+            <input
+              type="text"
+              value={categoryPayload.id}
+              disabled
+              className="w-full border rounded px-3 py-2 bg-gray-100"
+            />
+          </div>
+        )}
+
         <label className="block text-sm font-medium mb-1">Название</label>
         <input
           type="text"
@@ -672,14 +821,118 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
     </form>
   );
 
+  const renderBidForm = () => {
+    return (
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4"
+      >
+        {bidPayload && bidPayload.id !== undefined && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">ID</label>
+            <input
+              type="text"
+              value={bidPayload.id}
+              disabled
+              className="w-full border rounded px-3 py-2 bg-gray-100"
+            />
+          </div>
+        )}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Имя</label>
+            <input
+              type="text"
+              value={bidPayload?.name || ''}
+              disabled
+              className="w-full border rounded px-3 py-2"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Фамилия</label>
+            <input
+              type="text"
+              value={bidPayload?.surname || ''}
+              disabled
+              className="w-full border rounded px-3 py-2"
+            />
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Телефон</label>
+          <input
+            type="text"
+            value={bidPayload?.phone || ''}
+            disabled
+            className="w-full border rounded px-3 py-2"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Email</label>
+          <input
+            type="email"
+            value={bidPayload?.email || ''}
+            disabled
+            className="w-full border rounded px-3 py-2"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <input
+            id="isChecked"
+            type="checkbox"
+            checked={bidPayload?.isChecked || false}
+            onChange={(e) => setBidPayload((b) => ({
+              ...b,
+              isChecked: e.target.checked
+            }))}
+            className="mr-1"
+          />
+          <label htmlFor="isChecked">Просмотрено</label>
+        </div>
+
+        <div className="flex justify-between items-center pt-4 border-t">
+          <div>
+            {isEditing && onDelete && (
+              <button
+                type="button"
+                onClick={() => void onDelete()}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Удалить
+              </button>
+            )}
+          </div>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-4 py-2 border rounded"
+            >
+              Отмена
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            >
+              {saving ? 'Сохранение...' : 'Сохранить'}
+            </button>
+          </div>
+        </div>
+      </form>
+    );
+  };
+
+
   const title = useMemo(() => {
     if (contentType === 'flat') return isEditing ? 'Редактировать квартиру' : 'Создать квартиру';
     if (contentType === 'home') return isEditing ? 'Редактировать комплекс' : 'Создать комплекс';
-    return isEditing ? 'Редактировать категорию' : 'Создать категорию';
+    if (contentType === 'category') return isEditing ? 'Редактировать категорию' : 'Создать категорию';
+    if (contentType === 'bid') return isEditing ? 'Редактировать заявку' : 'Создать заявку?';
   }, [contentType, isEditing]);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-start justify-center z-50 overflow-auto py-10 px-4">
+    <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 overflow-auto py-10 px-4">
       <div className="bg-white rounded-lg p-6 max-w-4xl w-full relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">{title}</h2>
@@ -700,6 +953,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
         {contentType === 'flat' && renderFlatForm()}
         {contentType === 'home' && renderHomeForm()}
         {contentType === 'category' && renderCategoryForm()}
+        {contentType === 'bid' && renderBidForm()}
       </div>
     </div>
   );

@@ -170,7 +170,7 @@ const ApartmentPage = () => {
                 <div className="flex space-x-2 mt-4 overflow-x-auto">
                   {images.map((image, index) => (
                     <button
-                      key={index}
+                      key={`${image}-${index}`}
                       onClick={() => setCurrentImageIndex(index)}
                       className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
                         index === currentImageIndex
@@ -270,8 +270,11 @@ const ApartmentPage = () => {
                   Особенности квартиры
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {selectedFlat.flat?.features?.map((feature) => (
-                    <div className="flex items-center text-gray-600">
+                  {selectedFlat.flat?.features?.map((feature, index) => (
+                    <div
+                      key={`${feature.slice(15)}-${index}`}
+                      className="flex items-center text-gray-600"
+                    >
                       <svg
                         className="w-5 h-5 text-green-500 mr-3"
                         fill="none"

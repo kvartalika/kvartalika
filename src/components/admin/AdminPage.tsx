@@ -13,7 +13,6 @@ import Panel from './Panel.tsx';
 import UserForm from './UserForm.tsx';
 import FileExplorer from '../file-explorer/FileExplorer.tsx';
 import DirectoryBrowser from '../file-explorer/DirectoryBrowser.tsx';
-import {useFileExplorer} from '../file-explorer/hooks/useFileExplorer.ts';
 import UserList from "./UserList.tsx";
 import Alert from './Alert.tsx';
 
@@ -37,23 +36,22 @@ const AdminPage: FC = () => {
     editAdmin,
     removeAdmin,
     clearError,
-  } = useAdminStore();
 
-  const {
-    currentDirectory,
-    setCurrentDirectory,
+    currentPath,
+    setCurrentPath,
     directories,
-    files,
-    loadingDirs,
-    loadingFiles,
-    refreshDirs,
-    refreshFiles,
-    createDir,
-    deleteDir,
-    upload,
-    download,
+    currentDirectoryFiles,
+    isLoadingDirectories,
+    isLoadingFiles,
+    listDirectories,
+    getDirectory,
+    listFilesInDir,
+    createDirectory,
+    deleteDirectory,
+    uploadFile,
+    downloadFile,
     deleteFile,
-  } = useFileExplorer();
+  } = useAdminStore();
 
   const [activeTab, setActiveTab] = useState<Tab>('managers');
   const [formData, setFormData] = useState<UserDto>(() => ({
@@ -79,14 +77,35 @@ const AdminPage: FC = () => {
     void loadAdmins();
   }, [isAuthenticated, role, navigate, loadContentManagers, loadAdmins]);
 
+  const [prevTab, setPrevTab] = useState<Tab | null>(null);
+
   useEffect(() => {
     if (activeTab === 'directories') {
-      void refreshDirs();
+      void listDirectories();
+
+
+      if (prevTab !== 'directories') {
+        void setCurrentPath([]);
+        void getDirectory([]);
+        void listFilesInDir([]);
+      }
     }
+
     if (activeTab === 'files') {
-      void refreshFiles();
+      void listFilesInDir(currentPath);
+      void getDirectory(currentPath);
     }
-  }, [activeTab, refreshDirs, refreshFiles]);
+
+    setPrevTab(activeTab);
+  }, [
+    activeTab,
+    currentPath,
+    listDirectories,
+    getDirectory,
+    listFilesInDir,
+    setCurrentPath,
+    prevTab,
+  ]);
 
   const resetForm = useCallback(() => {
     setFormData({
@@ -101,7 +120,7 @@ const AdminPage: FC = () => {
     });
     setIsEditMode(false);
     setEditingType('manager');
-  }, []);
+  }, [editingType]);
 
   const handleSubmitManager = async (e: FormEvent) => {
     e.preventDefault();
@@ -194,11 +213,45 @@ const AdminPage: FC = () => {
   const handleCreateDirectory = async () => {
     if (!newDirectoryName.trim()) return;
     try {
-      await createDir(newDirectoryName.trim());
+      await createDirectory([...currentPath, newDirectoryName.trim()]);
       setNewDirectoryName('');
+      await getDirectory(currentPath);
     } catch {
-      // handled inside hook
+      // handled in store
     }
+  };
+
+  const handleNavigateDirectory = async (nextPath: string[]) => {
+    setCurrentPath(nextPath);
+    await getDirectory(nextPath);
+    await listFilesInDir(nextPath);
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    await uploadFile(currentPath, f);
+    await listFilesInDir(currentPath);
+  };
+
+  const handleDownload = async (path: string[]) => {
+    try {
+      const blob = await downloadFile(path);
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = path[path.length - 1];
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e) {
+      console.error("Download failed", e);
+    }
+  };
+
+  const handleDeleteFile = async (path: string[]) => {
+    await deleteFile(path);
+    await listFilesInDir(currentPath);
   };
 
   if (!isAuthenticated || role !== 'ADMIN') return null;
@@ -275,45 +328,39 @@ const AdminPage: FC = () => {
                     <div className="flex gap-2">
                       <input
                         type="file"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0];
-                          if (f) void upload(f);
-                        }}
+                        onChange={handleUpload}
                         className="border rounded px-2 py-1"
                       />
                     </div>
                     <div>
-                      <strong>Current directory:</strong> /{currentDirectory.join('/')}
+                      <strong>Current directory:</strong> /{currentPath.join('/')}
                     </div>
                     <div className="ml-auto flex gap-2">
                       <button
-                        onClick={() => void refreshFiles()}
+                        onClick={() => void listFilesInDir(currentPath)}
                         className="px-3 py-1 bg-gray-200 rounded"
                       >
                         Refresh files
+                      </button>
+                      <button
+                        onClick={() => void getDirectory(currentPath)}
+                        className="px-3 py-1 bg-gray-200 rounded"
+                      >
+                        Refresh dir
                       </button>
                     </div>
                   </div>
 
                   <FileExplorer
-                    currentDirectory={currentDirectory}
-                    files={files}
-                    loading={loadingFiles}
-                    onRefresh={() => void refreshFiles()}
-                    onDownload={async (path) => {
-                      const blob = await download(path);
-                      if (blob) {
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = path[path.length - 1];
-                        a.click();
-                        URL.revokeObjectURL(url);
-                      }
+                    currentDirectory={currentPath}
+                    files={currentDirectoryFiles}
+                    loading={isLoadingFiles}
+                    onRefresh={async () => {
+                      await listFilesInDir(currentPath);
                     }}
+                    onDownload={handleDownload}
                     onDelete={async (path) => {
-                      await deleteFile(path);
-                      void refreshFiles();
+                      await handleDeleteFile(path);
                     }}
                   />
                 </div>
@@ -323,14 +370,17 @@ const AdminPage: FC = () => {
             {activeTab === 'directories' && (
               <Panel title="Directory Management">
                 <DirectoryBrowser
-                  segments={currentDirectory}
+                  segments={currentPath}
                   directories={directories}
-                  loading={loadingDirs}
-                  onNavigate={setCurrentDirectory}
+                  loading={isLoadingDirectories}
+                  onNavigate={handleNavigateDirectory}
                   newDirName={newDirectoryName}
                   setNewDirName={setNewDirectoryName}
                   onCreate={handleCreateDirectory}
-                  onDelete={deleteDir}
+                  onDelete={async (name) => {
+                    await deleteDirectory([...currentPath, name]);
+                    await getDirectory(currentPath);
+                  }}
                 />
               </Panel>
             )}

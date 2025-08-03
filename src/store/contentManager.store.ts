@@ -1,77 +1,65 @@
 import {create} from 'zustand';
 import {
+  type BidRequest,
   createFlat,
-  createHome,
+  createHome, deleteBid,
   deleteFlat,
   deleteHome,
-  type FlatWithCategoryRequest,
-  getFlats,
-  getHomes,
-  type HomeRequest,
-  type PaginationParams,
+  type FlatWithCategoryRequest, getAllBids,
+  type HomeRequest, updateBid,
   updateFlat,
   updateHome,
 } from '../services';
+import {useFlatsStore} from "./flats.store.ts";
+import type {BidForm} from "./ui.store.ts";
+import {useContentStore} from "./content.store.ts";
 
 export interface ContentManagerState {
-  flats: FlatWithCategoryRequest[];
-  homes: HomeRequest[];
+  bids: BidForm[];
+  selectedBid: BidForm | null;
 
   isLoadingFlats: boolean;
   isLoadingHomes: boolean;
+  isLoadingBids: boolean;
 
   error: string | null;
 }
 
 export interface ContentManagerActions {
-  loadFlats: (params?: PaginationParams) => Promise<void>;
   addFlat: (FlatData: FlatWithCategoryRequest) => Promise<void>;
   editFlat: (id: number, FlatData: FlatWithCategoryRequest) => Promise<void>;
   removeFlat: (id: number) => Promise<void>;
 
-  // Homes
-  loadHomes: (params?: PaginationParams) => Promise<void>;
   addHome: (HomeData: HomeRequest) => Promise<void>;
   editHome: (id: number, HomeData: HomeRequest) => Promise<void>;
   removeHome: (id: number) => Promise<void>;
 
-  // General
+  getBids: () => Promise<void>;
+  editBid: (bid: BidForm) => void;
+  getBid: (id: number) => Promise<void>;
+  saveBid: (data: BidRequest) => Promise<boolean>;
+  removeBid: (id: number) => Promise<void>;
+
   setError: (error: string | null) => void;
   clearError: () => void;
 }
 
 export const useContentManagerStore = create<ContentManagerState & ContentManagerActions>((set, get) => ({
-  flats: [],
-  homes: [],
+  bids: [],
+  selectedBid: null,
 
   isLoadingFlats: false,
   isLoadingHomes: false,
+  isLoadingBids: false,
 
   error: null,
-
-  loadFlats: async (params?: PaginationParams) => {
-    set({isLoadingFlats: true, error: null});
-
-    try {
-      const flats = await getFlats(params);
-      set({
-        flats: flats,
-        isLoadingFlats: false,
-      });
-    } catch (error) {
-      set({
-        isLoadingFlats: false,
-        error: error instanceof Error ? error.message : 'Failed to load Flats',
-      });
-    }
-  },
 
   addFlat: async (FlatData: FlatWithCategoryRequest) => {
     set({error: null});
 
     try {
       await createFlat(FlatData);
-      await get().loadFlats();
+      await useFlatsStore.getState().loadFlats();
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to add Flat',
@@ -84,7 +72,7 @@ export const useContentManagerStore = create<ContentManagerState & ContentManage
 
     try {
       await updateFlat(id, FlatData);
-      await get().loadFlats();
+      await useFlatsStore.getState().loadFlats();
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to update Flat',
@@ -97,27 +85,10 @@ export const useContentManagerStore = create<ContentManagerState & ContentManage
 
     try {
       await deleteFlat(id);
-      await get().loadFlats();
+      await useFlatsStore.getState().loadFlats();
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to delete Flat',
-      });
-    }
-  },
-
-  loadHomes: async (params?: PaginationParams) => {
-    set({isLoadingHomes: true, error: null});
-
-    try {
-      const Homes = await getHomes(params);
-      set({
-        homes: Homes,
-        isLoadingHomes: false,
-      });
-    } catch (error) {
-      set({
-        isLoadingHomes: false,
-        error: error instanceof Error ? error.message : 'Failed to load Homes',
       });
     }
   },
@@ -127,7 +98,7 @@ export const useContentManagerStore = create<ContentManagerState & ContentManage
 
     try {
       await createHome(HomeData);
-      await get().loadHomes();
+      await useFlatsStore.getState().loadHomes();
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to add Home',
@@ -140,7 +111,7 @@ export const useContentManagerStore = create<ContentManagerState & ContentManage
 
     try {
       await updateHome(id, HomeData);
-      await get().loadHomes();
+      await useFlatsStore.getState().loadHomes();
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to update Home',
@@ -153,10 +124,105 @@ export const useContentManagerStore = create<ContentManagerState & ContentManage
 
     try {
       await deleteHome(id);
-      await get().loadHomes();
+      await useFlatsStore.getState().loadHomes();
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to delete Home',
+      });
+    }
+  },
+
+  getBids: async () => {
+    set({error: null});
+
+    try {
+      set({bids: await getAllBids()})
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to update Flat',
+        bids: [],
+      });
+    }
+  },
+
+  getBid: async (id: number) => {
+    set({error: null});
+
+    try {
+      const bid = get().bids.find(b => b.id === id);
+
+      if (bid) {
+        set({selectedBid: bid});
+        return;
+      }
+
+      await get().getBids();
+
+      const loadedBid = get().bids.find(b => b.id === id);
+      set({selectedBid: loadedBid});
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to update Flat',
+      });
+    }
+  },
+
+  editBid: (bid) => {
+    useContentStore.setState({
+      bidForm: {
+        ...bid
+      },
+      ui: {...useContentStore.getState().ui, showForm: true, editMode: true},
+    });
+
+    set({
+      selectedBid: bid,
+    });
+  },
+
+  saveBid: async (data: BidRequest) => {
+    useContentStore.setState(({
+      loading: {
+        ...useContentStore.getState().loading,
+        saving: true
+      }
+    }));
+    try {
+      const {selectedBid} = get();
+      if (selectedBid?.id) {
+        await updateBid(selectedBid.id, data);
+      }
+      await get().getBids();
+      useContentStore.getState().resetForms();
+      useContentStore.getState().setShowForm(false);
+      useContentStore.setState(({
+        loading: {
+          ...useContentStore.getState().loading,
+          saving: false
+        }
+      }));
+      return true;
+    } catch (error) {
+      set({error: error instanceof Error ? error.message : 'Failed to update Flat'});
+      useContentStore.setState(({
+        loading: {
+          ...useContentStore.getState().loading,
+          saving: false
+        }
+      }));
+      return false;
+    }
+  },
+
+  removeBid: async (id: number) => {
+    set({error: null});
+
+    try {
+      await deleteBid(id);
+      await useFlatsStore.getState().loadFlats();
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to delete Flat',
       });
     }
   },

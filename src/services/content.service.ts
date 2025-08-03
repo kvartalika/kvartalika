@@ -2,7 +2,7 @@ import {apiClient} from './api.config';
 import type {
   ApiResponse,
   BidRequest,
-  Category,
+  Category, DirectoriesChildrenResponse, DirectoriesResponse, FilesResponse,
   FileUploadResponse,
   FlatWithCategoryRequest,
   HomeRequest,
@@ -20,7 +20,7 @@ export class ContentService {
 
   static async updateCategory(id: number, categoryData: Category): Promise<void> {
     return ContentService.safeRequest(() =>
-        apiClient.put<void, Category>(`/categories?id=${id}`, categoryData),
+        apiClient.put<void, Category>(`/categories/${id}`, categoryData),
       'Category not found',
       404
     );
@@ -28,36 +28,36 @@ export class ContentService {
 
   static async deleteCategory(id: number): Promise<void> {
     return ContentService.safeRequest(() =>
-        apiClient.delete<void>(`/categories?id=${id}`),
+        apiClient.delete<void>(`/categories/${id}`),
       'Category not found',
       404
     );
   }
 
   // === DIRECTORIES ===
-  static async listDirectories(): Promise<string[]> {
-    return this.safeRequest(() => apiClient.get<string[]>('/directories'));
+  static async listDirectories(): Promise<DirectoriesResponse> {
+    return ContentService.safeRequest(() => apiClient.get<DirectoriesResponse>('/directories'));
   }
 
-  static async getDirectory(pathParts: string[]): Promise<string[]> {
+  static async getDirectory(pathParts: string[]): Promise<DirectoriesChildrenResponse> {
     const path = pathParts.map(encodeURIComponent).join('/');
-    return this.safeRequest(() => apiClient.get<string[]>(`/directories/${path}`));
+    return ContentService.safeRequest(() => apiClient.get<DirectoriesChildrenResponse>(`/directories/${path}`));
   }
 
   static async createDirectory(pathParts: string[]): Promise<void> {
     const path = pathParts.map(encodeURIComponent).join('/');
-    return this.safeRequest(() => apiClient.post(`/directories/${path}`));
+    return ContentService.safeRequest(() => apiClient.post(`/directories/${path}`));
   }
 
   static async deleteDirectory(pathParts: string[]): Promise<void> {
     const path = pathParts.map(encodeURIComponent).join('/');
-    return this.safeRequest(() => apiClient.delete(`/directories/${path}`));
+    return ContentService.safeRequest(() => apiClient.delete(`/directories/${path}`));
   }
 
   // === FILES ===
-  static async listFilesInDir(dirParts: string[]): Promise<string[]> {
+  static async listFilesInDir(dirParts: string[]): Promise<FilesResponse> {
     const dir = dirParts.map(encodeURIComponent).join('/');
-    return this.safeRequest(() => apiClient.get<string[]>(`/files/list/${dir}`));
+    return ContentService.safeRequest(() => apiClient.get<FilesResponse>(`/files/list/${dir}`));
   }
 
   static async getFile(pathParts: string[]): Promise<Blob> {
@@ -73,7 +73,7 @@ export class ContentService {
   static async downloadFile(pathParts: string[]): Promise<Blob> {
     const path = pathParts.map(encodeURIComponent).join('/');
     try {
-      const resp = await apiClient.get<Blob>(`/files/download/${path}`, {responseType: 'blob'});
+      const resp = await apiClient.get<Blob>(`/files/${path}`, {responseType: 'blob'});
       return resp.data;
     } catch (err) {
       this.handleError(err, 'Failed to download file');
@@ -84,17 +84,25 @@ export class ContentService {
     const dir = dirParts.map(encodeURIComponent).join('/');
     const form = new FormData();
     form.append('file', file);
-    return this.safeRequest(() => apiClient.postForm(`/files/upload/${dir}`, form));
+    return ContentService.safeRequest(() => apiClient.postForm(`/files/upload/${dir}`, form));
   }
 
   static async deleteFile(pathParts: string[]): Promise<void> {
     const path = pathParts.map(encodeURIComponent).join('/');
-    return this.safeRequest(() => apiClient.delete(`/files/${path}`));
+    return ContentService.safeRequest(() => apiClient.delete(`/files/${path}`));
   }
 
   // Bids
+  static async getAllBids(): Promise<BidForm[]> {
+    return ContentService.safeRequest(() =>
+        apiClient.get<BidForm[]>(`/bids`),
+      'Bid not found',
+      404
+    );
+  }
+
   static async getBid(id: string | number): Promise<BidForm> {
-    return this.safeRequest(() =>
+    return ContentService.safeRequest(() =>
         apiClient.get<BidForm>(`/bids/${id}`),
       'Bid not found',
       404
@@ -102,7 +110,7 @@ export class ContentService {
   }
 
   static async updateBid(id: string | number, data: BidRequest): Promise<void> {
-    return this.safeRequest(() =>
+    return ContentService.safeRequest(() =>
         apiClient.put<void, BidRequest>(`/bids/${id}`, data),
       'Bid not found',
       404
@@ -110,7 +118,7 @@ export class ContentService {
   }
 
   static async deleteBid(id: string | number): Promise<void> {
-    return this.safeRequest(() =>
+    return ContentService.safeRequest(() =>
         apiClient.delete<void>(`/bids/${id}`),
       'Bid not found',
       404
@@ -127,7 +135,7 @@ export class ContentService {
 
   static async updateFlat(id: number, data: FlatWithCategoryRequest): Promise<void> {
     return ContentService.safeRequest(() =>
-        apiClient.put<void, FlatWithCategoryRequest>(`/flats?id=${id}`, data),
+        apiClient.put<void, FlatWithCategoryRequest>(`/flats/${id}`, data),
       'Flat not found',
       404
     );
@@ -135,20 +143,20 @@ export class ContentService {
 
   static async deleteFlat(id: number): Promise<void> {
     return ContentService.safeRequest(() =>
-        apiClient.delete<void>(`/flats?id=${id}`),
+        apiClient.delete<void>(`/flats/${id}`),
       'Flat not found',
       404
     );
   }
 
   static async addCategoryToFlat(flatId: number, categoryId: number): Promise<void> {
-    return this.safeRequest(() =>
+    return ContentService.safeRequest(() =>
       apiClient.post(`/flats/${flatId}/categories/${categoryId}`)
     );
   }
 
   static async removeCategoryFromFlat(flatId: number, categoryId: number): Promise<void> {
-    return this.safeRequest(() =>
+    return ContentService.safeRequest(() =>
       apiClient.delete(`/flats/${flatId}/categories/${categoryId}`)
     );
   }
@@ -162,7 +170,7 @@ export class ContentService {
 
   static async updateHome(id: number, data: HomeRequest): Promise<void> {
     return ContentService.safeRequest(() =>
-        apiClient.put<void, HomeRequest>(`/homes?id=${id}`, data),
+        apiClient.put<void, HomeRequest>(`/homes/${id}`, data),
       'Home not found',
       404
     );
@@ -170,7 +178,7 @@ export class ContentService {
 
   static async deleteHome(id: number): Promise<void> {
     return ContentService.safeRequest(() =>
-        apiClient.delete<void>(`/homes?id=${id}`),
+        apiClient.delete<void>(`/homes/${id}`),
       'Home not found',
       404
     );
@@ -195,7 +203,7 @@ export class ContentService {
     if (altText) formData.append('altText', altText);
 
     return ContentService.safeRequest(() =>
-        apiClient.putForm<ApiResponse<Photo>>(`/photos?id=${id}`, formData),
+        apiClient.putForm<ApiResponse<Photo>>(`/photos/id${id}`, formData),
       'Photo not found',
       404
     );
@@ -203,7 +211,7 @@ export class ContentService {
 
   static async deletePhoto(id: number): Promise<ApiResponse<void>> {
     return ContentService.safeRequest(() =>
-        apiClient.delete<ApiResponse<void>>(`/photos?id=${id}`),
+        apiClient.delete<ApiResponse<void>>(`/photos/id${id}`),
       'Photo not found',
       404
     );
@@ -245,6 +253,7 @@ export const {
   listDirectories,
   getDirectory,
   getBid,
+  getAllBids,
   createDirectory,
   deleteDirectory,
   listFilesInDir,

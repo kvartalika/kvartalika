@@ -66,7 +66,7 @@ const DirectoryBrowser: FC<DirectoryBrowserProps> = ({
         <div>Loading directories...</div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {directories.map(dir => (
+          {Array.isArray(directories) && directories.map(dir => (
             <div
               key={dir}
               className="border rounded p-3 flex justify-between items-center"

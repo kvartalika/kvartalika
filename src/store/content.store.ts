@@ -1,5 +1,6 @@
 import {create} from 'zustand';
 import type {
+  BidRequest,
   Category,
   CategoryRequest,
   FlatWithCategoryRequest,
@@ -21,6 +22,8 @@ import {
   bulkDeletePhotos,
 } from '../services';
 import {useFlatsStore} from "./flats.store.ts";
+import {type BidForm, initialBidForm} from "./ui.store.ts";
+import {useContentManagerStore} from "./contentManager.store.ts";
 
 export interface ContentState {
   categories: Category[];
@@ -36,6 +39,7 @@ export interface ContentState {
   categoryForm: Partial<CategoryRequest>;
   flatForm: Partial<FlatWithCategoryRequest>;
   homeForm: Partial<HomeRequest>;
+  bidForm: Partial<BidRequest>;
 
   loading: {
     categories: boolean;
@@ -52,7 +56,7 @@ export interface ContentState {
   };
 
   ui: {
-    activeTab: 'flats' | 'homes' | 'categories' | 'photos';
+    activeTab: 'flats' | 'homes' | 'categories' | 'photos' | 'bids';
     showForm: boolean;
     editMode: boolean;
     selectedPhotoIds: number[];
@@ -65,11 +69,12 @@ export interface ContentState {
     totalCategories: number;
     totalPhotos: number;
     lastUpdated: number | null;
+    totalBids: number;
   };
 }
 
 export interface ContentActions {
-  saveCategory: (data: CategoryRequest) => Promise<boolean>;
+  saveCategory: (data: Category) => Promise<boolean>;
   removeCategory: (id: number) => Promise<boolean>;
   editCategory: (category: Category) => void;
 
@@ -92,6 +97,7 @@ export interface ContentActions {
   setCategoryForm: (form: Partial<CategoryRequest>) => void;
   setFlatForm: (form: Partial<FlatWithCategoryRequest>) => void;
   setHomeForm: (form: Partial<HomeRequest>) => void;
+  setBidForm: (form: Partial<BidForm>) => void;
   resetForms: () => void;
 
   setActiveTab: (tab: ContentState['ui']['activeTab']) => void;
@@ -145,6 +151,7 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
   categoryForm: initialCategoryForm,
   flatForm: initialFlatForm,
   homeForm: initialHomeForm,
+  bidForm: initialBidForm,
 
   loading: {
     categories: false,
@@ -172,6 +179,7 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
     totalCategories: 0,
     totalPhotos: 0,
     lastUpdated: null,
+    totalBids: 0,
   },
 
   saveCategory: async (data) => {
@@ -442,12 +450,15 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
   setCategoryForm: (form) => set(state => ({categoryForm: {...state.categoryForm, ...form}})),
   setFlatForm: (form) => set(state => ({flatForm: {...state.flatForm, ...form}})),
   setHomeForm: (form) => set(state => ({homeForm: {...state.homeForm, ...form}})),
+  setBidForm: (form) => set(state => ({bidForm: {...state.bidForm, ...form}})),
 
   resetForms: () => {
+    useContentManagerStore.setState({selectedBid: null});
     set({
       categoryForm: initialCategoryForm,
       flatForm: initialFlatForm,
       homeForm: initialHomeForm,
+      bidForm: initialBidForm,
       selectedCategory: null,
       selectedFlat: null,
       selectedHome: null,
@@ -494,6 +505,7 @@ export const useContentStore = create<ContentState & ContentActions>((set, get) 
         totalCategories: categories.length,
         totalPhotos: photos.length,
         lastUpdated: Date.now(),
+        totalBids: useContentManagerStore.getState().bids.length,
       },
     });
   },

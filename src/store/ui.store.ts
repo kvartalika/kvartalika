@@ -1,7 +1,7 @@
 import {create} from 'zustand';
 import {persist} from "zustand/middleware";
 
-import type {RequestCreate} from '../services';
+import type {BidRequest, RequestCreate} from '../services';
 import {
   addSocialMedia,
   createRequest,
@@ -13,7 +13,7 @@ import {
 } from '../services';
 
 export interface BidForm {
-  id?: number;
+  id: number;
   name?: string;
   surname?: string;
   patronymic?: string;
@@ -81,7 +81,7 @@ export interface UIState {
     };
   };
 
-  bidForm: BidForm;
+  bidForm: BidRequest;
 
   loading: {
     global: boolean;
@@ -94,6 +94,7 @@ export interface UIState {
 
   notifications: Notification[];
 
+  inFlightRequests: number;
   errors: {
     [key: string]: string | null;
   };
@@ -136,9 +137,12 @@ export interface UIActions {
 
   setError: (key: string, error: string | null) => void;
   clearErrors: () => void;
+
+  startRequest: () => void;
+  endRequest: () => void;
 }
 
-const initialBidForm: BidForm = {
+export const initialBidForm: BidRequest = {
   name: '',
   surname: '',
   patronymic: '',
@@ -147,6 +151,8 @@ const initialBidForm: BidForm = {
   createdAt: Date.now(),
   isChecked: false,
 };
+
+let debounceTimer: number | null = null;
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
@@ -193,6 +199,8 @@ export const useUIStore = create<
       notifications: [],
 
       errors: {},
+
+      inFlightRequests: 0,
 
       openModal: (modal, data) => {
         set(state => ({
@@ -420,9 +428,38 @@ export const useUIStore = create<
         }
       },
 
-      setLoading: (key, loading) => {
+      startRequest: () => {
+        set(state => ({inFlightRequests: state.inFlightRequests + 1}));
+        if (debounceTimer !== null) {
+          clearTimeout(debounceTimer);
+          debounceTimer = null;
+        }
+        debounceTimer = window.setTimeout(() => {
+          set(state => ({
+            loading: {
+              ...state.loading,
+              global: state.inFlightRequests > 0
+            }
+          }));
+          debounceTimer = null;
+        }, 100);
+      },
+
+      endRequest: () => {
+        set(state => ({inFlightRequests: Math.max(0, state.inFlightRequests - 1)}));
+        if (debounceTimer === null) {
+          set(state => ({
+            loading: {
+              ...state.loading,
+              global: state.inFlightRequests > 0
+            }
+          }));
+        }
+      },
+
+      setLoading: (key, loadingFlag) => {
         set(state => ({
-          loading: {...state.loading, [key]: loading},
+          loading: {...state.loading, [key]: loadingFlag},
         }));
       },
 

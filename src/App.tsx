@@ -37,7 +37,7 @@ function ScrollToTop() {
 }
 
 const InnerApp = () => {
-  const loading = useUIStore(state => state.loading);
+  const globalLoading = useUIStore(state => state.loading.global);
   const setLoading = useUIStore(state => state.setLoading);
   const modals = useUIStore(state => state.modals);
 
@@ -69,7 +69,7 @@ const InnerApp = () => {
   const shouldShowLoader =
     (!['/auth', '/admin', '/content'].includes(location.pathname)) &&
     (
-      loading.global ||
+      globalLoading ||
       (
         !pageInfo?.published &&
         (
