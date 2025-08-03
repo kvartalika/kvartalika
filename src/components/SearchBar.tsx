@@ -1,4 +1,4 @@
-import {type FormEvent, useCallback, useRef, useState} from 'react';
+import {type FormEvent, useCallback, useRef, useState, useMemo, memo} from 'react';
 import {createSearchParams, useNavigate} from 'react-router-dom';
 import {useClickOutside} from "../hooks/useClickOutside.ts";
 import type {SearchRequest} from "../services";
@@ -26,7 +26,7 @@ const serializeFiltersToParams = (filters: SearchRequest): Record<string, string
   return params;
 };
 
-const SearchBar = () => {
+const SearchBar = memo(() => {
   const {
     currentSearchParams,
     setFilters,
@@ -48,21 +48,21 @@ const SearchBar = () => {
   const homeRef = useRef<HTMLDivElement | null>(null);
   useClickOutside(homeRef, () => setIsHomeOpen(false));
 
-  const toggleCategory = (id: number) => {
+  const toggleCategory = useCallback((id: number) => {
     const current = currentSearchParams.categoriesId || [];
     const updated = current.includes(id)
       ? current.filter(c => c !== id)
       : [...current, id];
     handleFilterChange('categoriesId', updated.length > 0 ? updated : undefined);
-  };
+  }, [currentSearchParams.categoriesId]);
 
-  const selectHome = (homeId?: number) => {
+  const selectHome = useCallback((homeId?: number) => {
     handleFilterChange('homeId', homeId);
-  };
+  }, []);
 
   const navigate = useNavigate();
 
-  const handleSearchSubmit = (e: FormEvent) => {
+  const handleSearchSubmit = useCallback((e: FormEvent) => {
     e.preventDefault();
     closeModal('filters');
 
@@ -71,7 +71,7 @@ const SearchBar = () => {
 
     navigate({pathname: '/apartments', search}, {replace: true});
     searchFlats(1);
-  };
+  }, [currentSearchParams, closeModal, navigate, searchFlats]);
 
   const handleFilterChange = useCallback(
     (key: keyof SearchRequest, value: unknown) => {
@@ -80,22 +80,23 @@ const SearchBar = () => {
     [setFilters]
   );
 
-  const toggleRoomFilter = (rooms: number) => {
+  const toggleRoomFilter = useCallback((rooms: number) => {
     const current = currentSearchParams.rooms ?? 0;
     handleFilterChange('rooms', current === rooms ? undefined : rooms);
-  };
+  }, [currentSearchParams.rooms, handleFilterChange]);
 
-  const toggleBathroomFilter = (bathrooms: number) => {
+  const toggleBathroomFilter = useCallback((bathrooms: number) => {
     const current = currentSearchParams.bathrooms ?? 0;
     handleFilterChange('bathrooms', current === bathrooms ? undefined : bathrooms);
-  };
+  }, [currentSearchParams.bathrooms, handleFilterChange]);
 
-  const clearAll = () => {
+  const clearAll = useCallback(() => {
     clearSearch();
     closeModal('filters');
-  };
+    navigate('/apartments');
+  }, [clearSearch, closeModal, navigate]);
 
-  const anyActive =
+  const anyActive = useMemo(() => 
     Boolean(currentSearchParams.query) ||
     currentSearchParams.minPrice !== undefined ||
     currentSearchParams.maxPrice !== undefined ||
@@ -108,22 +109,38 @@ const SearchBar = () => {
     currentSearchParams.hasShops !== undefined ||
     (currentSearchParams.categoriesId && currentSearchParams.categoriesId.length > 0) ||
     Boolean(currentSearchParams.sortBy) ||
-    Boolean(currentSearchParams.sortOrder);
+    Boolean(currentSearchParams.sortOrder),
+    [currentSearchParams]
+  );
+
+  const activeFiltersCount = useMemo(() => 
+    Object.keys(currentSearchParams).filter(key => 
+      currentSearchParams[key as keyof typeof currentSearchParams] !== undefined && 
+      currentSearchParams[key as keyof typeof currentSearchParams] !== '' &&
+      key !== 'sortBy' && key !== 'sortOrder'
+    ).length,
+    [currentSearchParams]
+  );
 
   return (
     <div className="w-full">
       <form
         onSubmit={handleSearchSubmit}
-        className="bg-white rounded-2xl shadow-xl p-2"
+        className="bg-white rounded-2xl shadow-xl p-4"
       >
-        <div className="flex flex-col lg:flex-row gap-2">
-          <div className="flex-1">
+        <div className="flex flex-col lg:flex-row gap-3">
+          <div className="flex-1 relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
             <input
               type="text"
               placeholder="Поиск по названию ЖК или адресу..."
               value={currentSearchParams.query || ''}
               onChange={(e) => handleFilterChange('query', e.target.value)}
-              className="input-field border-0 rounded-xl w-full px-4 py-3"
+              className="input-field border-0 rounded-xl w-full pl-10 pr-4 py-3 bg-gray-50 focus:bg-white transition-colors"
             />
           </div>
 
@@ -132,14 +149,14 @@ const SearchBar = () => {
             onClick={() => {
               return (modals.filters) ? closeModal('filters') : openModal('filters');
             }}
-            className={`px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2 ${
+            className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 ${
               modals.filters || anyActive
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md'
             }`}
           >
             <svg
-              className="w-5 h-5 inline"
+              className="w-5 h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -152,14 +169,19 @@ const SearchBar = () => {
               />
             </svg>
             Фильтры
+            {anyActive && (
+              <span className="bg-white text-blue-600 text-xs px-2 py-1 rounded-full font-bold">
+                {activeFiltersCount}
+              </span>
+            )}
           </button>
 
           <button
             type="submit"
-            className="btn-primary px-8 py-3 rounded-xl flex items-center gap-2"
+            className="btn-primary px-8 py-3 rounded-xl flex items-center gap-2 shadow-lg shadow-blue-600/25 hover:shadow-xl transition-all duration-200"
           >
             <svg
-              className="w-5 h-5 inline"
+              className="w-5 h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -177,12 +199,12 @@ const SearchBar = () => {
       </form>
 
       {modals.filters && (
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 mt-4 p-6">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 mt-4 p-6 animate-fade-in">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Расширенные фильтры</h3>
             <button
               onClick={clearAll}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors"
             >
               Очистить все
             </button>
@@ -439,6 +461,8 @@ const SearchBar = () => {
       )}
     </div>
   );
-};
+});
+
+SearchBar.displayName = 'SearchBar';
 
 export default SearchBar;

@@ -4,8 +4,8 @@ const Panel: FC<React.PropsWithChildren<{ title: string }>> = ({
                                                                  title,
                                                                  children
                                                                }) => (
-  <div className="bg-white shadow rounded-lg p-6">
-    <h3 className="text-lg font-medium text-gray-900 mb-4">{title}</h3>
+  <div className="bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl p-8 border border-white/20">
+    <h3 className="text-xl font-semibold text-gray-900 mb-6">{title}</h3>
     {children}
   </div>
 );

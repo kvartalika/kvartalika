@@ -1,8 +1,9 @@
-import {Link, useNavigate} from 'react-router-dom';
+import {Link, useNavigate, memo, useMemo, useCallback} from 'react';
 import type {
   ResolvedFlat
 } from "../services";
 import {safeImage} from "../utils/safeImage.ts";
+import PhotoSlider from './PhotoSlider.tsx';
 
 interface ApartmentCardProps {
   apartment: ResolvedFlat;
@@ -10,22 +11,36 @@ interface ApartmentCardProps {
   onBookingClick?: () => void;
 }
 
-const ApartmentCard = ({
+const ApartmentCard = memo(({
                          apartment,
                          onBookingClick,
                          homeName
                        }: ApartmentCardProps) => {
   const navigate = useNavigate();
-  const formatPrice = (price: number) => {
+  
+  const formatPrice = useCallback((price: number) => {
     return new Intl.NumberFormat('ru-RU').format(price);
-  };
+  }, []);
 
-  const handleCardClick = () => {
+  const handleCardClick = useCallback(() => {
     navigate(`/apartment/${apartment.flat.id}`);
-  };
+  }, [navigate, apartment.flat.id]);
 
-  let img = safeImage(apartment?.imagesResolved, 'flat');
-  img = Array.isArray(img) ? img[0] : img;
+  const handleBookingClick = useCallback(() => {
+    onBookingClick?.();
+  }, [onBookingClick]);
+
+  const images = useMemo(() => {
+    const image = safeImage(apartment?.imagesResolved, 'flat');
+    return Array.isArray(image) ? image : [image];
+  }, [apartment?.imagesResolved]);
+
+  const price = useMemo(() => formatPrice(apartment.flat.price || 0), [apartment.flat.price, formatPrice]);
+
+  const isHotOffer = useMemo(() => 
+    apartment.flat.features?.length && apartment.flat.features.length >= 3, 
+    [apartment.flat.features]
+  );
 
   return (
     <div
@@ -35,20 +50,22 @@ const ApartmentCard = ({
         className="relative h-48 overflow-hidden"
         onClick={handleCardClick}
       >
-        <img
-          src={img}
+        <PhotoSlider
+          images={images}
           alt={`${apartment.flat.numberOfRooms ?? 1}-комнатная квартира в ${homeName}`}
-          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+          showDots={false}
+          showNav={false}
+          className="h-full"
         />
 
-        {apartment.flat.features?.length && apartment.flat.features.length >= 3 && (
-          <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-lg text-xs font-semibold">
+        {isHotOffer && (
+          <div className="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 rounded-lg text-xs font-semibold z-10">
             🔥 Горячее предложение
           </div>
         )}
 
-        <div className="absolute bottom-3 right-3 bg-black bg-opacity-70 text-white px-3 py-1 rounded-lg font-semibold">
-          {formatPrice(apartment.flat.price || 0)} ₽
+        <div className="absolute bottom-3 right-3 bg-black bg-opacity-70 text-white px-3 py-1 rounded-lg font-semibold z-10">
+          {price} ₽
         </div>
       </div>
 
@@ -159,7 +176,7 @@ const ApartmentCard = ({
 
           {onBookingClick && (
             <button
-              onClick={() => onBookingClick()}
+              onClick={handleBookingClick}
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors text-sm"
             >
               Записаться
@@ -169,6 +186,8 @@ const ApartmentCard = ({
       </div>
     </div>
   );
-};
+});
+
+ApartmentCard.displayName = 'ApartmentCard';
 
 export default ApartmentCard;
