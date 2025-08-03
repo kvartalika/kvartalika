@@ -12,7 +12,7 @@ import type {
   Category,
 } from '../../services';
 import ArrayField from "./ArrayField.tsx";
-import type {BidForm} from "../../store";
+import type {BidForm} from "../../store/ui.store.ts";
 import {useDeferredNumber} from "../../hooks/useDeferredNumber.ts";
 
 export type ContentType = 'flat' | 'home' | 'category' | 'bid';
@@ -459,7 +459,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               <button
                 type="button"
                 onClick={() => void onDelete()}
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                className="px-4 py-2 bg-red-500 text-secondary-100 rounded hover:bg-red-600"
               >
                 Удалить
               </button>
@@ -476,7 +476,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+              className="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 disabled:opacity-50"
             >
               {saving ? 'Сохранение...' : 'Сохранить'}
             </button>
@@ -581,6 +581,16 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
             className="w-full border rounded px-3 py-2 h-20"
           />
         </div>
+
+        <ArrayField
+          label="Особенности"
+          values={h.features}
+          placeholder="например: удобное местоположение"
+          onChange={(arr) => setHomePayload((p) => ({
+            ...p,
+            features: arr,
+          }))}
+        />
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">3D модель</label>
@@ -748,7 +758,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+              className="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 disabled:opacity-50"
             >
               {saving ? 'Сохранение...' : 'Сохранить'}
             </button>
@@ -824,7 +834,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
           <button
             type="submit"
             disabled={saving}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            className="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 disabled:opacity-50"
           >
             {saving ? 'Сохранение...' : 'Сохранить'}
           </button>
@@ -925,7 +935,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
             <button
               type="submit"
               disabled={saving}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+              className="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 disabled:opacity-50"
             >
               {saving ? 'Сохранение...' : 'Сохранить'}
             </button>

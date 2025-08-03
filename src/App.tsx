@@ -4,7 +4,7 @@ import {
   Routes,
   useLocation,
 } from 'react-router-dom';
-import {useEffect} from 'react';
+import {useEffect, lazy, Suspense} from 'react';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -13,18 +13,19 @@ import BookingModal from './components/BookingModal';
 import ScrollToAnchor from './components/ScrollToAnchor';
 import ProtectedRoute from './components/ProtectedRoute';
 
-import HomePage from './pages/HomePage';
-import ApartmentsPage from './pages/ApartmentsPage';
-import ComplexesPage from './pages/ComplexesPage';
-import ComplexPage from './pages/ComplexPage';
-import ApartmentPage from './pages/ApartmentPage';
-import AuthPage from './pages/AuthPage';
-import AdminPage from './components/admin/AdminPage.tsx';
+const HomePage = lazy(() => import('./pages/HomePage'));
+const ApartmentsPage = lazy(() => import('./pages/ApartmentsPage'));
+const ComplexesPage = lazy(() => import('./pages/ComplexesPage'));
+const ComplexPage = lazy(() => import('./pages/ComplexPage'));
+const ApartmentPage = lazy(() => import('./pages/ApartmentPage'));
+const AuthPage = lazy(() => import('./pages/AuthPage'));
+const AdminPage = lazy(() => import('./components/admin/AdminPage.tsx'));
+const ContentManagementPage = lazy(() => import("./components/content/ContentManagementPage.tsx"));
 
-import {useAuthStore, useFlatsStore, useUIStore} from "./store";
-import ContentManagementPage
-  from "./components/content/ContentManagementPage.tsx";
+import {useAuthStore} from "./store/auth.store.ts";
 import RouterListener from "./components/RouterListener.tsx";
+import {useUIStore} from "./store/ui.store.ts";
+import {useFlatsStore} from "./store/flats.store.ts";
 
 function ScrollToTop() {
   const {pathname} = useLocation();
@@ -91,59 +92,61 @@ const InnerApp = () => {
         <Header />
 
         <main className="flex-grow">
-          <Routes>
-            <Route
-              path="/"
-              element={<HomePage />}
-            />
-            <Route
-              path="/auth"
-              element={<AuthPage />}
-            />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute requiredRole="ADMIN">
-                  <AdminPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/content"
-              element={
-                <ProtectedRoute requiredRole={["CONTENT_MANAGER", "ADMIN"]}>
-                  <ContentManagementPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/apartments"
-              element={<ApartmentsPage />}
-            />
-            <Route
-              path="/complexes"
-              element={<ComplexesPage />}
-            />
-            <Route
-              path="/complex/:homeId"
-              element={<ComplexPage />}
-            />
-            <Route
-              path="/apartment/:apartmentId"
-              element={<ApartmentPage />}
-            />
-            <Route
-              path="*"
-              element={
-                <div className="flex items-center justify-center min-h-[400px]">
-                  <div className="text-center">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
-                    <p className="text-gray-600">Страница не найдена</p>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route
+                path="/"
+                element={<HomePage />}
+              />
+              <Route
+                path="/auth"
+                element={<AuthPage />}
+              />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute requiredRole="ADMIN">
+                    <AdminPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/content"
+                element={
+                  <ProtectedRoute requiredRole={["CONTENT_MANAGER", "ADMIN"]}>
+                    <ContentManagementPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/apartments"
+                element={<ApartmentsPage />}
+              />
+              <Route
+                path="/complexes"
+                element={<ComplexesPage />}
+              />
+              <Route
+                path="/complex/:homeId"
+                element={<ComplexPage />}
+              />
+              <Route
+                path="/apartment/:apartmentId"
+                element={<ApartmentPage />}
+              />
+              <Route
+                path="*"
+                element={
+                  <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="text-center">
+                      <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
+                      <p className="text-gray-600">Страница не найдена</p>
+                    </div>
                   </div>
-                </div>
-              }
-            />
-          </Routes>
+                }
+              />
+            </Routes>
+          </Suspense>
         </main>
 
         <Footer />

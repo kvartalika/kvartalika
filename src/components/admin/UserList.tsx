@@ -19,7 +19,7 @@ const UserList: FC<{
         <div className="flex space-x-2">
           <button
             onClick={() => onEdit(item)}
-            className="text-blue-600 hover:text-blue-800 text-sm"
+            className="text-primary-600 hover:text-primary-800 text-sm"
           >
             Edit
           </button>

@@ -1,5 +1,5 @@
 import type {FlatWithCategoryRequest, HomeRequest} from "../services";
-import {useAuthStore} from "../store";
+import {useAuthStore} from "../store/auth.store.ts";
 
 export const publishChecker = (data: HomeRequest | FlatWithCategoryRequest) => {
   if (useAuthStore.getState().isAuthenticated) {

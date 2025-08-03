@@ -11,7 +11,7 @@ import type {
   SearchRequest,
 } from './api.types';
 import {AxiosError} from "axios";
-import type {PageInfo, SocialMedia} from "../store";
+import type {PageInfo, SocialMedia} from "../store/ui.store";
 
 export class PublicService {
   // Page Info

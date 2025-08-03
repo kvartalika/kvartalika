@@ -106,7 +106,7 @@ const BookingModal = () => {
               type="text"
               value={bidForm.surname}
               onChange={(e) => handleInputChange('surname', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
               placeholder="Фамилия"
             />
           </div>
@@ -117,7 +117,7 @@ const BookingModal = () => {
               required
               value={bidForm.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
               placeholder="Имя*"
             />
           </div>
@@ -127,7 +127,7 @@ const BookingModal = () => {
               type="text"
               value={bidForm.patronymic}
               onChange={(e) => handleInputChange('patronymic', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
               placeholder="Отчество"
             />
           </div>
@@ -138,7 +138,7 @@ const BookingModal = () => {
               required
               value={bidForm.phone}
               onChange={(e) => handleInputChange('phone', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
               placeholder="Номер телефона*"
             />
           </div>
@@ -148,7 +148,7 @@ const BookingModal = () => {
               type="email"
               value={bidForm.email}
               onChange={(e) => handleInputChange('email', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
               placeholder="Электронная почта"
             />
           </div>
@@ -164,7 +164,7 @@ const BookingModal = () => {
             <button
               type="submit"
               disabled={loading.bid || !bidForm.name || !bidForm.phone}
-              className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+              className="flex-1 px-4 py-3 bg-primary-600 text-secondary-100 rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
             >
               {loading.bid ? 'Отправка...' : 'Отправить заявку'}
             </button>
@@ -175,7 +175,7 @@ const BookingModal = () => {
           Нажимая "Отправить заявку", вы соглашаетесь с{' '}
           <a
             href="/privacy"
-            className="text-blue-600 hover:underline"
+            className="text-primary-600 hover:underline"
           >
             политикой конфиденциальности
           </a>

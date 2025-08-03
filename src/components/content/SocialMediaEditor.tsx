@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {type SocialMedia, useUIStore} from "../../store";
+import {type SocialMedia, useUIStore} from "../../store/ui.store.ts";
 import SocialMediaForm from "../forms/SocialMediaForm.tsx";
 
 interface SocialMediaEditorProps {
@@ -93,7 +93,7 @@ const SocialMediaEditor = ({
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            className="px-4 py-2 bg-primary-600 text-secondary-100 rounded-md hover:bg-primary-700 disabled:opacity-50"
           >
             {loading ? 'Сохранение...' : 'Сохранить соц. сети'}
           </button>

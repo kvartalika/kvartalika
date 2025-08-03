@@ -6,7 +6,7 @@ import {
   type FC, type ChangeEvent,
 } from 'react';
 import {useNavigate} from 'react-router-dom';
-import {useAdminStore, useAuthStore, useUIStore} from '../../store';
+import {useAdminStore} from '../../store/admin.store.ts';
 import type {Tab, UserDto} from '../../services';
 import TabSwitcher from './TabSwitcher.tsx';
 import Panel from './Panel.tsx';
@@ -14,6 +14,8 @@ import UserForm from './UserForm.tsx';
 import UserList from "./UserList.tsx";
 import Alert from './Alert.tsx';
 import UnifiedFileManager from "../file-explorer/UnifiedFileManager.tsx";
+import {useAuthStore} from "../../store/auth.store.ts";
+import {useUIStore} from "../../store/ui.store.ts";
 
 const AdminPage: FC = () => {
   const {role, isAuthenticated} = useAuthStore();
@@ -271,7 +273,7 @@ const AdminPage: FC = () => {
 
         {(isLoadingContentManagers || isLoadingAdmins) ? (
           <div className="mt-8 flex justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
           </div>
         ) : (
           <div className="space-y-8">

@@ -1,7 +1,8 @@
 import {useEffect, useState} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import Logo from './Logo';
-import {useAuthStore, useUIStore} from "../store";
+import {useAuthStore} from "../store/auth.store.ts";
+import {useUIStore} from "../store/ui.store.ts";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -58,7 +59,7 @@ const Header = () => {
           >
             <Logo
               className={`h-8 lg:h-10 ${
-                isScrolled || !isHomePage ? 'text-blue-600' : 'text-white'
+                isScrolled || !isHomePage ? 'text-primary-600' : 'text-secondary-100'
               }`}
             />
           </Link>
@@ -66,30 +67,30 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-8">
             <Link
               to="/"
-              className={`font-medium transition-colors hover:text-blue-600 ${
+              className={`font-medium transition-colors hover:text-primary-600 ${
                 isScrolled || !isHomePage
                   ? 'text-gray-700'
-                  : 'text-white hover:text-blue-200'
+                  : 'text-secondary-100 hover:text-primary-200'
               }`}
             >
               Главная
             </Link>
             <Link
               to="/complexes"
-              className={`font-medium transition-colors hover:text-blue-600 ${
+              className={`font-medium transition-colors hover:text-primary-600 ${
                 isScrolled || !isHomePage
                   ? 'text-gray-700'
-                  : 'text-white hover:text-blue-200'
+                  : 'text-secondary-100 hover:text-primary-200'
               }`}
             >
               Жилые комплексы
             </Link>
             <Link
               to="/apartments"
-              className={`font-medium transition-colors hover:text-blue-600 ${
+              className={`font-medium transition-colors hover:text-primary-600 ${
                 isScrolled || !isHomePage
                   ? 'text-gray-700'
-                  : 'text-white hover:text-blue-200'
+                  : 'text-secondary-100 hover:text-primary-200'
               }`}
             >
               Квартиры
@@ -97,10 +98,10 @@ const Header = () => {
             {!isAuthenticated
               ? <button
                 onClick={handleAboutClick}
-                className={`font-medium transition-colors hover:text-blue-600 ${
+                className={`font-medium transition-colors hover:text-primary-600 ${
                   isScrolled || !isHomePage
                     ? "text-gray-700"
-                    : "text-white hover:text-blue-200"
+                    : "text-secondary-100 hover:text-primary-200"
                 }`}
               >
                 О нас
@@ -112,14 +113,14 @@ const Header = () => {
                   logout();
                 }}
               >
-                <p className='text-white'>Выйти</p>
+                <p className='text-secondary-100'>Выйти</p>
               </div>
             }
           </nav>
 
           <div className="hidden lg:flex items-center space-x-4">
             <button
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              className="bg-primary-600 hover:bg-primary-700 text-secondary-100 px-6 py-2 rounded-lg font-medium transition-colors"
               onClick={() => {
                 openModal("bid");
               }}
@@ -163,21 +164,21 @@ const Header = () => {
             <nav className="flex flex-col space-y-4">
               <Link
                 to="/"
-                className="text-gray-700 hover:text-blue-600 font-medium px-4 py-2"
+                className="text-gray-700 hover:text-primary-600 font-medium px-4 py-2"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Главная
               </Link>
               <Link
                 to="/complexes"
-                className="text-gray-700 hover:text-blue-600 font-medium px-4 py-2"
+                className="text-gray-700 hover:text-primary-600 font-medium px-4 py-2"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Жилые комплексы
               </Link>
               <Link
                 to="/apartments"
-                className="text-gray-700 hover:text-blue-600 font-medium px-4 py-2"
+                className="text-gray-700 hover:text-primary-600 font-medium px-4 py-2"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Квартиры
@@ -185,10 +186,10 @@ const Header = () => {
               {!isAuthenticated
                 ? <button
                   onClick={handleAboutClick}
-                  className={`font-medium transition-colors hover:text-blue-600 ${
+                  className={`font-medium transition-colors hover:text-primary-600 ${
                     isScrolled || !isHomePage
                       ? "text-gray-700"
-                      : "text-white hover:text-blue-200"
+                      : "text-secondary-100 hover:text-primary-200"
                   }`}
                 >
                   О нас
@@ -200,12 +201,12 @@ const Header = () => {
                     logout();
                   }}
                 >
-                  <p className='text-white'>Выйти</p>
+                  <p className='text-secondary-100'>Выйти</p>
                 </div>
               }
               <div className="px-4 py-2 border-t border-gray-200">
                 <button
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium w-full"
+                  className="bg-primary-600 hover:bg-primary-700 text-secondary-100 px-4 py-2 rounded-lg font-medium w-full"
                   onClick={() => {
                     openModal("bid");
                     setIsMobileMenuOpen(false);

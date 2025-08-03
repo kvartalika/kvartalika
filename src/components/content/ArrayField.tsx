@@ -19,7 +19,7 @@ const ArrayField: FC<{
         <button
           type="button"
           onClick={handleAdd}
-          className="text-sm text-blue-600 hover:underline"
+          className="text-sm text-primary-600 hover:underline"
         >
           + Добавить
         </button>

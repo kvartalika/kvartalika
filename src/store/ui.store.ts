@@ -100,7 +100,7 @@ export interface UIState {
 }
 
 export interface UIActions {
-  openModal: (modal: keyof UIState['modals'], data?: any) => void;
+  openModal: (modal: keyof UIState['modals'], data?: unknown) => void;
   closeModal: (modal: keyof UIState['modals']) => void;
   closeAllModals: () => void;
 

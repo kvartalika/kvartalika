@@ -2,8 +2,9 @@ import {useEffect, useMemo, useCallback} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import ApartmentCard from '../components/ApartmentCard';
 import SearchBar from '../components/SearchBar';
-import {useFlatsStore, useUIStore} from "../store";
 import type {SearchRequest} from "../services";
+import {useUIStore} from "../store/ui.store.ts";
+import {useFlatsStore} from "../store/flats.store.ts";
 
 
 const ApartmentsPage = () => {
@@ -162,13 +163,13 @@ const ApartmentsPage = () => {
   return (
     <div className="min-h-screen pt-16">
 
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 py-20 relative overflow-hidden">
+      <section className="bg-gradient-to-br from-primary-600 via-primary-700 to-indigo-800 py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-600/20 to-indigo-600/20"></div>
         <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center text-white mb-12">
+          <div className="text-center text-secondary-100 mb-12">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">{pageTitle}</h1>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto animate-slide-up">{pageDescription}</p>
+            <p className="text-xl text-primary-100 max-w-3xl mx-auto animate-slide-up">{pageDescription}</p>
           </div>
 
           <div className="max-w-4xl mx-auto animate-slide-up">
@@ -182,7 +183,7 @@ const ApartmentsPage = () => {
           <div className="flex items-center text-sm text-gray-600">
             <Link
               to="/"
-              className="text-blue-600 hover:text-blue-700"
+              className="text-primary-600 hover:text-primary-700"
             >
               Главная
             </Link>
@@ -204,7 +205,7 @@ const ApartmentsPage = () => {
               <select
                 value={limit}
                 onChange={(e) => handleLimitChange(Number(e.target.value))}
-                className="rounded-xl border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="rounded-xl border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
                 {[10, 20, 50].map(n => (
                   <option
@@ -252,7 +253,7 @@ const ApartmentsPage = () => {
               Попробуйте изменить параметры поиска или{' '}
               <button
                 onClick={handleClearSearch}
-                className="text-blue-600 hover:text-blue-700 font-medium"
+                className="text-primary-600 hover:text-primary-700 font-medium"
               >
                 посмотреть все квартиры
               </button>
@@ -292,7 +293,7 @@ const ApartmentsPage = () => {
                     onClick={() => handlePageChange(page)}
                     className={`w-10 h-10 rounded-lg font-medium transition-colors ${
                       page === currentPage
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-primary-600 text-secondary-100'
                         : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
                     }`}
                   >
@@ -311,19 +312,19 @@ const ApartmentsPage = () => {
           </div>
         )}
 
-        <section className="mt-20 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-3xl p-12 relative overflow-hidden">
+        <section className="mt-20 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 rounded-3xl p-12 relative overflow-hidden">
           <div className="absolute inset-0 bg-black/10"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary-600/20 to-indigo-600/20"></div>
           <div className="max-w-3xl mx-auto text-center relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
               Не нашли подходящую квартиру?
             </h2>
-            <p className="text-blue-100 mb-8 text-lg">
+            <p className="text-primary-100 mb-8 text-lg">
               Наши специалисты помогут подобрать идеальный вариант под ваши требования и бюджет
             </p>
             <button
               onClick={handleBookingClick}
-              className="bg-white text-blue-600 hover:bg-gray-100 px-10 py-4 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg"
+              className="bg-white text-primary-600 hover:bg-gray-100 px-10 py-4 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg"
             >
               Получить персональную подборку
             </button>

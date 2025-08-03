@@ -65,13 +65,13 @@ const FileExplorer: FC<FileExplorerProps> = ({
                 <div className="mt-2 flex gap-2 text-xs">
                   <button
                     onClick={() => onDownload(name.includes('/') ? [name] : [...currentDirectory, name])}
-                    className="px-2 py-1 bg-blue-500 text-white rounded"
+                    className="px-2 py-1 bg-primary-500 text-secondary-100 rounded"
                   >
                     Download
                   </button>
                   <button
                     onClick={() => onDelete(name.includes('/') ? [name] : [...currentDirectory, name])}
-                    className="px-2 py-1 bg-red-500 text-white rounded"
+                    className="px-2 py-1 bg-red-500 text-secondary-100 rounded"
                   >
                     Delete
                   </button>

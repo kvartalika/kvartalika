@@ -1,12 +1,14 @@
-import {useEffect, useState} from 'react';
+import {lazy, useEffect, useState} from 'react';
 import {Link, useParams} from 'react-router-dom';
 import ApartmentCard from '../components/ApartmentCard';
 
-import {useFlatsStore, useUIStore} from "../store";
+import {useFlatsStore} from "../store/flats.store.ts";
 import {safeImage} from "../utils/safeImage.ts";
-import Map from '../components/Map.tsx';
-import {Scene3D} from '../components/Scene3D.tsx';
 import ImageSlider from "../components/ImageSlider.tsx";
+import {useUIStore} from "../store/ui.store.ts";
+
+const Map = lazy(() => import('../components/Map.tsx'));
+const Scene3D = lazy(() => import('../components/Scene3D'));
 
 const ComplexPage = () => {
   const {homeId} = useParams<{ homeId: string }>();
@@ -59,7 +61,7 @@ const ComplexPage = () => {
           </h1>
           <Link
             to="/"
-            className="text-blue-600 hover:text-blue-700 font-medium"
+            className="text-primary-600 hover:text-primary-700 font-medium"
           >
             Вернуться на главную
           </Link>
@@ -84,7 +86,7 @@ const ComplexPage = () => {
           <nav className="text-sm">
             <Link
               to="/"
-              className="text-blue-600 hover:text-blue-700"
+              className="text-primary-600 hover:text-primary-700"
             >
               Главная
             </Link>
@@ -107,7 +109,7 @@ const ComplexPage = () => {
           </div>
 
           <div className="absolute inset-0 flex items-center justify-center z-10">
-            <div className="text-center text-white max-w-4xl px-4">
+            <div className="text-center text-secondary-100 max-w-4xl px-4">
               <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
                 {selectedHome.name ?? "Неизвестное ЖК"}
               </h1>
@@ -119,7 +121,7 @@ const ComplexPage = () => {
               </p>
               <button
                 onClick={() => openModal('bid')}
-                className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors shadow-lg"
+                className="bg-primary-600 text-secondary-100 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-700 transition-colors shadow-lg"
               >
                 Записаться на осмотр
               </button>
@@ -151,7 +153,7 @@ const ComplexPage = () => {
             {flatsByHome.length > 4 && (
               <Link
                 to={`/apartments?homeId=${selectedHome.id}`}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="bg-primary-600 text-secondary-100 px-6 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors"
               >
                 Показать все квартиры
               </Link>
@@ -189,7 +191,7 @@ const ComplexPage = () => {
               <p className="text-gray-600 mb-6">В данный момент в этом комплексе нет доступных квартир. Оставьте заявку, и мы уведомим вас о новых предложениях.</p>
               <button
                 onClick={() => openModal('bid')}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                className="bg-primary-600 text-secondary-100 px-6 py-3 rounded-lg font-medium hover:bg-primary-700 transition-colors"
               >
                 Оставить заявку
               </button>
@@ -214,9 +216,9 @@ const ComplexPage = () => {
                       key={index}
                       className="bg-white rounded-xl p-6 shadow-lg text-center"
                     >
-                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg
-                          className="w-6 h-6 text-blue-600"
+                          className="w-6 h-6 text-primary-600"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -248,7 +250,7 @@ const ComplexPage = () => {
                         key={`${phase}-${index}`}
                         className="flex items-start"
                       >
-                        <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-4">
+                        <div className="flex-shrink-0 w-8 h-8 bg-primary-600 text-secondary-100 rounded-full flex items-center justify-center text-sm font-semibold mr-4">
                           {index + 1}
                         </div>
                         <div className="flex-grow">
@@ -271,18 +273,18 @@ const ComplexPage = () => {
                             <button
                               onClick={() => setCurrentHistoryIndex(prev => (prev - 1 + historyImages.length) % historyImages.length)}
                               aria-label="Предыдущее фото истории"
-                              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+                              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-secondary-100 p-2 rounded-full hover:bg-opacity-70 transition-all"
                             >
                               ‹
                             </button>
                             <button
                               onClick={() => setCurrentHistoryIndex(prev => (prev + 1) % historyImages.length)}
                               aria-label="Следующее фото истории"
-                              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+                              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-secondary-100 p-2 rounded-full hover:bg-opacity-70 transition-all"
                             >
                               ›
                             </button>
-                            <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-xs">
+                            <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-secondary-100 px-2 py-1 rounded text-xs">
                               {currentHistoryIndex + 1} / {historyImages.length}
                             </div>
                           </>
@@ -445,7 +447,7 @@ const ComplexPage = () => {
                           />
                         </svg>
                       </button>
-                      <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-60 text-white px-3 py-1 rounded-full text-sm">
+                      <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-60 text-secondary-100 px-3 py-1 rounded-full text-sm">
                         {yardSlideIndex + 1} / {yardsImages.length}
                       </div>
                     </>
@@ -461,17 +463,17 @@ const ComplexPage = () => {
         </div>
       )}
 
-      <section className="bg-blue-600 py-16">
+      <section className="bg-primary-600 py-16">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-3xl font-bold text-secondary-100 mb-4">
             Заинтересовались ЖК?
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-primary-100 mb-8">
             Запишитесь на персональную экскурсию по жилому комплексу {selectedHome.name}
           </p>
           <button
             onClick={() => openModal('bid')}
-            className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors"
+            className="bg-white text-primary-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors"
           >
             Записаться на осмотр
           </button>

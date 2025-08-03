@@ -31,9 +31,9 @@ interface UnifiedFileManagerProps {
 const isImageName = (name: string) => /\.(jpe?g|png|webp|gif)$/i.test(name);
 
 const btnBase = "inline-flex items-center gap-1 px-3 py-1 rounded shadow-sm font-medium transition";
-const btnPrimary = "bg-indigo-600 text-white hover:bg-indigo-700";
+const btnPrimary = "bg-indigo-600 text-secondary-100 hover:bg-indigo-700";
 const btnSecondary = "bg-gray-100 text-gray-800 hover:bg-gray-200";
-const btnSuccess = "bg-green-600 text-white hover:bg-green-700";
+const btnSuccess = "bg-green-600 text-secondary-100 hover:bg-green-700";
 const btnDanger = "bg-red-500 text-white hover:bg-red-600";
 const btnDisabled = "opacity-50 cursor-not-allowed";
 
@@ -166,7 +166,7 @@ const UnifiedFileManager: FC<UnifiedFileManagerProps> = ({
       {/* Content grid */}
       {isLoading ? (
         <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600" />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -174,11 +174,11 @@ const UnifiedFileManager: FC<UnifiedFileManagerProps> = ({
           {directories.map((dir) => (
             <div
               key={dir}
-              className="border rounded-lg p-4 bg-blue-50 hover:bg-blue-100 transition-colors"
+              className="border rounded-lg p-4 bg-primary-50 hover:bg-primary-100 transition-colors"
             >
               <div className="flex items-center justify-between mb-2">
                 <div
-                  className="cursor-pointer flex items-center gap-2 text-blue-700 hover:text-blue-800 font-medium"
+                  className="cursor-pointer flex items-center gap-2 text-primary-700 hover:text-primary-800 font-medium"
                   onClick={() => handleDirectoryClick(dir)}
                 >
                   <svg
@@ -208,7 +208,7 @@ const UnifiedFileManager: FC<UnifiedFileManagerProps> = ({
                   </svg>
                 </button>
               </div>
-              <div className="text-xs text-blue-600">Папка</div>
+              <div className="text-xs text-primary-600">Папка</div>
             </div>
           ))}
 
@@ -236,7 +236,7 @@ const UnifiedFileManager: FC<UnifiedFileManagerProps> = ({
                 <div className="flex gap-2 text-xs">
                   <button
                     onClick={() => onDownload(name.includes('/') ? [name] : [...currentPath, name])}
-                    className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                    className="px-2 py-1 bg-primary-500 text-white rounded hover:bg-primary-600 transition-colors"
                   >
                     Скачать
                   </button>

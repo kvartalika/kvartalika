@@ -1,5 +1,5 @@
 import React from 'react';
-import type {PageInfo} from "../../store";
+import type {PageInfo} from "../../store/ui.store.ts";
 
 interface ContactFormProps {
   contactData: PageInfo;

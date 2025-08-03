@@ -1,18 +1,18 @@
 import {Link} from "react-router-dom";
 import SocialIcon from "./builtinIcons.tsx";
 import Logo from "./Logo.tsx";
-import {useUIStore} from "../store";
+import {useUIStore} from "../store/ui.store.ts";
 
 const Footer = () => {
   const pageInfo = useUIStore(state => state.pageInfo);
   const socialMediaList = useUIStore(state => state.socialMediaList);
 
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-gray-900 text-secondary-100">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="md:col-span-2 flex flex-col justify-center items-center lg:items-start">
-            <Logo className="text-white mb-4" />
+            <Logo className="text-secondary-100 mb-4" />
             <p className="text-gray-300 mb-6 max-w-md">{pageInfo.footerDescription}</p>
             <div className="flex space-x-4">
               {socialMediaList && socialMediaList.length > 0
@@ -53,7 +53,7 @@ const Footer = () => {
                 </svg>
                 <a
                   href={pageInfo.phone}
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="text-gray-300 hover:text-secondary-100 transition-colors"
                 >
                   {pageInfo.phone}
                 </a>
@@ -74,7 +74,7 @@ const Footer = () => {
                 </svg>
                 <a
                   href={pageInfo.email}
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="text-gray-300 hover:text-secondary-100 transition-colors"
                 >
                   {pageInfo.email}
                 </a>
@@ -90,13 +90,13 @@ const Footer = () => {
           <div className="flex space-x-6 text-sm">
             <Link
               to="/privacy"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-400 hover:text-secondary-100 transition-colors"
             >
               Политика конфиденциальности
             </Link>
             <Link
               to="/terms"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-400 hover:text-secondary-100 transition-colors"
             >
               Условия использования
             </Link>

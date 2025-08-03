@@ -9,7 +9,7 @@ import type {
   Photo,
 } from './api.types';
 import {AxiosError} from 'axios';
-import type {BidForm} from "../store";
+import type {BidForm} from "../store/ui.store";
 
 export class ContentService {
   static async createCategory(categoryData: Category): Promise<void> {

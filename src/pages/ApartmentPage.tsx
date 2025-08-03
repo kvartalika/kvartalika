@@ -1,9 +1,11 @@
-import {useEffect} from 'react';
+import {lazy, useEffect} from 'react';
 import {Link, useParams} from 'react-router-dom';
-import {useFlatsStore, useUIStore} from "../store";
+import {useFlatsStore} from "../store/flats.store.ts";
 import {safeImage} from "../utils/safeImage.ts";
-import Map from '../components/Map.tsx';
 import ImageSlider from "../components/ImageSlider.tsx";
+import {useUIStore} from "../store/ui.store.ts";
+
+const Map = lazy(() => import('../components/Map.tsx'));
 
 const ApartmentPage = () => {
   const {apartmentId} = useParams<{ apartmentId: string }>();
@@ -47,7 +49,7 @@ const ApartmentPage = () => {
           </h1>
           <Link
             to="/"
-            className="text-blue-600 hover:text-blue-700 font-medium"
+            className="text-primary-600 hover:text-primary-700 font-medium"
           >
             Вернуться на главную
           </Link>
@@ -75,14 +77,14 @@ const ApartmentPage = () => {
           <nav className="text-sm">
             <Link
               to="/"
-              className="text-blue-600 hover:text-blue-700"
+              className="text-primary-600 hover:text-primary-700"
             >
               Главная
             </Link>
             <span className="mx-2 text-gray-400">›</span>
             <Link
               to={`/complex/${selectedFlat.flat.homeId}`}
-              className="text-blue-600 hover:text-blue-700"
+              className="text-primary-600 hover:text-primary-700"
             >
               {selectedHome?.name ?? `ЖК №${selectedFlat.flat.homeId}`}
             </Link>
@@ -112,7 +114,7 @@ const ApartmentPage = () => {
                 {selectedFlat.flat?.features?.some(el =>
                   el.toLowerCase().includes('горячее предложение')
                 ) && (
-                  <div className="absolute bottom-2 left-4 bg-red-600 text-white px-2 py-2 rounded-lg text-xs font-semibold flex items-center gap-1">
+                  <div className="absolute bottom-2 left-4 bg-red-600 text-secondary-100 px-2 py-2 rounded-lg text-xs font-semibold flex items-center gap-1">
                     <span>🔥</span> Горячее предложение
                   </div>
                 )}
@@ -173,7 +175,7 @@ const ApartmentPage = () => {
                     <span className="text-gray-600">Жилой комплекс:</span>
                     <Link
                       to={`/complex/${selectedFlat.flat.homeId}`}
-                      className="font-medium text-blue-600 hover:text-blue-700"
+                      className="font-medium text-primary-600 hover:text-primary-700"
                     >
                       {selectedHome?.name ?? `ЖК №${selectedFlat.flat.homeId}`}
                     </Link>
@@ -220,6 +222,22 @@ const ApartmentPage = () => {
                         />
                       </svg>
                       {feature}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Категории
+                </h3>
+                <div className="flex gap-4">
+                  {selectedFlat.categories.map((cat, index) => (
+                    <div
+                      key={`${cat.name}-${index}`}
+                      className="flex items-center text-secondary-100 px-3 py-2 bg-primary-500 font-semibold text-center rounded-lg"
+                    >
+                      {cat.name}
                     </div>
                   ))}
                 </div>
@@ -271,7 +289,7 @@ const ApartmentPage = () => {
                 <button
                   onClick={() => openModal('bid')}
                   aria-label="Записаться на осмотр квартиры"
-                  className="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors mb-4"
+                  className="w-full bg-primary-600 text-secondary-100 py-4 rounded-lg font-semibold text-lg hover:bg-primary-700 transition-colors mb-4"
                 >
                   Записаться на осмотр
                 </button>

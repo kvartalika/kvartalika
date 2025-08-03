@@ -1,5 +1,5 @@
 import {type FormEvent, useState, useEffect} from 'react';
-import {type PageInfo, useUIStore} from "../../store";
+import {type PageInfo, useUIStore} from "../../store/ui.store.ts";
 import ContactForm from "../forms/ContactForm.tsx";
 
 interface PageInfoEditorProps {
@@ -52,7 +52,7 @@ const PageInfoEditor = ({onSaved}: PageInfoEditorProps) => {
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            className="px-4 py-2 bg-primary-600 text-secondary-100 rounded-md hover:bg-primary-700 disabled:opacity-50"
           >
             {loading ? 'Сохранение...' : 'Сохранить контактную информацию'}
           </button>

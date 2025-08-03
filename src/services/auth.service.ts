@@ -6,7 +6,7 @@ import type {
   RegisterResponse,
 } from './api.types';
 import {AxiosError} from "axios";
-import {useAuthStore} from "../store";
+import {useAuthStore} from "../store/auth.store.ts";
 
 export class AuthService {
   static async adminLogin(credentials: LoginRequest): Promise<AuthResponse> {

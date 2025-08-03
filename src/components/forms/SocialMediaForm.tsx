@@ -1,5 +1,5 @@
 import React from 'react';
-import {type SocialMedia} from "../../store";
+import {type SocialMedia} from "../../store/ui.store.ts";
 
 interface SocialMediaFormProps {
   list: SocialMedia[];
@@ -21,7 +21,7 @@ const SocialMediaForm: React.FC<SocialMediaFormProps> = ({
         <button
           type="button"
           onClick={onAddSocialMedia}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className="bg-primary-600 text-secondary-100 px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
         >
           + Добавить
         </button>

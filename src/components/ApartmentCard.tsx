@@ -53,18 +53,18 @@ const ApartmentCard = ({
           autoPlay={false}
         />
 
-        <div className="absolute top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg font-semibold shadow-lg text-md">
+        <div className="absolute top-2 right-2 bg-green-500 text-secondary-100 px-4 py-2 rounded-lg font-semibold shadow-lg text-md">
           {formatPrice(apartment.flat.price || 0)} ₽
         </div>
 
-        <div className="absolute top-4 left-4 bg-gray-200/70 text-black px-4 py-2 rounded-lg font-medium text-sm">
+        <div className="absolute top-2 left-2 bg-gray-200/70 text-black px-4 py-2 rounded-lg font-medium text-sm">
           {apartment.flat.numberOfRooms || 1} комн.
         </div>
 
         {apartment.flat.features?.some(el =>
           el.toLowerCase().includes('горячее предложение')
         ) && (
-          <div className="absolute bottom-2 left-4 bg-red-600 text-white px-2 py-2 rounded-lg text-xs font-semibold flex items-center gap-1">
+          <div className="absolute bottom-2 left-2 bg-red-600 text-secondary-100 px-2 py-2 rounded-lg text-xs font-semibold flex items-center gap-1">
             <span>🔥</span> Горячее предложение
           </div>
         )}
@@ -73,7 +73,7 @@ const ApartmentCard = ({
       <div className="p-4 flex flex-col flex-1">
         <Link
           to={`/complex/${apartment.flat.homeId}`}
-          className="text-sm text-blue-600 hover:text-blue-700 font-medium mb-1"
+          className="text-sm text-primary-600 hover:text-primary-700 font-medium mb-1"
           onClick={(e) => e.stopPropagation()}
         >
           {homeName}
@@ -231,7 +231,7 @@ const ApartmentCard = ({
                 e.stopPropagation();
                 onBookingClick();
               }}
-              className="font-bold flex-1 bg-blue-600 hover:bg-blue-700 text-white py-4 px-4 rounded-lg transition-colors text-sm"
+              className="font-bold flex-1 bg-primary-600 hover:bg-primary-700 text-secondary-100 py-4 px-4 rounded-lg transition-colors text-sm"
               type="button"
             >
               Записаться

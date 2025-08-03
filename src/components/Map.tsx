@@ -1,5 +1,4 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import {MapContainer, TileLayer, Marker, Popup} from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -19,19 +18,25 @@ const DefaultIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-const Map = ({ latitude, longitude, description }: MapProps) => {
+const Map = ({latitude, longitude, description}: MapProps) => {
   return (
     <MapContainer
       center={[latitude, longitude]}
       zoom={13}
       scrollWheelZoom={false}
-      className="z-10 h-[400px] w-full rounded-2xl shadow-lg"
+      className="mx-auto z-10 w-full rounded-2xl shadow-lg aspect-[16/9] min-h-[250px] max-h-[400px] max-w-[70vw] relative"
     >
+      <div className='absolute bottom-0 right-0 bg-sky-50 z-2000 rounded-md'>
+        <p className='px-16 font-bold text-lg'>@Кварталика</p>
+      </div>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <Marker position={[latitude, longitude]} icon={DefaultIcon}>
+      <Marker
+        position={[latitude, longitude]}
+        icon={DefaultIcon}
+      >
         <Popup>
           {description}
         </Popup>

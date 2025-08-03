@@ -1,5 +1,5 @@
 import {useEffect, useState, type FC, type ReactNode} from "react";
-import type {SocialMedia} from "../store";
+import type {SocialMedia} from "../store/ui.store.ts";
 import {usePhotoStore} from "../store/usePhotoStore.ts";
 
 const builtinIcons: Record<string, ReactNode> = {
@@ -97,9 +97,9 @@ const SocialIcon: FC<{ media: SocialMedia }> = ({media}) => {
   }
 
   const bgClass = isVK
-    ? "hover:bg-blue-600"
+    ? "hover:bg-primary-600"
     : isTelegram
-      ? "hover:bg-blue-500"
+      ? "hover:bg-primary-500"
       : isWhatsApp
         ? "hover:bg-green-600"
         : "hover:bg-gray-700";

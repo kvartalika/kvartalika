@@ -1,5 +1,4 @@
-// API Request Types
-import type {UserRole} from "../store";
+import type {UserRole} from "../store/auth.store.ts";
 import type {TABS} from "./index.ts";
 
 export interface LoginRequest {

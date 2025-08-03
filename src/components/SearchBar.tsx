@@ -9,7 +9,8 @@ import {
 import {createSearchParams, useNavigate} from 'react-router-dom';
 import {useClickOutside} from "../hooks/useClickOutside.ts";
 import type {SearchRequest} from "../services";
-import {useFlatsStore, useUIStore} from "../store";
+import {useFlatsStore} from "../store/flats.store.ts";
+import {useUIStore} from "../store/ui.store.ts";
 
 const serializeFiltersToParams = (filters: SearchRequest): Record<string, string> => {
   const params: Record<string, string> = {};
@@ -55,19 +56,26 @@ const SearchBar = memo(() => {
   const homeRef = useRef<HTMLDivElement | null>(null);
   useClickOutside(homeRef, () => setIsHomeOpen(false));
 
+  const navigate = useNavigate();
+
+  const handleFilterChange = useCallback(
+    (key: keyof SearchRequest, value: unknown) => {
+      setFilters({[key]: value} as Partial<SearchRequest>);
+    },
+    [setFilters]
+  );
+
   const toggleCategory = useCallback((id: number) => {
     const current = currentSearchParams.categoriesId || [];
     const updated = current.includes(id)
       ? current.filter(c => c !== id)
       : [...current, id];
     handleFilterChange('categoriesId', updated.length > 0 ? updated : undefined);
-  }, [currentSearchParams.categoriesId]);
+  }, [currentSearchParams.categoriesId, handleFilterChange]);
 
   const selectHome = useCallback((homeId?: number) => {
     handleFilterChange('homeId', homeId);
-  }, []);
-
-  const navigate = useNavigate();
+  }, [handleFilterChange]);
 
   const handleSearchSubmit = useCallback((e: FormEvent) => {
     e.preventDefault();
@@ -78,14 +86,7 @@ const SearchBar = memo(() => {
 
     navigate({pathname: '/apartments', search}, {replace: true});
     void searchFlats(1);
-  }, [currentSearchParams, closeModal, navigate, searchFlats]);
-
-  const handleFilterChange = useCallback(
-    (key: keyof SearchRequest, value: unknown) => {
-      setFilters({[key]: value} as Partial<SearchRequest>);
-    },
-    [setFilters]
-  );
+  }, [currentSearchParams, closeModal, searchFlats]);
 
   const toggleRoomFilter = useCallback((rooms: number) => {
     const current = currentSearchParams.rooms ?? 0;
@@ -166,7 +167,7 @@ const SearchBar = memo(() => {
             }}
             className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 ${
               modals.filters || anyActive
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                ? 'bg-primary-600 text-secondary-100 shadow-lg shadow-primary-600/25'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md'
             }`}
           >
@@ -185,7 +186,7 @@ const SearchBar = memo(() => {
             </svg>
             Фильтры
             {anyActive && (
-              <span className="bg-white text-blue-600 text-xs px-2 py-1 rounded-full font-bold">
+              <span className="bg-white text-primary-600 text-xs px-2 py-1 rounded-full font-bold">
                 {activeFiltersCount}
               </span>
             )}
@@ -225,7 +226,7 @@ const SearchBar = memo(() => {
               )}
               <button
                 onClick={clearAll}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors"
+                className="text-sm text-primary-600 hover:text-primary-700 font-medium hover:underline transition-colors"
               >
                 Очистить все
               </button>
@@ -266,7 +267,7 @@ const SearchBar = memo(() => {
                     type="button"
                     onClick={() => toggleRoomFilter(r)}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      currentSearchParams.rooms === r ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      currentSearchParams.rooms === r ? 'bg-primary-600 text-secondary-100' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
                     {r === 4 ? '4+' : r}
@@ -285,7 +286,7 @@ const SearchBar = memo(() => {
                     onClick={() => toggleBathroomFilter(b)}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       currentSearchParams.bathrooms === b
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-primary-600 text-secondary-100'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
@@ -302,7 +303,7 @@ const SearchBar = memo(() => {
                   type="checkbox"
                   checked={currentSearchParams.isDecorated || false}
                   onChange={(e) => handleFilterChange('isDecorated', e.target.checked || undefined)}
-                  className="w-4 h-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="w-4 h-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                   id="decorated-checkbox"
                 />
                 <label
@@ -344,7 +345,7 @@ const SearchBar = memo(() => {
                       >
                         <span className="text-sm">{home.name}</span>
                         {currentSearchParams.homeId === home.id &&
-                          <span className="text-blue-600 text-xs">✓</span>}
+                          <span className="text-primary-600 text-xs">✓</span>}
                       </div>
                     ))}
                     {homes.length === 0 && (
@@ -474,7 +475,7 @@ const SearchBar = memo(() => {
           <div className="flex justify-end mt-6">
             <button
               onClick={(e) => handleSearchSubmit(e)}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
             >
               Применить фильтры
             </button>

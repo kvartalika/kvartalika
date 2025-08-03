@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';
 import type {ResolvedHome} from "../services";
-import {useFlatsStore} from "../store";
+import {useFlatsStore} from "../store/flats.store.ts";
 import {safeImage} from "../utils/safeImage.ts";
 
 const ComplexesPage = () => {
@@ -42,13 +42,13 @@ const ComplexesPage = () => {
 
   return (
     <div className="min-h-screen pt-16">
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 py-16">
+      <section className="bg-gradient-to-r from-primary-600 to-primary-800 py-16">
         <div className="container mx-auto px-4">
-          <div className="text-center text-white">
+          <div className="text-center text-secondary-100">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               Жилые комплексы
             </h1>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+            <p className="text-xl text-primary-100 max-w-3xl mx-auto">
               Выберите идеальный жилой комплекс из нашего широкого портфолио современных проектов
             </p>
           </div>
@@ -59,7 +59,7 @@ const ComplexesPage = () => {
                 placeholder="Поиск по названию, адресу или описанию..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent pl-14 bg-white"
+                className="w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:ring-2 focus:ring-primary-500 focus:border-transparent pl-14 bg-white"
               />
               <svg
                 className="w-6 h-6 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2"
@@ -105,73 +105,120 @@ const ComplexesPage = () => {
                 <Link
                   key={complex.id}
                   to={`/complex/${complex.id}`}
-                  className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
+                  className="group flex flex-col bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+                  aria-label={complex.name ? `ЖК ${complex.name}` : 'ЖК'}
                 >
                   <div className="relative h-64 overflow-hidden">
                     <img
                       src={images[0]}
-                      alt={complex.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      alt={complex.name || 'Изображение ЖК'}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
                     />
-                    <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                      {complex.numberOfFloors ?? "Неизвестно"} этажей
+                    <div className="absolute top-4 right-4 bg-primary-600 text-secondary-100 px-3 py-1 rounded-full text-sm font-medium shadow">
+                      {complex.numberOfFloors ?? "–"} этажей
                     </div>
+                    {complex.features?.some(f => f.toLowerCase().includes('горячее предложение')) && (
+                      <div className="absolute bottom-3 left-3 bg-red-600 text-secondary-100 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
+                        <span>🔥</span> Горячее предложение
+                      </div>
+                    )}
                   </div>
 
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                      {complex.name ?? "Нет данных"}
+                  <div className="p-6 flex flex-col flex-1">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
+                      {complex.name || 'Без названия'}
                     </h3>
 
-                    <div className="flex items-center text-gray-600 mb-3">
-                      <svg
-                        className="w-4 h-4 mr-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                      <span className="text-sm">{complex.address ?? "Уточняется"}</span>
+                    <div className="flex items-start gap-4 mb-3 flex-wrap">
+                      <div className="flex items-center text-sm text-gray-700 bg-gray-100 rounded-lg p-2 gap-2 flex-1 min-w-[150px]">
+                        <svg
+                          className="w-4 h-4 flex-shrink-0 text-gray-500"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+                        <span className="truncate">{complex.address || 'Адрес уточняется'}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-700 bg-gray-100 rounded-lg p-2 gap-2 min-w-[120px]">
+                        <svg
+                          className="w-4 h-4 flex-shrink-0 text-gray-500"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 7h8M8 11h5m-5 4h8"
+                          />
+                        </svg>
+                        <span>{complex.numberOfFloors ? `${complex.numberOfFloors} этажей` : '– этажей'}</span>
+                      </div>
                     </div>
 
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                      {complex.description ?? "Описания еще нет..."}
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-3 flex-1">
+                      {complex.description || 'Описание отсутствует'}
                     </p>
 
                     {complex.features && complex.features.length > 0 && (
-                      <div className="border-t pt-4">
-                        <div className="flex flex-wrap gap-2">
-                          {complex.features.slice(0, 3).map((amenity, index) => (
+                      <div className="mt-auto">
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          {complex.features.slice(0, 3).map((feat, idx) => (
                             <span
-                              key={index}
-                              className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
+                              key={idx}
+                              className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded inline-flex items-center"
                             >
-                            {amenity}
-                          </span>
+                  {feat}
+                </span>
                           ))}
                           {complex.features.length > 3 && (
-                            <span className="text-xs text-gray-500">
-                            +{complex.features.length - 3} еще
-                          </span>
+                            <span className="text-xs text-gray-500 inline-flex items-center">
+                  +{complex.features.length - 3} еще
+                </span>
                           )}
+                        </div>
+                        <div className="flex gap-2 mt-2">
+                          <div className="flex-1">
+                <span className="inline-block bg-primary-50 text-primary-700 px-3 py-2 rounded-4xl text-xs font-medium">
+                  Подробнее
+                </span>
+                          </div>
+                          <div>
+                            <svg
+                              className="w-5 h-5 text-gray-400"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 5l7 7-7 7"
+                              />
+                            </svg>
+                          </div>
                         </div>
                       </div>
                     )}
                   </div>
                 </Link>
-              )
+              );
             })}
           </div>
         ) : (
@@ -198,7 +245,7 @@ const ComplexesPage = () => {
               Попробуйте изменить параметры поиска или{' '}
               <button
                 onClick={() => setSearchQuery('')}
-                className="text-blue-600 hover:text-blue-700 font-medium"
+                className="text-primary-600 hover:text-primary-700 font-medium"
               >
                 сбросить фильтры
               </button>

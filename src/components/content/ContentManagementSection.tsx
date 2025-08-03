@@ -1,10 +1,7 @@
 import {useState, useMemo, useCallback, useEffect} from 'react';
 import {
   type BidForm,
-  useContentManagerStore,
-  useContentStore,
-  useFlatsStore
-} from '../../store';
+} from '../../store/ui.store.ts';
 import type {
   FlatWithCategoryRequest,
   HomeRequest,
@@ -12,6 +9,9 @@ import type {
 } from '../../services';
 import ContentEditor, {type ContentType} from "./ContentEditor.tsx";
 import {useDebounce} from "../../hooks/useDebounce.ts";
+import {useContentStore} from "../../store/content.store.ts";
+import {useFlatsStore} from "../../store/flats.store.ts";
+import {useContentManagerStore} from "../../store/contentManager.store.ts";
 
 const TABS: Array<ContentType> = ['flat', 'home', 'category', 'bid'];
 type PayLoadType = FlatWithCategoryRequest | HomeRequest | Category | BidForm;
@@ -194,7 +194,7 @@ const ContentManagementSection = () => {
               (t === 'home' && ui.activeTab === 'homes') ||
               (t === 'category' && ui.activeTab === 'categories') ||
               (t === 'bid' && ui.activeTab === 'bids')
-                ? 'bg-blue-600 text-white'
+                ? 'bg-primary-600 text-secondary-100'
                 : 'bg-gray-100'
             }`}
             type="button"
@@ -211,7 +211,7 @@ const ContentManagementSection = () => {
         <div className="ml-auto flex gap-2 flex-wrap">
           <button
             onClick={() => openNew('flat')}
-            className="px-3 py-1 bg-green-600 text-white rounded text-sm"
+            className="px-3 py-1 bg-green-600 text-secondary-100 rounded text-sm"
             type="button"
           >
             Новая квартира
@@ -332,7 +332,7 @@ const ContentManagementSection = () => {
                       e.stopPropagation();
                       openEdit(item.type, item.payload);
                     }}
-                    className="text-blue-600 hover:underline text-sm"
+                    className="text-primary-600 hover:underline text-sm"
                     type="button"
                   >
                     Изменить

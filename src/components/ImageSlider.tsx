@@ -76,7 +76,7 @@ const ImageSlider: FC<ImageSliderProps> = ({
           <>
             <button
               onClick={prevSlide}
-              className="z-20 absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-40 hover:bg-opacity-60 text-white p-2 rounded-full transition-all duration-200"
+              className="z-20 absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-40 hover:bg-opacity-60 text-secondary-100 p-2 rounded-full transition-all duration-200"
               aria-label="Previous slide"
               type="button"
             >
@@ -132,7 +132,7 @@ const ImageSlider: FC<ImageSliderProps> = ({
               key={index}
               onClick={() => goToSlide(index)}
               className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
-                index === currentIndex ? 'border-blue-500 scale-105' : 'border-gray-200 hover:border-gray-300'
+                index === currentIndex ? 'border-primary-500 scale-105' : 'border-gray-200 hover:border-gray-300'
               }`}
               type="button"
               aria-label={`Перейти к слайду ${index + 1}`}
@@ -154,7 +154,7 @@ const ImageSlider: FC<ImageSliderProps> = ({
               key={index}
               onClick={() => goToSlide(index)}
               className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                index === currentIndex ? 'bg-blue-500 scale-110' : 'bg-gray-300 hover:bg-gray-400'
+                index === currentIndex ? 'bg-primary-500 scale-110' : 'bg-gray-300 hover:bg-gray-400'
               }`}
               aria-label={`Слайд ${index + 1}`}
               type="button"
