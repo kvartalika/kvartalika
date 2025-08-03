@@ -1,9 +1,10 @@
-import {Link, useNavigate, memo, useMemo, useCallback} from 'react';
+import {memo, useMemo, useCallback} from 'react';
 import type {
   ResolvedFlat
 } from "../services";
 import {safeImage} from "../utils/safeImage.ts";
 import PhotoSlider from './PhotoSlider.tsx';
+import {Link, useNavigate} from "react-router-dom";
 
 interface ApartmentCardProps {
   apartment: ResolvedFlat;

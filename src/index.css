@@ -35,7 +35,6 @@
 
   --box-shadow-soft: 0 2px 15px -3px rgb(0 0 0 / 0.07), 0 10px 20px -2px rgb(0 0 0 / 0.04);
   --box-shadow-strong: 0 10px 25px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05);
-  --box-shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
 
   --animate-fade-in: fadeIn 0.5s ease-in-out;
   --animate-slide-up: slideUp 0.5s ease-out;
@@ -234,7 +233,7 @@
 
   /* Button Enhancements */
   .btn-glow {
-    @apply bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-glow;
+    @apply bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105;
   }
 
   .btn-soft {
@@ -261,7 +260,7 @@
 
   /* Loading States */
   .loading-shimmer {
-    @apply animate-pulse bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-size-200;
+    @apply animate-pulse bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200;
   }
 
   /* Success/Error States */
@@ -393,8 +392,8 @@
 
 /* Hide scrollbar for webkit browsers */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
