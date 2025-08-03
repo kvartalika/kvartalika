@@ -1,6 +1,6 @@
 import type {AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 import axios from 'axios';
-import {useAuthStore, useUIStore} from "../store";
+import {useAuthStore} from "../store";
 
 export interface ApiConfig {
   baseURL: string;
@@ -40,7 +40,6 @@ class ApiClient {
   private setupInterceptors() {
     this.axiosInstance.interceptors.request.use(
       (config) => {
-        useUIStore.getState().startRequest();
 
         if (useAuthStore.getState().accessToken) {
           config.headers = config.headers || {};
@@ -49,18 +48,15 @@ class ApiClient {
         return config;
       },
       (error) => {
-        useUIStore.getState().endRequest();
         return Promise.reject(error);
       }
     );
 
     this.axiosInstance.interceptors.response.use(
       (response: AxiosResponse) => {
-        useUIStore.getState().endRequest();
         return response;
       },
       async (error: any) => {
-        useUIStore.getState().endRequest();
         const originalRequest = error.config;
         if (error.response?.status === 401 && !originalRequest?._retry) {
           originalRequest._retry = true;

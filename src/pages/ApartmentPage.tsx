@@ -1,8 +1,9 @@
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 import {Link, useParams} from 'react-router-dom';
 import {useFlatsStore, useUIStore} from "../store";
 import {safeImage} from "../utils/safeImage.ts";
 import Map from '../components/Map.tsx';
+import ImageSlider from "../components/ImageSlider.tsx";
 
 const ApartmentPage = () => {
   const {apartmentId} = useParams<{ apartmentId: string }>();
@@ -17,8 +18,6 @@ const ApartmentPage = () => {
     setSelectedHome,
     selectedHome
   } = useFlatsStore();
-
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     const load = async () => {
@@ -37,7 +36,7 @@ const ApartmentPage = () => {
       }
     };
     void load()
-  }, [apartmentId, getFlatById, setSelectedFlat]);
+  }, [apartmentId, getFlatById, setSelectedFlat, homes, selectedHome, setSelectedHome]);
 
   if (!selectedFlat?.flat) {
     return (
@@ -69,14 +68,6 @@ const ApartmentPage = () => {
   let layoutImg = safeImage(selectedFlat.layoutResolved, 'layout');
   layoutImg = Array.isArray(layoutImg) ? layoutImg[0] : layoutImg;
 
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % images?.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + images?.length) % images?.length);
-  };
-
   return (
     <div className="min-h-screen pt-20">
       <section className="bg-gray-50 py-4">
@@ -103,90 +94,30 @@ const ApartmentPage = () => {
         </div>
       </section>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 w-[90vw]">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <div className="mb-8">
-              <div className="relative h-96 rounded-xl overflow-hidden bg-gray-200">
-                <img
-                  src={images[currentImageIndex]}
-                  alt={`${selectedFlat.flat?.numberOfRooms}-комнатная квартира`}
-                  className="w-full h-full object-cover"
-                />
+            <div className="mb-4">
+              <div className="relative rounded-xl overflow-hidden bg-gray-200 w-full">
 
-                {selectedFlat.flat.features?.length && selectedFlat.flat.features.length >= 3 && (
-                  <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-2 rounded-lg font-semibold">
-                    🔥 Горячее предложение
+                <div className="aspect-[4/3] w-full">
+                  <ImageSlider
+                    images={images || []}
+                    className="h-full"
+                    showThumbnails={true}
+                    autoPlay={true}
+                  />
+                </div>
+
+                {selectedFlat.flat?.features?.some(el =>
+                  el.toLowerCase().includes('горячее предложение')
+                ) && (
+                  <div className="absolute bottom-2 left-4 bg-red-600 text-white px-2 py-2 rounded-lg text-xs font-semibold flex items-center gap-1">
+                    <span>🔥</span> Горячее предложение
                   </div>
                 )}
-
-                {images.length > 1 && (
-                  <>
-                    <button
-                      onClick={prevImage}
-                      className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
-                    >
-                      <svg
-                        className="w-6 h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 19l-7-7 7-7"
-                        />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={nextImage}
-                      className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
-                    >
-                      <svg
-                        className="w-6 h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </button>
-                  </>
-                )}
-
-                <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-lg text-sm">
-                  {currentImageIndex + 1} / {images?.length}
-                </div>
               </div>
 
-              {Array.isArray(images) && images.length > 1 && (
-                <div className="flex space-x-2 mt-4 overflow-x-auto">
-                  {images.map((image, index) => (
-                    <button
-                      key={`${image}-${index}`}
-                      onClick={() => setCurrentImageIndex(index)}
-                      className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                        index === currentImageIndex
-                          ? 'border-blue-500'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <img
-                        src={image}
-                        alt={`Фото ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
 
             {selectedFlat.flat.layout && (
@@ -339,6 +270,7 @@ const ApartmentPage = () => {
 
                 <button
                   onClick={() => openModal('bid')}
+                  aria-label="Записаться на осмотр квартиры"
                   className="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold text-lg hover:bg-blue-700 transition-colors mb-4"
                 >
                   Записаться на осмотр

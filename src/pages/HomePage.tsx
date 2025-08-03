@@ -28,7 +28,6 @@ const HomePage = () => {
     homes,
   } = useFlatsStore();
 
-
   const renderSection = (section: HomePageFlats, idx: number) => {
     return (
       <section
@@ -36,19 +35,13 @@ const HomePage = () => {
         className={`py-16 ${idx % 2 === 1 ? 'bg-gray-50' : 'bg-white'}`}
       >
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-12">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">{section.category.name}</h2>
-            </div>
-            <Link
-              to={`/apartments?categoriesId=${section.category.id}`}
-              className={`px-6 py-3 rounded-lg font-medium transition-colors bg-blue-600 hover:bg-blue-700 text-white`}
-            >
-              Посмотреть все
-            </Link>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              {section.category.name}
+            </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {section.flats.map(apartment => (
               <ApartmentCard
                 homeName={homes.find(item => item.id === apartment.flat.homeId)?.name ?? "?"}
@@ -57,6 +50,28 @@ const HomePage = () => {
                 onBookingClick={() => openModal('bid')}
               />
             ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link
+              to={`/apartments?categoriesId=${section.category.id}`}
+              className="inline-flex items-center px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            >
+              Посмотреть все
+              <svg
+                className="w-5 h-5 ml-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>
@@ -68,33 +83,33 @@ const HomePage = () => {
       <section className="relative min-h-screen flex pt-24 pb-6 justify-center gradient-primary overflow-hidden">
         <BackgroundPattern />
         <div className="container mx-auto px-4 text-center text-white relative z-10">
-          <h1 className="heading-xl mb-6">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
             {pageInfo.title}
           </h1>
           <p className="text-xl md:text-2xl mb-12 text-blue-100 max-w-3xl mx-auto">
             {pageInfo.description}
           </p>
 
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto mb-16">
             <SearchBar />
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 max-w-4xl mx-auto">
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-200 mb-2">50+</div>
-              <div className="text-sm text-blue-100">Жилых комплексов</div>
+              <div className="text-4xl md:text-5xl font-bold text-blue-200 mb-2">50+</div>
+              <div className="text-sm md:text-base text-blue-100">Жилых комплексов</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-200 mb-2">1000+</div>
-              <div className="text-sm text-blue-100">Квартир в продаже</div>
+              <div className="text-4xl md:text-5xl font-bold text-blue-200 mb-2">1000+</div>
+              <div className="text-sm md:text-base text-blue-100">Квартир в продаже</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-200 mb-2">15</div>
-              <div className="text-sm text-blue-100">Лет на рынке</div>
+              <div className="text-4xl md:text-5xl font-bold text-blue-200 mb-2">15</div>
+              <div className="text-sm md:text-base text-blue-100">Лет на рынке</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-200 mb-2">5000+</div>
-              <div className="text-sm text-blue-100">Довольных клиентов</div>
+              <div className="text-4xl md:text-5xl font-bold text-blue-200 mb-2">5000+</div>
+              <div className="text-sm md:text-base text-blue-100">Довольных клиентов</div>
             </div>
           </div>
         </div>
@@ -116,36 +131,36 @@ const HomePage = () => {
         </div>
 
         {isAuthenticated && role && role !== 'CLIENT' && (
-          <>
-            <div className='fixed right-4 bottom-4 flex flex-col gap-2 z-50 text-white '>
+          <div className='fixed bottom-4 flex items-center justify-between w-[90vw] flex-wrap gap-2 z-100'>
+            <div className='flex flex-col gap-2 text-white '>
               <Link
                 to={`/admin`}
-                className="bg-black  px-4 py-2 rounded-lg shadow"
+                className="bg-black  px-4 py-2 rounded-md shadow"
               >
                 Админ Панель
               </Link>
               <Link
                 to={`/content`}
-                className="bg-black px-4 py-2 rounded-lg shadow"
+                className="bg-black px-4 py-2 rounded-md shadow"
               >
                 Управление контентом
               </Link>
             </div>
-            <div className='fixed left-4 bottom-4 flex flex-col gap-2 z-50 text-white '>
+            <div className='flex flex-col gap-2 text-white'>
               <button
                 onClick={() => openModal('mainPage')}
-                className="px-4 py-2 shadow bg-black rounded-xl  "
+                className="px-4 py-2 shadow bg-black rounded-md"
               >
                 Редактировать главную
               </button>
               <button
                 onClick={() => openModal('social')}
-                className="px-4 py-2 shadow bg-black rounded-xl"
+                className="px-4 py-2 shadow bg-black rounded-md"
               >
                 Редактировать медиа
               </button>
             </div>
-          </>
+          </div>
         )}
       </section>
 

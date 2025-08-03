@@ -54,7 +54,7 @@ const UserForm: FC<{
           className="w-full border rounded px-3 py-2"
         />
       </div>
-      {submitLabel !== 'Update' && <div>
+      {submitLabel !== 'Изменить' && <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
         <input
           type="email"
@@ -74,7 +74,7 @@ const UserForm: FC<{
           required
         />
       </div>
-      {submitLabel !== 'Update' &&
+      {submitLabel !== 'Изменить' &&
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
           <input

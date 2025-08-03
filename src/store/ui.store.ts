@@ -94,7 +94,6 @@ export interface UIState {
 
   notifications: Notification[];
 
-  inFlightRequests: number;
   errors: {
     [key: string]: string | null;
   };
@@ -137,9 +136,6 @@ export interface UIActions {
 
   setError: (key: string, error: string | null) => void;
   clearErrors: () => void;
-
-  startRequest: () => void;
-  endRequest: () => void;
 }
 
 export const initialBidForm: BidRequest = {
@@ -151,8 +147,6 @@ export const initialBidForm: BidRequest = {
   createdAt: Date.now(),
   isChecked: false,
 };
-
-let debounceTimer: number | null = null;
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
@@ -200,8 +194,6 @@ export const useUIStore = create<
 
       errors: {},
 
-      inFlightRequests: 0,
-
       openModal: (modal, data) => {
         set(state => ({
           modals: {...state.modals, [modal]: true},
@@ -228,14 +220,11 @@ export const useUIStore = create<
             message: 'Не удалось загрузить настройки страницы',
             duration: 2500,
           });
-        } finally {
-          setLoading('global', false);
         }
       },
 
       loadSocialMediaList: async () => {
-        const {setLoading, addNotification} = get();
-        setLoading('global', true);
+        const {addNotification} = get();
         try {
           const list = await getSocialMedia();
           set({socialMediaList: list});
@@ -246,8 +235,6 @@ export const useUIStore = create<
             message: 'Не удалось загрузить соцсети',
             duration: 2500,
           });
-        } finally {
-          setLoading('global', false);
         }
       },
 
@@ -425,35 +412,6 @@ export const useUIStore = create<
 
           setLoading('bid', false);
           return false;
-        }
-      },
-
-      startRequest: () => {
-        set(state => ({inFlightRequests: state.inFlightRequests + 1}));
-        if (debounceTimer !== null) {
-          clearTimeout(debounceTimer);
-          debounceTimer = null;
-        }
-        debounceTimer = window.setTimeout(() => {
-          set(state => ({
-            loading: {
-              ...state.loading,
-              global: state.inFlightRequests > 0
-            }
-          }));
-          debounceTimer = null;
-        }, 100);
-      },
-
-      endRequest: () => {
-        set(state => ({inFlightRequests: Math.max(0, state.inFlightRequests - 1)}));
-        if (debounceTimer === null) {
-          set(state => ({
-            loading: {
-              ...state.loading,
-              global: state.inFlightRequests > 0
-            }
-          }));
         }
       },
 

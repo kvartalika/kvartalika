@@ -5,7 +5,8 @@ import ApartmentCard from '../components/ApartmentCard';
 import {useFlatsStore, useUIStore} from "../store";
 import {safeImage} from "../utils/safeImage.ts";
 import Map from '../components/Map.tsx';
-import { Scene3D } from '../components/Scene3D.tsx';
+import {Scene3D} from '../components/Scene3D.tsx';
+import ImageSlider from "../components/ImageSlider.tsx";
 
 const ComplexPage = () => {
   const {homeId} = useParams<{ homeId: string }>();
@@ -76,14 +77,6 @@ const ComplexPage = () => {
   let yardsImages = safeImage(selectedHome.yardsImagesResolved, 'history');
   yardsImages = Array.isArray(yardsImages) ? yardsImages : [yardsImages];
 
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
-
   return (
     <div className="min-h-screen pt-20">
       <section className="bg-gray-50 py-4">
@@ -101,64 +94,19 @@ const ComplexPage = () => {
         </div>
       </section>
 
-      <section className="relative h-96 md:h-[500px]">
-        <div className="relative h-full overflow-hidden bg-gray-200">
+      <section className="relative">
+        <div className="relative overflow-hidden mx-auto]">
 
-          <img
-            key={currentImageIndex}
-            src={images[currentImageIndex]}
-            alt={`${selectedHome.name} - фото ${currentImageIndex + 1}`}
-            className="w-full h-full object-cover absolute inset-0"
-          />
-
-          {images.length > 1 && (
-            <>
-              <button
-                onClick={prevImage}
-                aria-label="Предыдущее фото"
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all z-20"
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-              </button>
-              <button
-                onClick={nextImage}
-                aria-label="Следующее фото"
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all z-20"
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </button>
-            </>
-          )}
-
-          <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-lg text-sm z-20">
-            {currentImageIndex + 1} / {images.length}
+          <div className="aspect-[4/3] w-full">
+            <ImageSlider
+              images={images || []}
+              className="h-full w-full"
+              showThumbnails={false}
+              autoPlay={true}
+            />
           </div>
 
-          <div className="absolute inset-0 flex items-center justify-center z-10 bg-black/60">
+          <div className="absolute inset-0 flex items-center justify-center z-10">
             <div className="text-center text-white max-w-4xl px-4">
               <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
                 {selectedHome.name ?? "Неизвестное ЖК"}
@@ -352,7 +300,7 @@ const ComplexPage = () => {
           </div>
         </div>
       </section>
-      {selectedHome.model3DResolved && 
+      {selectedHome.model3DResolved &&
         <section className="py-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">3D-панорама</h2>
           <div className="lg:w-[100%] flex flex-col items-center justify-center">

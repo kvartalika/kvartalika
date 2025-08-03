@@ -78,6 +78,7 @@ export interface flatsActions {
 
   searchFlats: (page?: number) => Promise<void>;
   clearSearch: () => void;
+  resetFilters: () => void;
 
   setError: (error: string | null) => void;
   setSearchError: (error: string | null) => void;
@@ -182,6 +183,15 @@ export const useFlatsStore = create<flatsState & flatsActions>()(persist((set, g
           isLoadingHomes: false
         });
       }
+    },
+
+    resetFilters: () => {
+      set({
+        currentSearchParams: defaultFilters,
+        currentPage: 1,
+        hasSearched: false,
+        searchError: null,
+      });
     },
 
     loadCategories: async (force = false) => {

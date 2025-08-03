@@ -13,6 +13,7 @@ import type {
 } from '../../services';
 import ArrayField from "./ArrayField.tsx";
 import type {BidForm} from "../../store";
+import {useDeferredNumber} from "../../hooks/useDeferredNumber.ts";
 
 export type ContentType = 'flat' | 'home' | 'category' | 'bid';
 
@@ -133,6 +134,19 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
 
   const isCategorySelected = (category: Category) =>
     flatPayload.categories.some((c) => c.id === category.id);
+
+  const latControl = useDeferredNumber(flatPayload.flat.latitude, (num) =>
+    setFlatPayload((p) => ({
+      ...p,
+      flat: {...p.flat, latitude: num ?? undefined},
+    }))
+  );
+  const lonControl = useDeferredNumber(flatPayload.flat.longitude, (num) =>
+    setFlatPayload((p) => ({
+      ...p,
+      flat: {...p.flat, longitude: num ?? undefined},
+    }))
+  );
 
   const renderFlatForm = () => {
     const f = flatPayload.flat;
@@ -345,31 +359,29 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Широта</label>
             <input
-              type="number"
-              step="any"
-              value={f.latitude ?? ''}
-              onChange={(e) =>
-                setFlatPayload((p) => ({
-                  ...p,
-                  flat: {...p.flat, latitude: Number(e.target.value)}
-                }))
-              }
+              type="text"
+              inputMode="decimal"
+              pattern="[0-9]*[.,]?[0-9]*"
+              value={latControl.text}
+              onChange={(e) => latControl.setText(e.target.value)}
+              onBlur={latControl.commit}
+              onKeyDown={latControl.handleKey}
               className="w-full border rounded px-3 py-2"
+              placeholder="например 55,754"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Долгота</label>
             <input
-              type="number"
-              step="any"
-              value={f.longitude ?? ''}
-              onChange={(e) =>
-                setFlatPayload((p) => ({
-                  ...p,
-                  flat: {...p.flat, longitude: Number(e.target.value)}
-                }))
-              }
+              type="text"
+              inputMode="decimal"
+              pattern="[0-9]*[.,]?[0-9]*"
+              value={lonControl.text}
+              onChange={(e) => lonControl.setText(e.target.value)}
+              onBlur={lonControl.commit}
+              onKeyDown={lonControl.handleKey}
               className="w-full border rounded px-3 py-2"
+              placeholder="например 37,617"
             />
           </div>
         </div>

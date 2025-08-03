@@ -1,4 +1,4 @@
-import {useEffect, useMemo} from 'react';
+import {useEffect, useMemo, useCallback} from 'react';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import ApartmentCard from '../components/ApartmentCard';
 import SearchBar from '../components/SearchBar';
@@ -24,7 +24,7 @@ const ApartmentsPage = () => {
     setFilters,
     setPage,
     setLimit,
-    clearSearch,
+    resetFilters,
     searchFlats,
     homes,
     categories
@@ -94,12 +94,18 @@ const ApartmentsPage = () => {
     void searchFlats(1);
   }, [searchParams, setFilters, searchFlats]);
 
+  useEffect(() => {
+    return () => {
+      resetFilters();
+    };
+  }, [resetFilters]);
+
   const pagedFlats = useMemo(() => {
     const start = (currentPage - 1) * limit;
     return searchResults.slice(start, start + limit);
   }, [searchResults, currentPage, limit]);
 
-  const getPageTitle = () => {
+  const getPageTitle = useCallback(() => {
     const curCat = currentSearchParams.categoriesId;
     if (curCat && curCat.length === 1) {
       const cat = categories?.find((c) => c.id === curCat[0])
@@ -115,9 +121,9 @@ const ApartmentsPage = () => {
         return `Квартиры в комплексе ${curHome.name}`;
     }
     return 'Квартиры на любой вкус';
-  };
+  }, [currentSearchParams, categories, homes]);
 
-  const getPageDescription = () => {
+  const getPageDescription = useCallback(() => {
     if (currentSearchParams.categoriesId && currentSearchParams.categoriesId.length === 1) {
       const curCat = currentSearchParams.categoriesId;
       const cat = categories?.find((c) => c.id === curCat[0])
@@ -131,27 +137,41 @@ const ApartmentsPage = () => {
       return `Большой выбор квартир в выбранном комплексе`;
     }
     return 'Большой выбор квартир в лучших жилых комплексах города';
-  };
+  }, [currentSearchParams, categories]);
 
-  const handlePageChange = (newPage: number) => {
+  const handlePageChange = useCallback((newPage: number) => {
     setPage(newPage);
-  };
+  }, [setPage]);
 
-  const handleLimitChange = (newLimit: number) => {
+  const handleLimitChange = useCallback((newLimit: number) => {
     setLimit(newLimit);
-  };
+  }, [setLimit]);
+
+  const handleBookingClick = useCallback(() => {
+    openModal('bid');
+  }, [openModal]);
+
+  const handleClearSearch = useCallback(() => {
+    resetFilters();
+    navigate('/apartments');
+  }, [resetFilters, navigate]);
+
+  const pageTitle = useMemo(() => getPageTitle(), [getPageTitle]);
+  const pageDescription = useMemo(() => getPageDescription(), [getPageDescription]);
 
   return (
     <div className="min-h-screen pt-16">
 
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center text-white mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">{getPageTitle()}</h1>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">{getPageDescription()}</p>
+      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 py-20 relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center text-white mb-12">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">{pageTitle}</h1>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto animate-slide-up">{pageDescription}</p>
           </div>
 
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto animate-slide-up">
             <SearchBar />
           </div>
         </div>
@@ -171,20 +191,20 @@ const ApartmentsPage = () => {
           </div>
         </nav>
 
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-8 p-6 bg-white rounded-2xl shadow-lg">
           <div>
             <p className="text-gray-600">
               Найдено квартир:{' '}
-              <span className="font-semibold text-gray-900">{totalResults}</span>
+              <span className="font-semibold text-gray-900 text-lg">{totalResults}</span>
             </p>
           </div>
-          <div className="flex gap-4">
-            <div>
-              <label className="text-sm text-gray-500 mr-2">На странице:</label>
+          <div className="flex gap-4 items-center">
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-gray-500">На странице:</label>
               <select
                 value={limit}
                 onChange={(e) => handleLimitChange(Number(e.target.value))}
-                className="rounded border px-2 py-1"
+                className="rounded-xl border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 {[10, 20, 50].map(n => (
                   <option
@@ -194,10 +214,8 @@ const ApartmentsPage = () => {
                 ))}
               </select>
             </div>
-            <div>
-              <span className="text-sm text-gray-500">
-                Страница {currentPage} из {totalPages}
-              </span>
+            <div className="text-sm text-gray-500">
+              Страница <span className="font-semibold">{currentPage}</span> из <span className="font-semibold">{totalPages}</span>
             </div>
           </div>
         </div>
@@ -233,10 +251,7 @@ const ApartmentsPage = () => {
             <p className="text-gray-600 mb-6">
               Попробуйте изменить параметры поиска или{' '}
               <button
-                onClick={() => {
-                  clearSearch();
-                  navigate('/apartments');
-                }}
+                onClick={handleClearSearch}
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
                 посмотреть все квартиры
@@ -246,51 +261,69 @@ const ApartmentsPage = () => {
         )}
 
         {pagedFlats.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {pagedFlats.map((apartment) => (
               <ApartmentCard
                 homeName={homes.find(home => home.id === apartment.flat.homeId)?.name ?? '?'}
                 key={apartment.flat.id}
                 apartment={apartment}
-                onBookingClick={() => openModal('bid')}
+                onBookingClick={handleBookingClick}
               />
             ))}
           </div>
         )}
 
         {totalPages > 1 && (
-          <div className="flex justify-center items-center gap-4 mt-8">
+          <div className="flex justify-center items-center gap-4 mt-12">
             <button
               disabled={currentPage === 1 || isSearching}
               onClick={() => handlePageChange(currentPage - 1)}
-              className="px-4 py-2 bg-gray-100 rounded disabled:opacity-50"
+              className="px-6 py-3 bg-white border border-gray-200 rounded-xl disabled:opacity-50 hover:bg-gray-50 transition-colors font-medium"
             >
-              Назад
+              ← Назад
             </button>
-            <span>
-              {currentPage} / {totalPages}
-            </span>
+            <div className="flex items-center gap-2">
+              {Array.from({length: Math.min(5, totalPages)}, (_, i) => {
+                const page = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
+                if (page > totalPages) return null;
+                return (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`w-10 h-10 rounded-lg font-medium transition-colors ${
+                      page === currentPage
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
+            </div>
             <button
               disabled={currentPage === totalPages || isSearching}
               onClick={() => handlePageChange(currentPage + 1)}
-              className="px-4 py-2 bg-gray-100 rounded disabled:opacity-50"
+              className="px-6 py-3 bg-white border border-gray-200 rounded-xl disabled:opacity-50 hover:bg-gray-50 transition-colors font-medium"
             >
-              Вперед
+              Вперед →
             </button>
           </div>
         )}
 
-        <section className="mt-16 bg-blue-600 rounded-2xl p-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-2xl font-bold text-white mb-4">
+        <section className="mt-20 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-3xl p-12 relative overflow-hidden">
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20"></div>
+          <div className="max-w-3xl mx-auto text-center relative z-10">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
               Не нашли подходящую квартиру?
             </h2>
-            <p className="text-blue-100 mb-6">
+            <p className="text-blue-100 mb-8 text-lg">
               Наши специалисты помогут подобрать идеальный вариант под ваши требования и бюджет
             </p>
             <button
-              onClick={() => openModal('bid')}
-              className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-medium transition-colors"
+              onClick={handleBookingClick}
+              className="bg-white text-blue-600 hover:bg-gray-100 px-10 py-4 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg"
             >
               Получить персональную подборку
             </button>

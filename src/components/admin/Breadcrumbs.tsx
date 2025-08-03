@@ -1,23 +1,25 @@
-import React, {type FC} from "react";
+import {type FC, Fragment} from "react";
 
 const Breadcrumbs: FC<{
   segments: string[];
-  onCrumbClick: (index: number) => void
+  onCrumbClick: (idx: number) => void
 }> = ({
         segments,
         onCrumbClick,
       }) => (
   <div className="flex items-center gap-1 text-sm">
     {segments.map((seg, idx) => (
-      <React.Fragment key={idx}>
+      <Fragment key={`${seg}-${idx}`}>
         <button
-          onClick={() => onCrumbClick(idx)}
+          onClick={() => {
+            onCrumbClick(idx)
+          }}
           className="underline"
         >
-          {seg === 'root' ? '/' : seg}
+          {seg === '' ? '/' : seg}
         </button>
         {idx < segments.length - 1 && <span>/</span>}
-      </React.Fragment>
+      </Fragment>
     ))}
   </div>
 );

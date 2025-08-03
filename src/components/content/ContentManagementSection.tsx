@@ -1,4 +1,4 @@
-import {useState, useMemo, useEffect} from 'react';
+import {useState, useMemo, useCallback, useEffect} from 'react';
 import {
   type BidForm,
   useContentManagerStore,
@@ -13,8 +13,15 @@ import type {
 import ContentEditor, {type ContentType} from "./ContentEditor.tsx";
 import {useDebounce} from "../../hooks/useDebounce.ts";
 
-const TABS: Array<ContentType | 'bid'> = ['flat', 'home', 'category', 'bid'];
+const TABS: Array<ContentType> = ['flat', 'home', 'category', 'bid'];
 type PayLoadType = FlatWithCategoryRequest | HomeRequest | Category | BidForm;
+
+const GUIDE: Record<string, string> = {
+  flats: "Квартиры: создавайте, редактируйте и удаляйте квартиры. Используйте поиск для фильтрации по адресу или ID.",
+  homes: "Комплексы: управляйте жилыми комплексами, сопоставляйте квартиры с комплексами.",
+  categories: "Категории: держите классификацию актуальной. Назначайте категории на объекты.",
+  bids: "Заявки: просматривайте входящие заявки, отмечайте как просмотренные и редактируйте."
+};
 
 const ContentManagementSection = () => {
   const {
@@ -37,7 +44,14 @@ const ContentManagementSection = () => {
     loading
   } = useContentStore();
 
-  const {loadFlats, loadHomes, loadCategories} = useFlatsStore();
+  const {
+    loadFlats,
+    loadHomes,
+    loadCategories,
+    flats,
+    homes,
+    categories
+  } = useFlatsStore();
 
   const {
     bids,
@@ -49,82 +63,113 @@ const ContentManagementSection = () => {
     isLoadingBids,
   } = useContentManagerStore();
 
-  const {flats, homes, categories} = useFlatsStore();
-
-  const [editorType, setEditorType] = useState<ContentType>('flat');
-
   const [filter, setFilter] = useState('');
   const debouncedFilter = useDebounce(filter, 250);
 
+  const activeContentType: ContentType = useMemo(() => {
+    if (ui.activeTab === 'flats') return 'flat';
+    if (ui.activeTab === 'homes') return 'home';
+    if (ui.activeTab === 'categories') return 'category';
+    if (ui.activeTab === 'bids') return 'bid';
+    return 'flat';
+  }, [ui.activeTab]);
 
-  const switchTab = (type: ContentType | 'bid') => {
-    setEditorType(type);
+  const refreshCurrent = useCallback(() => {
+    if (ui.activeTab === 'bids') {
+      void getBids();
+    } else if (ui.activeTab === 'flats') {
+      void loadFlats(true);
+    } else if (ui.activeTab === 'homes') {
+      void loadHomes(true);
+    } else if (ui.activeTab === 'categories') {
+      void loadCategories(true);
+    }
+    setFilter('');
+  }, [ui.activeTab, getBids, loadFlats, loadHomes, loadCategories]);
+
+  useEffect(() => {
+    refreshCurrent();
+  }, [refreshCurrent]);
+
+  const switchTab = useCallback((type: ContentType) => {
     if (type === 'flat') setActiveTab('flats');
     if (type === 'home') setActiveTab('homes');
     if (type === 'category') setActiveTab('categories');
     if (type === 'bid') setActiveTab('bids');
-  };
+    setFilter('');
+  }, [setActiveTab]);
 
-  const openNew = (type: ContentType) => {
-    setEditorType(type);
+  const openNew = useCallback((type: ContentType) => {
     setEditMode(false);
     setShowForm(true);
     switchTab(type);
-  };
+  }, [setEditMode, setShowForm, switchTab]);
 
-  const openEdit = (type: ContentType, payload: PayLoadType) => {
-    setEditorType(type);
+  const openEdit = useCallback((type: ContentType, payload: PayLoadType) => {
     if (type === 'flat') editFlat(payload as FlatWithCategoryRequest);
     if (type === 'home') editHome(payload as HomeRequest);
     if (type === 'category') editCategory(payload as Category);
-    if (type === 'bid') editBid((payload as BidForm));
+    if (type === 'bid') editBid(payload as BidForm);
     setEditMode(true);
     setShowForm(true);
     switchTab(type);
-  };
+  }, [editFlat, editHome, editCategory, editBid, setEditMode, setShowForm, switchTab]);
 
-  const handleSave = async (payload: PayLoadType) => {
-    if (editorType === 'flat') await saveFlat(payload as FlatWithCategoryRequest);
-    if (editorType === 'home') await saveHome(payload as HomeRequest);
-    if (editorType === 'category') await saveCategory(payload as Category);
-    if (editorType === 'bid') await saveBid(payload as BidForm);
-  };
+  const handleSave = useCallback(async (payload: PayLoadType) => {
+    if (activeContentType === 'flat') await saveFlat(payload as FlatWithCategoryRequest);
+    if (activeContentType === 'home') await saveHome(payload as HomeRequest);
+    if (activeContentType === 'category') await saveCategory(payload as Category);
+    if (activeContentType === 'bid') await saveBid(payload as BidForm);
+    refreshCurrent();
+  }, [refreshCurrent, activeContentType, saveFlat, saveHome, saveCategory, saveBid]);
 
-  const handleDelete = async () => {
-    if (editorType === 'flat' && selectedFlat?.flat.id) await removeFlat(selectedFlat.flat.id);
-    if (editorType === 'home' && selectedHome?.id) await removeHome(selectedHome.id);
-    if (editorType === 'category' && selectedCategory?.id) await removeCategory(selectedCategory.id);
-    if (editorType === 'bid' && selectedBid?.id) await removeBid(selectedBid.id);
-
+  const handleDelete = useCallback(async () => {
+    if (activeContentType === 'flat' && selectedFlat?.flat.id) await removeFlat(selectedFlat.flat.id);
+    if (activeContentType === 'home' && selectedHome?.id) await removeHome(selectedHome.id);
+    if (activeContentType === 'category' && selectedCategory?.id) await removeCategory(selectedCategory.id);
+    if (activeContentType === 'bid' && selectedBid?.id) await removeBid(selectedBid.id);
     setShowForm(false);
-  };
+    refreshCurrent();
+  }, [
+    refreshCurrent,
+    activeContentType,
+    selectedFlat,
+    selectedHome,
+    selectedCategory,
+    selectedBid,
+    removeFlat,
+    removeHome,
+    removeCategory,
+    removeBid,
+    setShowForm,
+  ]);
 
   const currentList = useMemo(() => {
     let base: Array<{
-      type: ContentType;
+      type: ContentType | 'bid';
       payload: PayLoadType;
-      label: string
+      label: string;
     }> = [];
 
-    if (editorType === 'bid') {
+    if (activeContentType === 'bid') {
       base = bids.map(b => ({
         type: 'bid' as const,
         payload: b,
         label: `${b.id}-${b.name || ''} ${b.email || ''}`.trim(),
       }));
-    } else if (editorType === 'flat') {
+    } else if (activeContentType === 'flat') {
       base = flats.map(f => ({
         type: 'flat' as const,
         payload: f,
         label: `${f.flat.id} ${f.flat.address || ''} ${f.flat.homeId || ''}`.trim(),
       }));
-    } else if (editorType === 'home') {
+    } else if (activeContentType === 'home') {
       base = homes.map(h => ({
         type: 'home' as const,
         payload: h,
         label: `${h.id} ${h.address || ''}`.trim(),
       }));
-    } else if (editorType === 'category') {
+    } else if (activeContentType === 'category') {
       base = categories.map(c => ({
         type: 'category' as const,
         payload: c,
@@ -135,21 +180,7 @@ const ContentManagementSection = () => {
     if (!debouncedFilter) return base;
     const lowered = debouncedFilter.toLowerCase();
     return base.filter(i => i.label.toLowerCase().includes(lowered));
-  }, [editorType, debouncedFilter, bids, flats, homes, categories]);
-
-  useEffect(() => {
-    if (editorType === 'bid') {
-      void getBids();
-    } else if (editorType === 'flat') {
-      void loadFlats();
-    } else if (editorType === 'home') {
-      void loadHomes();
-    } else if (editorType === 'category') {
-      void loadCategories();
-    }
-    setFilter('');
-  }, [editorType, getBids, loadFlats, loadHomes, loadCategories]);
-
+  }, [activeContentType, debouncedFilter, bids, flats, homes, categories]);
 
   return (
     <div className="space-y-6">
@@ -158,83 +189,109 @@ const ContentManagementSection = () => {
           <button
             key={t}
             onClick={() => switchTab(t)}
-            className={`px-3 py-1 rounded ${(
+            className={`px-3 py-1 rounded ${
               (t === 'flat' && ui.activeTab === 'flats') ||
               (t === 'home' && ui.activeTab === 'homes') ||
               (t === 'category' && ui.activeTab === 'categories') ||
               (t === 'bid' && ui.activeTab === 'bids')
-            ) ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100'
+            }`}
+            type="button"
           >
-            {t === 'flat' ? 'Квартиры' : t === 'home' ? 'Комплексы' : t === 'category' ? 'Категории' : 'Заявки'}
+            {t === 'flat'
+              ? 'Квартиры'
+              : t === 'home'
+                ? 'Комплексы'
+                : t === 'category'
+                  ? 'Категории'
+                  : 'Заявки'}
           </button>
         ))}
-        <div className="ml-auto flex gap-2">
+        <div className="ml-auto flex gap-2 flex-wrap">
           <button
             onClick={() => openNew('flat')}
-            className="btn"
-          >Новая квартира
+            className="px-3 py-1 bg-green-600 text-white rounded text-sm"
+            type="button"
+          >
+            Новая квартира
           </button>
           <button
             onClick={() => openNew('home')}
-            className="btn"
-          >Новый комплекс
+            className="px-3 py-1 bg-green-600 text-white rounded text-sm"
+            type="button"
+          >
+            Новый комплекс
           </button>
           <button
             onClick={() => openNew('category')}
-            className="btn"
-          >Новая категория
+            className="px-3 py-1 bg-green-600 text-white rounded text-sm"
+            type="button"
+          >
+            Новая категория
+          </button>
+          <button
+            onClick={() => openNew('bid')}
+            className="px-3 py-1 bg-green-600 text-white rounded text-sm"
+            type="button"
+          >
+            Новая заявка
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">
-              {editorType === 'bid' && ui.activeTab === 'bids' && 'Список заявок'}
-              {editorType === 'flat' && ui.activeTab === 'flats' && 'Список квартир'}
-              {editorType === 'home' && ui.activeTab === 'homes' && 'Список комплексов'}
-              {editorType === 'category' && ui.activeTab === 'categories' && 'Список категорий'}
+              {ui.activeTab === 'bids' && 'Список заявок'}
+              {ui.activeTab === 'flats' && 'Список квартир'}
+              {ui.activeTab === 'homes' && 'Список комплексов'}
+              {ui.activeTab === 'categories' && 'Список категорий'}
             </h3>
-            {editorType === 'bid' && (
+            {ui.activeTab === 'bids' && (
               <div className="text-sm text-gray-500">
                 {isLoadingBids ? 'Загрузка...' : `${bids.length} заявок`}
               </div>
             )}
-            {editorType === 'flat' && (
+            {ui.activeTab === 'flats' && (
               <div className="text-sm text-gray-500">
                 {loading.flats ? 'Загрузка...' : `${flats.length} квартир`}
               </div>
             )}
-            {editorType === 'home' && (
+            {ui.activeTab === 'homes' && (
               <div className="text-sm text-gray-500">
                 {loading.homes ? 'Загрузка...' : `${homes.length} ЖК`}
               </div>
             )}
-            {editorType === 'category' && (
+            {ui.activeTab === 'categories' && (
               <div className="text-sm text-gray-500">
                 {loading.categories ? 'Загрузка...' : `${categories.length} категорий`}
               </div>
             )}
           </div>
 
-          <div className="flex gap-2 mb-2">
+          <div className="flex gap-2 mb-2 flex-wrap">
             <input
               placeholder="Поиск..."
               value={filter}
               onChange={e => setFilter(e.target.value)}
               className="flex-grow px-3 py-2 border rounded"
+              type="text"
             />
-            {editorType === 'bid' && (
-              <button
-                onClick={() => void getBids()}
-                className="px-3 py-2 bg-gray-200 rounded"
-                disabled={isLoadingBids}
-              >
-                Обновить
-              </button>
-            )}
+            <button
+              onClick={refreshCurrent}
+              className="px-3 py-2 bg-gray-200 rounded"
+              disabled={
+                (ui.activeTab === 'flats' && loading.flats) ||
+                (ui.activeTab === 'homes' && loading.homes) ||
+                (ui.activeTab === 'categories' && loading.categories) ||
+                (ui.activeTab === 'bids' && isLoadingBids)
+              }
+              type="button"
+            >
+              Обновить
+            </button>
           </div>
 
           {currentList.length === 0 &&
@@ -249,11 +306,7 @@ const ContentManagementSection = () => {
                 key={`${item.label}-${item.type}`}
                 onClick={() => openEdit(item.type, item.payload)}
                 className={`flex justify-between items-center p-2 border rounded hover:shadow-sm transition cursor-pointer ${
-                  isBid
-                    ? isChecked
-                      ? 'bg-green-50'
-                      : 'bg-yellow-50 font-semibold'
-                    : ''
+                  isBid ? (isChecked ? 'bg-green-50' : 'bg-yellow-50 font-semibold') : ''
                 }`}
               >
                 <div className="flex flex-col">
@@ -275,11 +328,12 @@ const ContentManagementSection = () => {
                     </div>
                   )}
                   <button
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       openEdit(item.type, item.payload);
                     }}
                     className="text-blue-600 hover:underline text-sm"
+                    type="button"
                   >
                     Изменить
                   </button>
@@ -289,21 +343,36 @@ const ContentManagementSection = () => {
           })}
         </div>
 
-        <div className="p-4 border rounded bg-white">
+        <div className="p-4 border rounded bg-white flex flex-col gap-4">
+          <div className="flex-1">
+            <h4 className="font-semibold mb-2">Руководство</h4>
+            <p className="text-sm text-gray-700 whitespace-pre-line">
+              {GUIDE[ui.activeTab] || "Выберите вкладку, чтобы увидеть руководство."}
+            </p>
+          </div>
+
           <div className="flex flex-col gap-2">
             <div>
               <button
-                onClick={() => openNew(editorType)}
-                className="px-3 py-1 bg-green-600 text-white rounded text-sm"
+                onClick={() => openNew(activeContentType)}
+                className="px-3 py-1 bg-green-600 text-white rounded text-sm w-full"
+                type="button"
               >
-                {editorType === 'flat' ? 'Новая квартира' : editorType === 'home' ? 'Новый комплекс' : 'Новая категория'}
+                {ui.activeTab === 'flats'
+                  ? 'Новая квартира'
+                  : ui.activeTab === 'homes'
+                    ? 'Новый комплекс'
+                    : ui.activeTab === 'categories'
+                      ? 'Новая категория'
+                      : 'Новая заявка'}
               </button>
             </div>
             {ui.editMode && (
               <div>
                 <button
                   onClick={handleDelete}
-                  className="px-3 py-1 bg-red-600 text-white rounded text-sm"
+                  className="px-3 py-1 bg-red-600 text-white rounded text-sm w-full"
+                  type="button"
                 >
                   Удалить текущий
                 </button>
@@ -315,11 +384,11 @@ const ContentManagementSection = () => {
 
       {ui.showForm && (
         <ContentEditor
-          contentType={editorType}
-          initialFlat={editorType === 'flat' ? selectedFlat || undefined : undefined}
-          initialHome={editorType === 'home' ? selectedHome || undefined : undefined}
-          initialCategory={editorType === 'category' ? selectedCategory || undefined : undefined}
-          initialBid={editorType === 'bid' ? selectedBid || undefined : undefined}
+          contentType={activeContentType}
+          initialFlat={activeContentType === 'flat' ? selectedFlat || undefined : undefined}
+          initialHome={activeContentType === 'home' ? selectedHome || undefined : undefined}
+          initialCategory={activeContentType === 'category' ? selectedCategory || undefined : undefined}
+          initialBid={activeContentType === 'bid' ? selectedBid || undefined : undefined}
           allCategories={categories}
           isEditing={ui.editMode}
           onSave={handleSave}

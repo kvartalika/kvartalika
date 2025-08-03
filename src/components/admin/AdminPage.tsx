@@ -3,7 +3,7 @@ import {
   useEffect,
   useState,
   useCallback,
-  type FC,
+  type FC, type ChangeEvent,
 } from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useAdminStore, useAuthStore, useUIStore} from '../../store';
@@ -11,10 +11,9 @@ import type {Tab, UserDto} from '../../services';
 import TabSwitcher from './TabSwitcher.tsx';
 import Panel from './Panel.tsx';
 import UserForm from './UserForm.tsx';
-import FileExplorer from '../file-explorer/FileExplorer.tsx';
-import DirectoryBrowser from '../file-explorer/DirectoryBrowser.tsx';
 import UserList from "./UserList.tsx";
 import Alert from './Alert.tsx';
+import UnifiedFileManager from "../file-explorer/UnifiedFileManager.tsx";
 
 const AdminPage: FC = () => {
   const {role, isAuthenticated} = useAuthStore();
@@ -39,7 +38,7 @@ const AdminPage: FC = () => {
 
     currentPath,
     setCurrentPath,
-    directories,
+    currentDirectoryDirs,
     currentDirectoryFiles,
     isLoadingDirectories,
     isLoadingFiles,
@@ -79,19 +78,11 @@ const AdminPage: FC = () => {
 
   const [prevTab, setPrevTab] = useState<Tab | null>(null);
 
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+
   useEffect(() => {
-    if (activeTab === 'directories') {
-      void listDirectories();
-
-
-      if (prevTab !== 'directories') {
-        void setCurrentPath([]);
-        void getDirectory([]);
-        void listFilesInDir([]);
-      }
-    }
-
     if (activeTab === 'files') {
+      void listDirectories();
       void listFilesInDir(currentPath);
       void getDirectory(currentPath);
     }
@@ -131,14 +122,14 @@ const AdminPage: FC = () => {
         addNotification({
           type: 'success',
           title: 'Обновлено',
-          message: 'Контент-менеджер обновлён'
+          message: 'Content-менеджер обновлён'
         });
       } else {
         await addContentManager(formData);
         addNotification({
           type: 'success',
           title: 'Создано',
-          message: 'Контент-менеджер добавлен'
+          message: 'Content-менеджер добавлен'
         });
       }
       resetForm();
@@ -195,7 +186,7 @@ const AdminPage: FC = () => {
         addNotification({
           type: 'success',
           title: 'Удалено',
-          message: 'Контент-менеджер удалён'
+          message: 'Content-менеджер удалён'
         });
       } else {
         await removeAdmin(email);
@@ -227,11 +218,17 @@ const AdminPage: FC = () => {
     await listFilesInDir(nextPath);
   };
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    await uploadFile(currentPath, f);
+  const handleUploadClick = async () => {
+    if (!pendingFile) return;
+    await uploadFile(currentPath, pendingFile);
+    setPendingFile(null);
     await listFilesInDir(currentPath);
+  };
+
+  const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0] ?? null;
+    setPendingFile(f);
+    e.currentTarget.value = "";
   };
 
   const handleDownload = async (path: string[]) => {
@@ -249,7 +246,9 @@ const AdminPage: FC = () => {
     }
   };
 
+
   const handleDeleteFile = async (path: string[]) => {
+    if (!window.confirm('Вы уверены?')) return;
     await deleteFile(path);
     await listFilesInDir(currentPath);
   };
@@ -279,17 +278,17 @@ const AdminPage: FC = () => {
             {/* Content Managers */}
             {activeTab === 'managers' && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Panel title={isEditMode && editingType === 'manager' ? 'Edit Content Manager' : 'Create Content Manager'}>
+                <Panel title={isEditMode && editingType === 'manager' ? 'Изменить Content Менеджера' : 'Создать Content Менеджера'}>
                   <UserForm
                     formData={formData}
                     setFormData={setFormData}
                     onSubmit={handleSubmitManager}
                     onCancel={resetForm}
-                    submitLabel={isEditMode && editingType === 'manager' ? 'Update' : 'Create'}
+                    submitLabel={isEditMode && editingType === 'manager' ? 'Изменить' : 'Создать'}
                     requirePassword={!isEditMode}
                   />
                 </Panel>
-                <Panel title="Content Managers">
+                <Panel title="Content Менеджеры">
                   <UserList
                     items={contentManagers}
                     onEdit={(u) => startEdit(u, 'manager')}
@@ -301,13 +300,13 @@ const AdminPage: FC = () => {
 
             {activeTab === 'admins' && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Panel title={isEditMode && editingType === 'admin' ? 'Edit Admin' : 'Create Admin'}>
+                <Panel title={isEditMode && editingType === 'admin' ? 'Изменить Админа' : 'Создать Админа'}>
                   <UserForm
                     formData={formData}
                     setFormData={setFormData}
                     onSubmit={handleSubmitAdmin}
                     onCancel={resetForm}
-                    submitLabel={isEditMode && editingType === 'admin' ? 'Update' : 'Create'}
+                    submitLabel={isEditMode && editingType === 'admin' ? 'Изменить' : 'Создать'}
                     requirePassword={!isEditMode}
                   />
                 </Panel>
@@ -323,62 +322,33 @@ const AdminPage: FC = () => {
 
             {activeTab === 'files' && (
               <Panel title="File Management">
-                <div className="flex flex-col gap-4">
-                  <div className="flex flex-wrap gap-4 items-center mb-4">
-                    <div className="flex gap-2">
-                      <input
-                        type="file"
-                        onChange={handleUpload}
-                        className="border rounded px-2 py-1"
-                      />
-                    </div>
-                    <div>
-                      <strong>Current directory:</strong> /{currentPath.join('/')}
-                    </div>
-                    <div className="ml-auto flex gap-2">
-                      <button
-                        onClick={() => void listFilesInDir(currentPath)}
-                        className="px-3 py-1 bg-gray-200 rounded"
-                      >
-                        Refresh files
-                      </button>
-                      <button
-                        onClick={() => void getDirectory(currentPath)}
-                        className="px-3 py-1 bg-gray-200 rounded"
-                      >
-                        Refresh dir
-                      </button>
-                    </div>
-                  </div>
-
-                  <FileExplorer
-                    currentDirectory={currentPath}
-                    files={currentDirectoryFiles}
-                    loading={isLoadingFiles}
-                    onRefresh={async () => {
-                      await listFilesInDir(currentPath);
-                    }}
-                    onDownload={handleDownload}
-                    onDelete={async (path) => {
-                      await handleDeleteFile(path);
-                    }}
-                  />
-                </div>
-              </Panel>
-            )}
-
-            {activeTab === 'directories' && (
-              <Panel title="Directory Management">
-                <DirectoryBrowser
-                  segments={currentPath}
-                  directories={directories}
-                  loading={isLoadingDirectories}
+                <UnifiedFileManager
+                  currentPath={currentPath}
+                  directories={currentDirectoryDirs}
+                  files={currentDirectoryFiles}
+                  isLoadingDirectories={isLoadingDirectories}
+                  isLoadingFiles={isLoadingFiles}
+                  newDirectoryName={newDirectoryName}
+                  setNewDirectoryName={setNewDirectoryName}
                   onNavigate={handleNavigateDirectory}
-                  newDirName={newDirectoryName}
-                  setNewDirName={setNewDirectoryName}
-                  onCreate={handleCreateDirectory}
-                  onDelete={async (name) => {
-                    await deleteDirectory([...currentPath, name]);
+                  onCreateDirectory={handleCreateDirectory}
+                  onDeleteDirectory={async (name: string) => {
+                    if (!window.confirm('Вы уверены?')) return;
+                    await deleteDirectory([name]);
+                    await getDirectory(currentPath);
+                    await listDirectories();
+                  }}
+
+                  pendingFile={pendingFile}
+                  setPendingFile={setPendingFile}
+                  handleUploadClick={handleUploadClick}
+                  handleFileSelect={handleFileSelect}
+
+                  onDownload={handleDownload}
+                  onDeleteFile={handleDeleteFile}
+                  onRefresh={async () => {
+                    await listDirectories();
+                    await listFilesInDir(currentPath);
                     await getDirectory(currentPath);
                   }}
                 />

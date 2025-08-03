@@ -61,8 +61,8 @@ const InnerApp = () => {
     };
 
     loadData().then(() => {
-      void loadAllData();
-      setLoading('global', false);
+      void loadAllData(true);
+      setTimeout(() => setLoading('global', false), 500);
     })
   }, [loadAllData, loadPageInfo, loadSocialMediaList, setLoading]);
 
