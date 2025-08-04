@@ -24,7 +24,7 @@ const Map = ({latitude, longitude, description}: MapProps) => {
       center={[latitude, longitude]}
       zoom={13}
       scrollWheelZoom={false}
-      className="mx-auto z-10 w-full rounded-2xl shadow-lg aspect-[16/9] min-h-[250px] max-h-[400px] max-w-[70vw] relative"
+      className="mx-auto z-10 w-full rounded-2xl shadow-lg aspect-[16/9] min-h-[250px] max-h-[400px] relative"
     >
       <div className='absolute bottom-0 right-0 bg-sky-50 z-2000 rounded-md'>
         <p className='px-16 font-bold text-lg'>@Кварталика</p>

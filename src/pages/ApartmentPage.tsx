@@ -111,10 +111,10 @@ const ApartmentPage = () => {
                   />
                 </div>
 
-                {selectedFlat.flat?.features?.some(el =>
-                  el.toLowerCase().includes('горячее предложение')
+                {selectedFlat.categories?.some(el =>
+                  el.name?.toLowerCase().includes('горячее предложение')
                 ) && (
-                  <div className="absolute bottom-2 left-4 bg-red-600 text-secondary-100 px-2 py-2 rounded-lg text-xs font-semibold flex items-center gap-1">
+                  <div className="absolute bottom-2 left-4 bg-red-600 text-white px-2 py-2 rounded-lg text-xs font-semibold flex items-center gap-1">
                     <span>🔥</span> Горячее предложение
                   </div>
                 )}
@@ -235,7 +235,7 @@ const ApartmentPage = () => {
                   {selectedFlat.categories.map((cat, index) => (
                     <div
                       key={`${cat.name}-${index}`}
-                      className="flex items-center text-secondary-100 px-3 py-2 bg-primary-500 font-semibold text-center rounded-lg"
+                      className="flex items-center text-white px-3 py-2 bg-primary-500 font-semibold text-center rounded-lg"
                     >
                       {cat.name}
                     </div>
@@ -289,7 +289,7 @@ const ApartmentPage = () => {
                 <button
                   onClick={() => openModal('bid')}
                   aria-label="Записаться на осмотр квартиры"
-                  className="w-full bg-primary-600 text-secondary-100 py-4 rounded-lg font-semibold text-lg hover:bg-primary-700 transition-colors mb-4"
+                  className="w-full bg-primary-600 text-surface-50 py-4 rounded-xl font-semibold text-lg hover:bg-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl mb-4"
                 >
                   Записаться на осмотр
                 </button>

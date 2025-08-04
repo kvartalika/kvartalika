@@ -114,7 +114,7 @@ const UserForm: FC<{
       </button>
       <button
         type="submit"
-        className="px-4 py-2 bg-primary-600 text-secondary-100 rounded hover:bg-primary-700"
+        className="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700"
       >
         {submitLabel}
       </button>

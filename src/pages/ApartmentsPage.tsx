@@ -163,13 +163,13 @@ const ApartmentsPage = () => {
   return (
     <div className="min-h-screen pt-16">
 
-      <section className="bg-gradient-to-br from-primary-600 via-primary-700 to-indigo-800 py-20 relative overflow-hidden">
+      <section className="bg-gradient-to-r from-primary-600 to-primary-800 via-primary-700 py-20 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-primary-600/20 to-indigo-600/20"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-600/20 to-primary-600/20"></div>
         <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center text-secondary-100 mb-12">
+          <div className="text-center text-white mb-12">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">{pageTitle}</h1>
-            <p className="text-xl text-primary-100 max-w-3xl mx-auto animate-slide-up">{pageDescription}</p>
+            <p className="text-xl text-gray-200 max-w-3xl mx-auto animate-slide-up">{pageDescription}</p>
           </div>
 
           <div className="max-w-4xl mx-auto animate-slide-up">
@@ -291,11 +291,11 @@ const ApartmentsPage = () => {
                   <button
                     key={page}
                     onClick={() => handlePageChange(page)}
-                    className={`w-10 h-10 rounded-lg font-medium transition-colors ${
-                      page === currentPage
-                        ? 'bg-primary-600 text-secondary-100'
-                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
-                    }`}
+                                          className={`w-10 h-10 rounded-lg font-medium transition-colors ${
+                        page === currentPage
+                          ? 'bg-primary-600 text-surface-50'
+                          : 'bg-surface-50 border border-surface-200 text-surface-700 hover:bg-surface-100'
+                      }`}
                   >
                     {page}
                   </button>
@@ -314,12 +314,12 @@ const ApartmentsPage = () => {
 
         <section className="mt-20 bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 rounded-3xl p-12 relative overflow-hidden">
           <div className="absolute inset-0 bg-black/10"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-primary-600/20 to-indigo-600/20"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary-600/20 to-primary-600/20"></div>
           <div className="max-w-3xl mx-auto text-center relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
               Не нашли подходящую квартиру?
             </h2>
-            <p className="text-primary-100 mb-8 text-lg">
+            <p className="text-gray-200 mb-8 text-lg">
               Наши специалисты помогут подобрать идеальный вариант под ваши требования и бюджет
             </p>
             <button

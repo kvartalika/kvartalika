@@ -9,7 +9,7 @@ const PageLoader = () => {
               height="32"
               viewBox="0 0 32 32"
               fill="none"
-              className="text-secondary-100"
+              className="text-white"
             >
               <path
                 d="M8 22V12L16 8L24 12V22H20V16H12V22H8Z"

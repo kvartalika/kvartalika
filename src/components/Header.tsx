@@ -47,7 +47,7 @@ const Header = () => {
     <header
       className={`fixed top-0 left-0 right-0 z-25 transition-all duration-300 ${
         isScrolled || !isHomePage
-          ? 'bg-white shadow-lg'
+          ? 'bg-primary-100 shadow-lg'
           : 'bg-transparent'
       }`}
     >
@@ -59,7 +59,7 @@ const Header = () => {
           >
             <Logo
               className={`h-8 lg:h-10 ${
-                isScrolled || !isHomePage ? 'text-primary-600' : 'text-secondary-100'
+                isScrolled || !isHomePage ? 'text-primary-600' : 'text-primary-100'
               }`}
             />
           </Link>
@@ -70,7 +70,7 @@ const Header = () => {
               className={`font-medium transition-colors hover:text-primary-600 ${
                 isScrolled || !isHomePage
                   ? 'text-gray-700'
-                  : 'text-secondary-100 hover:text-primary-200'
+                  : 'text-primary-100 hover:text-gray-200'
               }`}
             >
               Главная
@@ -80,7 +80,7 @@ const Header = () => {
               className={`font-medium transition-colors hover:text-primary-600 ${
                 isScrolled || !isHomePage
                   ? 'text-gray-700'
-                  : 'text-secondary-100 hover:text-primary-200'
+                  : 'text-primary-100 hover:text-gray-200'
               }`}
             >
               Жилые комплексы
@@ -90,7 +90,7 @@ const Header = () => {
               className={`font-medium transition-colors hover:text-primary-600 ${
                 isScrolled || !isHomePage
                   ? 'text-gray-700'
-                  : 'text-secondary-100 hover:text-primary-200'
+                  : 'text-primary-100 hover:text-gray-200'
               }`}
             >
               Квартиры
@@ -101,26 +101,26 @@ const Header = () => {
                 className={`font-medium transition-colors hover:text-primary-600 ${
                   isScrolled || !isHomePage
                     ? "text-gray-700"
-                    : "text-secondary-100 hover:text-primary-200"
+                    : "text-primary-100 hover:text-gray-200"
                 }`}
               >
                 О нас
               </button>
               :
               <div
-                className='rounded-md p-2 z-30 bg-rose-600'
+                className='rounded-md p-2 z-30 bg-red-600'
                 onClick={() => {
                   logout();
                 }}
               >
-                <p className='text-secondary-100'>Выйти</p>
+                <p className='text-white'>Выйти</p>
               </div>
             }
           </nav>
 
           <div className="hidden lg:flex items-center space-x-4">
             <button
-              className="bg-primary-600 hover:bg-primary-700 text-secondary-100 px-6 py-2 rounded-lg font-medium transition-colors"
+              className="bg-primary-600 hover:bg-primary-700 text-surface-50 px-6 py-2 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               onClick={() => {
                 openModal("bid");
               }}
@@ -136,21 +136,21 @@ const Header = () => {
             <div className="w-6 h-6 flex flex-col justify-center items-center">
               <span
                 className={`w-6 h-0.5 transition-all duration-300 ${
-                  isScrolled || !isHomePage ? 'bg-gray-900' : 'bg-white'
+                  isScrolled || !isHomePage ? 'bg-gray-900' : 'bg-primary-100'
                 } ${
                   isMobileMenuOpen ? 'rotate-45 translate-y-0.5' : ''
                 }`}
               />
               <span
                 className={`w-6 h-0.5 mt-1 transition-all duration-300 ${
-                  isScrolled || !isHomePage ? 'bg-gray-900' : 'bg-white'
+                  isScrolled || !isHomePage ? 'bg-gray-900' : 'bg-primary-100'
                 } ${
                   isMobileMenuOpen ? 'opacity-0' : ''
                 }`}
               />
               <span
                 className={`w-6 h-0.5 mt-1 transition-all duration-300 ${
-                  isScrolled || !isHomePage ? 'bg-gray-900' : 'bg-white'
+                  isScrolled || !isHomePage ? 'bg-gray-900' : 'bg-primary-100'
                 } ${
                   isMobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''
                 }`}
@@ -160,7 +160,7 @@ const Header = () => {
         </div>
 
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-200 py-4">
+          <div className="md:hidden primary-100 border-t border-gray-200 py-4 bg-primary-100 rounded-lg">
             <nav className="flex flex-col space-y-4">
               <Link
                 to="/"
@@ -186,27 +186,23 @@ const Header = () => {
               {!isAuthenticated
                 ? <button
                   onClick={handleAboutClick}
-                  className={`font-medium transition-colors hover:text-primary-600 ${
-                    isScrolled || !isHomePage
-                      ? "text-gray-700"
-                      : "text-secondary-100 hover:text-primary-200"
-                  }`}
+                  className="text-gray-700 hover:text-primary-600 font-medium px-4 py-2"
                 >
                   О нас
                 </button>
                 :
                 <div
-                  className='rounded-md p-2 z-30 bg-rose-600 mx-4'
+                  className='rounded-md p-2 z-30 bg-red-600 mx-4'
                   onClick={() => {
                     logout();
                   }}
                 >
-                  <p className='text-secondary-100'>Выйти</p>
+                  <p className='text-primary-100'>Выйти</p>
                 </div>
               }
               <div className="px-4 py-2 border-t border-gray-200">
                 <button
-                  className="bg-primary-600 hover:bg-primary-700 text-secondary-100 px-4 py-2 rounded-lg font-medium w-full"
+                  className="bg-primary-600 hover:bg-primary-700 text-surface-50 px-4 py-2 rounded-xl font-medium w-full transition-all duration-200 shadow-lg hover:shadow-xl"
                   onClick={() => {
                     openModal("bid");
                     setIsMobileMenuOpen(false);

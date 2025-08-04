@@ -33,7 +33,7 @@ export default function Scene3D({model}: Scene3DProps) {
   useGLTF.preload(model);
 
   return (
-    <div className="mx-auto p-4 w-full max-w-4xl h-[80vh] bg-gradient-to-br from-indigo-50 to-secondary-100 rounded-2xl shadow-xl overflow-hidden border border-indigo-100">
+    <div className="mx-auto p-4 w-full max-w-[75vw] h-[80vh] bg-gradient-to-br from-indigo-50 to-gray-100 rounded-2xl shadow-xl overflow-hidden border border-indigo-100">
       <Canvas
         className="w-full h-full rounded-xl"
         dpr={[1, 2]}
