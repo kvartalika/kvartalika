@@ -120,7 +120,7 @@ const Header = () => {
 
           <div className="hidden lg:flex items-center space-x-4">
             <button
-              className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              className="bg-accent-500 hover:bg-accent-600 text-surface-50 px-6 py-2 rounded-xl font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               onClick={() => {
                 openModal("bid");
               }}
@@ -202,7 +202,7 @@ const Header = () => {
               }
               <div className="px-4 py-2 border-t border-gray-200">
                 <button
-                  className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium w-full"
+                  className="bg-accent-500 hover:bg-accent-600 text-surface-50 px-4 py-2 rounded-xl font-medium w-full transition-all duration-200 shadow-lg hover:shadow-xl"
                   onClick={() => {
                     openModal("bid");
                     setIsMobileMenuOpen(false);

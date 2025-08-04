@@ -8,12 +8,12 @@ const Footer = () => {
   const socialMediaList = useUIStore(state => state.socialMediaList);
 
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-surface-900 text-surface-50">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="md:col-span-2 flex flex-col justify-center items-center lg:items-start">
             <Logo className="text-white mb-4" />
-            <p className="text-gray-300 mb-6 max-w-md">{pageInfo.footerDescription}</p>
+            <p className="text-surface-300 mb-6 max-w-md">{pageInfo.footerDescription}</p>
             <div className="flex space-x-4">
               {socialMediaList && socialMediaList.length > 0
                 && socialMediaList.map(media => (
@@ -53,7 +53,7 @@ const Footer = () => {
                 </svg>
                 <a
                   href={pageInfo.phone}
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="text-surface-300 hover:text-surface-50 transition-colors"
                 >
                   {pageInfo.phone}
                 </a>
@@ -74,7 +74,7 @@ const Footer = () => {
                 </svg>
                 <a
                   href={pageInfo.email}
-                  className="text-gray-300 hover:text-white transition-colors"
+                  className="text-surface-300 hover:text-surface-50 transition-colors"
                 >
                   {pageInfo.email}
                 </a>
@@ -83,20 +83,20 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm mb-4 md:mb-0">
+        <div className="border-t border-surface-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-surface-400 text-sm mb-4 md:mb-0">
             © 2024 Кварталика. Все права защищены.
           </p>
           <div className="flex space-x-6 text-sm">
             <Link
               to="/privacy"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-surface-400 hover:text-surface-50 transition-colors"
             >
               Политика конфиденциальности
             </Link>
             <Link
               to="/terms"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-surface-400 hover:text-surface-50 transition-colors"
             >
               Условия использования
             </Link>

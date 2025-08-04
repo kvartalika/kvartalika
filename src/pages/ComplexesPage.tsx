@@ -115,18 +115,18 @@ const ComplexesPage = () => {
                       className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                       loading="lazy"
                     />
-                    <div className="absolute top-4 right-4 bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow">
+                    <div className="absolute top-4 right-4 bg-accent-500 text-surface-50 px-3 py-1 rounded-full text-sm font-medium shadow">
                       {complex.numberOfFloors ?? "–"} этажей
                     </div>
                     {complex.features?.some(f => f.toLowerCase().includes('горячее предложение')) && (
-                      <div className="absolute bottom-3 left-3 bg-red-600 text-white px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
-                        <span>🔥</span> Горячее предложение
-                      </div>
+                                              <div className="absolute bottom-3 left-3 bg-error-500 text-surface-50 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
+                          <span>🔥</span> Горячее предложение
+                        </div>
                     )}
                   </div>
 
                   <div className="p-6 flex flex-col flex-1">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
+                    <h3 className="text-xl font-bold text-surface-900 mb-2 group-hover:text-accent-600 transition-colors">
                       {complex.name || 'Без названия'}
                     </h3>
 

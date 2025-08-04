@@ -187,9 +187,9 @@ const HomePage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
-                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-success-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
-                    className="w-8 h-8 text-primary-600"
+                    className="w-8 h-8 text-success-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -202,14 +202,14 @@ const HomePage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Проверенные объекты</h3>
-                <p className="text-gray-600">Все квартиры проходят тщательную проверку на юридическую чистоту</p>
+                <h3 className="text-xl font-semibold text-surface-900 mb-2">Проверенные объекты</h3>
+                <p className="text-surface-600">Все квартиры проходят тщательную проверку на юридическую чистоту</p>
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
-                    className="w-8 h-8 text-primary-600"
+                    className="w-8 h-8 text-accent-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -222,14 +222,14 @@ const HomePage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Быстрый поиск</h3>
-                <p className="text-gray-600">Удобные фильтры помогут найти идеальную квартиру за минуты</p>
+                <h3 className="text-xl font-semibold text-surface-900 mb-2">Быстрый поиск</h3>
+                <p className="text-surface-600">Удобные фильтры помогут найти идеальную квартиру за минуты</p>
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-warning-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
-                    className="w-8 h-8 text-primary-600"
+                    className="w-8 h-8 text-warning-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -242,8 +242,8 @@ const HomePage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Поддержка 24/7</h3>
-                <p className="text-gray-600">Наши специалисты готовы помочь вам в любое время</p>
+                <h3 className="text-xl font-semibold text-surface-900 mb-2">Поддержка 24/7</h3>
+                <p className="text-surface-600">Наши специалисты готовы помочь вам в любое время</p>
               </div>
             </div>
           </div>
@@ -260,7 +260,7 @@ const HomePage = () => {
           </p>
           <button
             onClick={() => openModal('bid')}
-            className="bg-white text-primary-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors"
+            className="bg-surface-50 text-accent-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-surface-100 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
           >
             Оставить заявку
           </button>

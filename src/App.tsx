@@ -88,7 +88,7 @@ const InnerApp = () => {
     <>
       <ScrollToTop />
       <ScrollToAnchor />
-      <div className="min-h-screen flex flex-col bg-gray-50">
+      <div className="min-h-screen flex flex-col bg-surface-50">
         <Header />
 
         <main className="flex-grow">
@@ -139,8 +139,8 @@ const InnerApp = () => {
                 element={
                   <div className="flex items-center justify-center min-h-[400px]">
                     <div className="text-center">
-                      <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
-                      <p className="text-gray-600">Страница не найдена</p>
+                      <h1 className="text-4xl font-bold text-surface-900 mb-4">404</h1>
+                      <p className="text-surface-600">Страница не найдена</p>
                     </div>
                   </div>
                 }
