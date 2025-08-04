@@ -98,19 +98,19 @@ const HomePage = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 max-w-4xl mx-auto">
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">50+</div>
+              <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">25+</div>
               <div className="text-sm md:text-base text-gray-200">Жилых комплексов</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">1000+</div>
+              <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">500+</div>
               <div className="text-sm md:text-base text-gray-200">Квартир в продаже</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">15</div>
+              <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">8</div>
               <div className="text-sm md:text-base text-gray-200">Лет на рынке</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">5000+</div>
+              <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">1200+</div>
               <div className="text-sm md:text-base text-gray-200">Довольных клиентов</div>
             </div>
           </div>
@@ -207,9 +207,9 @@ const HomePage = () => {
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 bg-accent-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
-                    className="w-8 h-8 text-accent-600"
+                    className="w-8 h-8 text-primary-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -260,7 +260,7 @@ const HomePage = () => {
           </p>
           <button
             onClick={() => openModal('bid')}
-            className="bg-surface-50 text-accent-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-surface-100 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            className="bg-surface-50 text-primary-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-surface-100 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
           >
             Оставить заявку
           </button>

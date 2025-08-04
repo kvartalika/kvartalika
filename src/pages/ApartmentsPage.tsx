@@ -291,11 +291,11 @@ const ApartmentsPage = () => {
                   <button
                     key={page}
                     onClick={() => handlePageChange(page)}
-                    className={`w-10 h-10 rounded-lg font-medium transition-colors ${
-                      page === currentPage
-                        ? 'bg-primary-600 text-white'
-                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
-                    }`}
+                                          className={`w-10 h-10 rounded-lg font-medium transition-colors ${
+                        page === currentPage
+                          ? 'bg-primary-600 text-surface-50'
+                          : 'bg-surface-50 border border-surface-200 text-surface-700 hover:bg-surface-100'
+                      }`}
                   >
                     {page}
                   </button>

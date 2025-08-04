@@ -44,24 +44,31 @@ const ApartmentCard = ({
     >
       {/* Image Section */}
       <div className="relative h-64 overflow-hidden">
-        <ImageSlider
-          images={apartment.imagesResolved || []}
-          className="w-full h-full"
-          showThumbnails={false}
-          autoPlay={false}
-        />
+        <div onClick={(e) => e.stopPropagation()}>
+          <ImageSlider
+            images={apartment.imagesResolved || []}
+            className="w-full h-full"
+            showThumbnails={false}
+            autoPlay={false}
+          />
+        </div>
         
         {/* Gradient overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-surface-900/20 via-transparent to-transparent"></div>
 
         {/* Price Badge */}
-        <div className="absolute top-4 right-4 bg-accent-500 text-surface-50 px-4 py-2 rounded-xl font-bold shadow-lg text-lg backdrop-blur-sm bg-opacity-95">
+        <div className="absolute top-4 right-4 bg-primary-600 text-surface-50 px-4 py-2 rounded-xl font-bold shadow-lg text-lg backdrop-blur-sm bg-opacity-95">
           {formatPrice(apartment.flat.price || 0)} ₽
         </div>
 
         {/* Rooms Badge */}
         <div className="absolute top-4 left-4 bg-surface-50/90 backdrop-blur-sm text-surface-800 px-3 py-2 rounded-xl font-semibold text-sm border border-surface-200/50">
           {apartment.flat.numberOfRooms || 1} комн.
+        </div>
+
+        {/* Floor Badge */}
+        <div className="absolute top-16 left-4 bg-surface-50/90 backdrop-blur-sm text-surface-800 px-3 py-2 rounded-xl font-semibold text-sm border border-surface-200/50">
+          {apartment.flat.floor ?? '—'} этаж
         </div>
 
         {/* Hot Offer Badge */}
@@ -83,7 +90,7 @@ const ApartmentCard = ({
         {/* Complex Name */}
         <Link
           to={`/complex/${apartment.flat.homeId}`}
-          className="text-sm text-accent-600 hover:text-accent-700 font-semibold mb-3 transition-colors duration-200 flex items-center gap-2"
+          className="text-sm text-primary-600 hover:text-primary-700 font-semibold mb-3 transition-colors duration-200 flex items-center gap-2"
           onClick={(e) => e.stopPropagation()}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -119,12 +126,12 @@ const ApartmentCard = ({
             {apartment.flat.area ?? '—'} м²
           </div>
 
-          {/* Floor */}
+          {/* Rooms */}
           <div className="flex items-center text-sm text-surface-700 bg-surface-100 rounded-xl p-3 font-medium border border-surface-200">
             <svg className="w-4 h-4 mr-2 text-surface-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
-            {apartment.flat.floor ?? '—'} этаж
+            {apartment.flat.numberOfRooms ?? 1} комн.
           </div>
         </div>
 
@@ -165,7 +172,7 @@ const ApartmentCard = ({
                 e.stopPropagation();
                 onBookingClick();
               }}
-              className="w-full bg-accent-500 hover:bg-accent-600 text-surface-50 py-3 px-4 rounded-xl font-bold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              className="w-full bg-primary-600 hover:bg-primary-700 text-surface-50 py-3 px-4 rounded-xl font-bold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               type="button"
             >
               Записаться на осмотр

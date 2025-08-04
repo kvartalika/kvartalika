@@ -164,7 +164,7 @@ const BookingModal = () => {
             <button
               type="submit"
               disabled={loading.bid || !bidForm.name || !bidForm.phone}
-              className="flex-1 px-4 py-3 bg-accent-500 text-surface-50 rounded-xl hover:bg-accent-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+              className="flex-1 px-4 py-3 bg-primary-600 text-surface-50 rounded-xl hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
             >
               {loading.bid ? 'Отправка...' : 'Отправить заявку'}
             </button>

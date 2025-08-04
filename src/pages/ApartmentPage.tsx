@@ -289,7 +289,7 @@ const ApartmentPage = () => {
                 <button
                   onClick={() => openModal('bid')}
                   aria-label="Записаться на осмотр квартиры"
-                  className="w-full bg-accent-500 text-surface-50 py-4 rounded-xl font-semibold text-lg hover:bg-accent-600 transition-all duration-200 shadow-lg hover:shadow-xl mb-4"
+                  className="w-full bg-primary-600 text-surface-50 py-4 rounded-xl font-semibold text-lg hover:bg-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl mb-4"
                 >
                   Записаться на осмотр
                 </button>

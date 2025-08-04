@@ -121,7 +121,7 @@ const ComplexPage = () => {
               </p>
               <button
                 onClick={() => openModal('bid')}
-                className="bg-accent-500 text-surface-50 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-accent-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="bg-primary-600 text-surface-50 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 Записаться на осмотр
               </button>
@@ -153,7 +153,7 @@ const ComplexPage = () => {
             {flatsByHome.length > 4 && (
               <Link
                 to={`/apartments?homeId=${selectedHome.id}`}
-                className="bg-accent-500 text-surface-50 px-6 py-3 rounded-xl font-medium hover:bg-accent-600 transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="bg-primary-600 text-surface-50 px-6 py-3 rounded-xl font-medium hover:bg-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 Показать все квартиры
               </Link>
@@ -191,7 +191,7 @@ const ComplexPage = () => {
               <p className="text-gray-600 mb-6">В данный момент в этом комплексе нет доступных квартир. Оставьте заявку, и мы уведомим вас о новых предложениях.</p>
               <button
                 onClick={() => openModal('bid')}
-                className="bg-accent-500 text-surface-50 px-6 py-3 rounded-xl font-medium hover:bg-accent-600 transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="bg-primary-600 text-surface-50 px-6 py-3 rounded-xl font-medium hover:bg-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 Оставить заявку
               </button>
