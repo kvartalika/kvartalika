@@ -47,7 +47,7 @@ const Header = () => {
     <header
       className={`fixed top-0 left-0 right-0 z-25 transition-all duration-300 ${
         isScrolled || !isHomePage
-          ? 'bg-white shadow-lg'
+          ? 'bg-primary-100 shadow-lg'
           : 'bg-transparent'
       }`}
     >
@@ -59,7 +59,7 @@ const Header = () => {
           >
             <Logo
               className={`h-8 lg:h-10 ${
-                isScrolled || !isHomePage ? 'text-primary-600' : 'text-white'
+                isScrolled || !isHomePage ? 'text-primary-600' : 'text-primary-100'
               }`}
             />
           </Link>
@@ -70,7 +70,7 @@ const Header = () => {
               className={`font-medium transition-colors hover:text-primary-600 ${
                 isScrolled || !isHomePage
                   ? 'text-gray-700'
-                  : 'text-white hover:text-gray-200'
+                  : 'text-primary-100 hover:text-gray-200'
               }`}
             >
               Главная
@@ -80,7 +80,7 @@ const Header = () => {
               className={`font-medium transition-colors hover:text-primary-600 ${
                 isScrolled || !isHomePage
                   ? 'text-gray-700'
-                  : 'text-white hover:text-gray-200'
+                  : 'text-primary-100 hover:text-gray-200'
               }`}
             >
               Жилые комплексы
@@ -90,7 +90,7 @@ const Header = () => {
               className={`font-medium transition-colors hover:text-primary-600 ${
                 isScrolled || !isHomePage
                   ? 'text-gray-700'
-                  : 'text-white hover:text-gray-200'
+                  : 'text-primary-100 hover:text-gray-200'
               }`}
             >
               Квартиры
@@ -101,7 +101,7 @@ const Header = () => {
                 className={`font-medium transition-colors hover:text-primary-600 ${
                   isScrolled || !isHomePage
                     ? "text-gray-700"
-                    : "text-white hover:text-gray-200"
+                    : "text-primary-100 hover:text-gray-200"
                 }`}
               >
                 О нас
@@ -136,21 +136,21 @@ const Header = () => {
             <div className="w-6 h-6 flex flex-col justify-center items-center">
               <span
                 className={`w-6 h-0.5 transition-all duration-300 ${
-                  isScrolled || !isHomePage ? 'bg-gray-900' : 'bg-white'
+                  isScrolled || !isHomePage ? 'bg-gray-900' : 'bg-primary-100'
                 } ${
                   isMobileMenuOpen ? 'rotate-45 translate-y-0.5' : ''
                 }`}
               />
               <span
                 className={`w-6 h-0.5 mt-1 transition-all duration-300 ${
-                  isScrolled || !isHomePage ? 'bg-gray-900' : 'bg-white'
+                  isScrolled || !isHomePage ? 'bg-gray-900' : 'bg-primary-100'
                 } ${
                   isMobileMenuOpen ? 'opacity-0' : ''
                 }`}
               />
               <span
                 className={`w-6 h-0.5 mt-1 transition-all duration-300 ${
-                  isScrolled || !isHomePage ? 'bg-gray-900' : 'bg-white'
+                  isScrolled || !isHomePage ? 'bg-gray-900' : 'bg-primary-100'
                 } ${
                   isMobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''
                 }`}
@@ -160,7 +160,7 @@ const Header = () => {
         </div>
 
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-200 py-4">
+          <div className="md:hidden primary-100 border-t border-gray-200 py-4 bg-primary-100 rounded-lg">
             <nav className="flex flex-col space-y-4">
               <Link
                 to="/"
@@ -197,7 +197,7 @@ const Header = () => {
                     logout();
                   }}
                 >
-                  <p className='text-white'>Выйти</p>
+                  <p className='text-primary-100'>Выйти</p>
                 </div>
               }
               <div className="px-4 py-2 border-t border-gray-200">

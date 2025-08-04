@@ -111,8 +111,8 @@ const ApartmentPage = () => {
                   />
                 </div>
 
-                {selectedFlat.flat?.features?.some(el =>
-                  el.toLowerCase().includes('горячее предложение')
+                {selectedFlat.categories?.some(el =>
+                  el.name?.toLowerCase().includes('горячее предложение')
                 ) && (
                   <div className="absolute bottom-2 left-4 bg-red-600 text-white px-2 py-2 rounded-lg text-xs font-semibold flex items-center gap-1">
                     <span>🔥</span> Горячее предложение

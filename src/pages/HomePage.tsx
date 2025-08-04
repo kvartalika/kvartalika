@@ -11,6 +11,7 @@ import SocialMediaEditor from "../components/content/SocialMediaEditor.tsx";
 import {useAuthStore} from "../store/auth.store.ts";
 import {useUIStore} from "../store/ui.store.ts";
 import {useFlatsStore} from "../store/flats.store.ts";
+import {useMemo} from "react";
 
 const HomePage = () => {
   const role = useAuthStore(state => state.role);
@@ -28,7 +29,10 @@ const HomePage = () => {
     isLoadingHomePageFlats,
     isLoadingHomes,
     homes,
+    flats,
   } = useFlatsStore();
+
+  const flatSum = useMemo(() => flats.reduce((sm, fl) => sm + (fl?.flat?.numberForSale || 0), 0), [flats]);
 
   const renderSection = (section: HomePageFlats, idx: number) => {
     return (
@@ -96,24 +100,18 @@ const HomePage = () => {
             <SearchBar />
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">25+</div>
-              <div className="text-sm md:text-base text-gray-200">Жилых комплексов</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">500+</div>
-              <div className="text-sm md:text-base text-gray-200">Квартир в продаже</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">8</div>
-              <div className="text-sm md:text-base text-gray-200">Лет на рынке</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">1200+</div>
-              <div className="text-sm md:text-base text-gray-200">Довольных клиентов</div>
-            </div>
-          </div>
+          {homes.length > 5 && flatSum >= 50 &&
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 max-w-4xl mx-auto">
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">{homes.length > 25 ? "25+" : homes.length}</div>
+                <div className="text-sm md:text-base text-gray-200">Жилых комплексов</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">{flatSum > 500 ? "500+" : flatSum}</div>
+                <div className="text-sm md:text-base text-gray-200">Квартир в продаже</div>
+              </div>
+            </div>}
+
         </div>
 
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">

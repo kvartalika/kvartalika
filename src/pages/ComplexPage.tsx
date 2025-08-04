@@ -273,18 +273,18 @@ const ComplexPage = () => {
                             <button
                               onClick={() => setCurrentHistoryIndex(prev => (prev - 1 + historyImages.length) % historyImages.length)}
                               aria-label="Предыдущее фото истории"
-                              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+                              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-primary-600 bg-opacity-50 text-white p-2 rounded-xl hover:bg-opacity-70 transition-all"
                             >
                               ‹
                             </button>
                             <button
                               onClick={() => setCurrentHistoryIndex(prev => (prev + 1) % historyImages.length)}
                               aria-label="Следующее фото истории"
-                              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-all"
+                              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary-600 bg-opacity-50 text-white p-2 rounded-xl hover:bg-opacity-70 transition-all"
                             >
                               ›
                             </button>
-                            <div className="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white px-2 py-1 rounded text-xs">
+                            <div className="absolute bottom-2 right-2 bg-primary-600 bg-opacity-60 text-white px-2 py-1 rounded text-xs">
                               {currentHistoryIndex + 1} / {historyImages.length}
                             </div>
                           </>
@@ -314,12 +314,12 @@ const ComplexPage = () => {
       }
 
       <section className="py-12">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
+        <div className="container mx-auto">
+          <div className="max-w-[75vw] mx-auto">
             {selectedHome.latitude !== undefined && selectedHome.longitude !== undefined && selectedHome.name &&
               <>
                 <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">Расположение ЖК</h2>
-                <div className="bg-gray-100 rounded-xl p-8 text-center mb-8">
+                <div className="bg-gray-100 rounded-xl px-4 py-6 text-center mb-8">
                   <Map
                     latitude={selectedHome.latitude}
                     longitude={selectedHome.longitude}
