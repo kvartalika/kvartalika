@@ -194,7 +194,7 @@ const ContentManagementSection = () => {
               (t === 'home' && ui.activeTab === 'homes') ||
               (t === 'category' && ui.activeTab === 'categories') ||
               (t === 'bid' && ui.activeTab === 'bids')
-                ? 'bg-primary-600 text-secondary-100'
+                ? 'bg-primary-600 text-white'
                 : 'bg-gray-100'
             }`}
             type="button"
@@ -211,7 +211,7 @@ const ContentManagementSection = () => {
         <div className="ml-auto flex gap-2 flex-wrap">
           <button
             onClick={() => openNew('flat')}
-            className="px-3 py-1 bg-green-600 text-secondary-100 rounded text-sm"
+            className="px-3 py-1 bg-green-600 text-white rounded text-sm"
             type="button"
           >
             Новая квартира

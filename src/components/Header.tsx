@@ -59,7 +59,7 @@ const Header = () => {
           >
             <Logo
               className={`h-8 lg:h-10 ${
-                isScrolled || !isHomePage ? 'text-primary-600' : 'text-secondary-100'
+                isScrolled || !isHomePage ? 'text-primary-600' : 'text-white'
               }`}
             />
           </Link>
@@ -70,7 +70,7 @@ const Header = () => {
               className={`font-medium transition-colors hover:text-primary-600 ${
                 isScrolled || !isHomePage
                   ? 'text-gray-700'
-                  : 'text-secondary-100 hover:text-primary-200'
+                  : 'text-white hover:text-gray-200'
               }`}
             >
               Главная
@@ -80,7 +80,7 @@ const Header = () => {
               className={`font-medium transition-colors hover:text-primary-600 ${
                 isScrolled || !isHomePage
                   ? 'text-gray-700'
-                  : 'text-secondary-100 hover:text-primary-200'
+                  : 'text-white hover:text-gray-200'
               }`}
             >
               Жилые комплексы
@@ -90,7 +90,7 @@ const Header = () => {
               className={`font-medium transition-colors hover:text-primary-600 ${
                 isScrolled || !isHomePage
                   ? 'text-gray-700'
-                  : 'text-secondary-100 hover:text-primary-200'
+                  : 'text-white hover:text-gray-200'
               }`}
             >
               Квартиры
@@ -101,26 +101,26 @@ const Header = () => {
                 className={`font-medium transition-colors hover:text-primary-600 ${
                   isScrolled || !isHomePage
                     ? "text-gray-700"
-                    : "text-secondary-100 hover:text-primary-200"
+                    : "text-white hover:text-gray-200"
                 }`}
               >
                 О нас
               </button>
               :
               <div
-                className='rounded-md p-2 z-30 bg-rose-600'
+                className='rounded-md p-2 z-30 bg-red-600'
                 onClick={() => {
                   logout();
                 }}
               >
-                <p className='text-secondary-100'>Выйти</p>
+                <p className='text-white'>Выйти</p>
               </div>
             }
           </nav>
 
           <div className="hidden lg:flex items-center space-x-4">
             <button
-              className="bg-primary-600 hover:bg-primary-700 text-secondary-100 px-6 py-2 rounded-lg font-medium transition-colors"
+              className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
               onClick={() => {
                 openModal("bid");
               }}
@@ -186,27 +186,23 @@ const Header = () => {
               {!isAuthenticated
                 ? <button
                   onClick={handleAboutClick}
-                  className={`font-medium transition-colors hover:text-primary-600 ${
-                    isScrolled || !isHomePage
-                      ? "text-gray-700"
-                      : "text-secondary-100 hover:text-primary-200"
-                  }`}
+                  className="text-gray-700 hover:text-primary-600 font-medium px-4 py-2"
                 >
                   О нас
                 </button>
                 :
                 <div
-                  className='rounded-md p-2 z-30 bg-rose-600 mx-4'
+                  className='rounded-md p-2 z-30 bg-red-600 mx-4'
                   onClick={() => {
                     logout();
                   }}
                 >
-                  <p className='text-secondary-100'>Выйти</p>
+                  <p className='text-white'>Выйти</p>
                 </div>
               }
               <div className="px-4 py-2 border-t border-gray-200">
                 <button
-                  className="bg-primary-600 hover:bg-primary-700 text-secondary-100 px-4 py-2 rounded-lg font-medium w-full"
+                  className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium w-full"
                   onClick={() => {
                     openModal("bid");
                     setIsMobileMenuOpen(false);

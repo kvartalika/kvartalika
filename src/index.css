@@ -5,71 +5,27 @@
   --font-family-sans: Montserrat, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif;
   --font-family-montserrat: Montserrat, sans-serif;
 
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
+  --color-primary-50: #f9fafb;
+  --color-primary-100: #f3f4f6;
+  --color-primary-200: #e5e7eb;
+  --color-primary-300: #d1d5db;
+  --color-primary-400: #9ca3af;
+  --color-primary-500: #6b7280;
+  --color-primary-600: #4b5563;
+  --color-primary-700: #374151;
+  --color-primary-800: #1f2937;
+  --color-primary-900: #111827;
 
-  /*--color-primary-50:  #fafafa;*/
-  /*--color-primary-100: #f4f4f5;*/
-  /*--color-primary-200: #e4e4e7;*/
-  /*--color-primary-300: #d4d4d8;*/
-  /*--color-primary-400: #a1a1aa;*/
-  /*--color-primary-500: #71717a;*/
-  /*--color-primary-600: #52525b;*/
-  /*--color-primary-700: #3f3f46;*/
-  /*--color-primary-800: #27272a;*/
-  /*--color-primary-900: #18181b;*/
-
-  /*--color-primary-50:  #f8fafc;*/
-  /*--color-primary-100: #f1f5f9;*/
-  /*--color-primary-200: #e2e8f0;*/
-  /*--color-primary-300: #cfd8e8;*/
-  /*--color-primary-400: #a8b8d4;*/
-  /*--color-primary-500: #7f96bf;*/
-  /*--color-primary-600: #5f78a3;*/
-  /*--color-primary-700: #4a5d86;*/
-  /*--color-primary-800: #36456a;*/
-  /*--color-primary-900: #252f4f;*/
-
-  /*--color-primary-50:  #fdfcf9;*/
-  /*--color-primary-100: #f7f3ee;*/
-  /*--color-primary-200: #eee7dd;*/
-  /*--color-primary-300: #e3d8c6;*/
-  /*--color-primary-400: #cbb8a2;*/
-  /*--color-primary-500: #aa8f7b;*/
-  /*--color-primary-600: #8a6f5f;*/
-  /*--color-primary-700: #695644;*/
-  /*--color-primary-800: #49392b;*/
-  /*--color-primary-900: #2f2418;*/
-
-  /*--color-primary-50:  #f9fafb;*/
-  /*--color-primary-100: #f3f4f6;*/
-  /*--color-primary-200: #e5e7eb;*/
-  /*--color-primary-300: #d1d5db;*/
-  /*--color-primary-400: #9ca3af;*/
-  /*--color-primary-500: #6b7280;*/
-  /*--color-primary-600: #4b5563;*/
-  /*--color-primary-700: #374151;*/
-  /*--color-primary-800: #1f2937;*/
-  /*--color-primary-900: #111827;*/
-
-  --color-secondary-50:  #f0f9fc;
-  --color-secondary-100: #d9f0fa;
-  --color-secondary-200: #bfe3f6;
-  --color-secondary-300: #9fd4f0;
-  --color-secondary-400: #7cc3e8;
-  --color-secondary-500: #52aedf;
-  --color-secondary-600: #388fc2;
-  --color-secondary-700: #2b6f98;
-  --color-secondary-800: #1f5270;
-  --color-secondary-900: #153d53;
+  --color-secondary-50: #f8fafc;
+  --color-secondary-100: #f1f5f9;
+  --color-secondary-200: #e2e8f0;
+  --color-secondary-300: #cbd5e1;
+  --color-secondary-400: #94a3b8;
+  --color-secondary-500: #64748b;
+  --color-secondary-600: #475569;
+  --color-secondary-700: #334155;
+  --color-secondary-800: #1e293b;
+  --color-secondary-900: #0f172a;
 
   --spacing-18: 4.5rem;
   --spacing-88: 22rem;

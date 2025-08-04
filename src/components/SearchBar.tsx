@@ -167,7 +167,7 @@ const SearchBar = memo(() => {
             }}
             className={`px-6 py-3 rounded-xl font-medium transition-all duration-200 flex items-center gap-2 ${
               modals.filters || anyActive
-                ? 'bg-primary-600 text-secondary-100 shadow-lg shadow-primary-600/25'
+                ? 'bg-primary-600 text-white shadow-lg shadow-primary-600/25'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-md'
             }`}
           >
@@ -267,7 +267,7 @@ const SearchBar = memo(() => {
                     type="button"
                     onClick={() => toggleRoomFilter(r)}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      currentSearchParams.rooms === r ? 'bg-primary-600 text-secondary-100' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      currentSearchParams.rooms === r ? 'bg-primary-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
                     {r === 4 ? '4+' : r}
@@ -286,7 +286,7 @@ const SearchBar = memo(() => {
                     onClick={() => toggleBathroomFilter(b)}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       currentSearchParams.bathrooms === b
-                        ? 'bg-primary-600 text-secondary-100'
+                        ? 'bg-primary-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >

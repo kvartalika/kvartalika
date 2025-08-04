@@ -76,7 +76,7 @@ const ImageSlider: FC<ImageSliderProps> = ({
           <>
             <button
               onClick={prevSlide}
-              className="z-20 absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-40 hover:bg-opacity-60 text-secondary-100 p-2 rounded-full transition-all duration-200"
+              className="z-20 absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-40 hover:bg-opacity-60 text-white p-2 rounded-full transition-all duration-200"
               aria-label="Previous slide"
               type="button"
             >

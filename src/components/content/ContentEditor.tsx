@@ -459,7 +459,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               <button
                 type="button"
                 onClick={() => void onDelete()}
-                className="px-4 py-2 bg-red-500 text-secondary-100 rounded hover:bg-red-600"
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
               >
                 Удалить
               </button>

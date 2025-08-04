@@ -57,7 +57,7 @@ const HomePage = () => {
           <div className="text-center mt-12">
             <Link
               to={`/apartments?categoriesId=${section.category.id}`}
-              className="inline-flex items-center px-8 py-3 bg-primary-600 text-secondary-100 rounded-lg font-medium hover:bg-primary-700 transition-colors"
+              className="inline-flex items-center px-8 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
             >
               Посмотреть все
               <svg
@@ -84,11 +84,11 @@ const HomePage = () => {
     <div className="min-h-screen">
       <section className="relative min-h-screen flex pt-24 pb-6 justify-center gradient-primary overflow-hidden">
         <BackgroundPattern />
-        <div className="container mx-auto px-4 text-center text-secondary-100 relative z-10">
+        <div className="container mx-auto px-4 text-center text-white relative z-10">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
             {pageInfo.title}
           </h1>
-          <p className="text-xl md:text-2xl mb-12 text-primary-100 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl mb-12 text-gray-200 max-w-3xl mx-auto">
             {pageInfo.description}
           </p>
 
@@ -98,27 +98,27 @@ const HomePage = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 max-w-4xl mx-auto">
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-primary-200 mb-2">50+</div>
-              <div className="text-sm md:text-base text-primary-100">Жилых комплексов</div>
+              <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">50+</div>
+              <div className="text-sm md:text-base text-gray-200">Жилых комплексов</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-primary-200 mb-2">1000+</div>
-              <div className="text-sm md:text-base text-primary-100">Квартир в продаже</div>
+              <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">1000+</div>
+              <div className="text-sm md:text-base text-gray-200">Квартир в продаже</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-primary-200 mb-2">15</div>
-              <div className="text-sm md:text-base text-primary-100">Лет на рынке</div>
+              <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">15</div>
+              <div className="text-sm md:text-base text-gray-200">Лет на рынке</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-primary-200 mb-2">5000+</div>
-              <div className="text-sm md:text-base text-primary-100">Довольных клиентов</div>
+              <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">5000+</div>
+              <div className="text-sm md:text-base text-gray-200">Довольных клиентов</div>
             </div>
           </div>
         </div>
 
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
           <svg
-            className="w-6 h-6 text-secondary-100"
+            className="w-6 h-6 text-white"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -134,7 +134,7 @@ const HomePage = () => {
 
         {isAuthenticated && role && role !== 'CLIENT' && (
           <div className='fixed bottom-4 flex items-center justify-between w-[90vw] flex-wrap gap-2 z-100'>
-            <div className='flex flex-col gap-2 text-secondary-100 '>
+            <div className='flex flex-col gap-2 text-white '>
               <Link
                 to={`/admin`}
                 className="bg-black  px-4 py-2 rounded-md shadow"
@@ -148,7 +148,7 @@ const HomePage = () => {
                 Управление контентом
               </Link>
             </div>
-            <div className='flex flex-col gap-2 text-secondary-100'>
+            <div className='flex flex-col gap-2 text-white'>
               <button
                 onClick={() => openModal('mainPage')}
                 className="px-4 py-2 shadow bg-black rounded-md"
@@ -187,7 +187,7 @@ const HomePage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
-                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
                     className="w-8 h-8 text-primary-600"
                     fill="none"
@@ -207,7 +207,7 @@ const HomePage = () => {
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
                     className="w-8 h-8 text-primary-600"
                     fill="none"
@@ -227,7 +227,7 @@ const HomePage = () => {
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
                     className="w-8 h-8 text-primary-600"
                     fill="none"
@@ -252,10 +252,10 @@ const HomePage = () => {
 
       <section className="py-16 bg-primary-600">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-secondary-100 mb-4">
+          <h2 className="text-3xl font-bold text-white mb-4">
             Готовы найти свою идеальную квартиру?
           </h2>
-          <p className="text-xl text-primary-100 mb-8">
+          <p className="text-xl text-gray-200 mb-8">
             Оставьте заявку и наш менеджер подберет лучшие варианты специально для вас
           </p>
           <button

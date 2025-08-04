@@ -44,11 +44,11 @@ const ComplexesPage = () => {
     <div className="min-h-screen pt-16">
       <section className="bg-gradient-to-r from-primary-600 to-primary-800 py-16">
         <div className="container mx-auto px-4">
-          <div className="text-center text-secondary-100">
+          <div className="text-center text-white">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               Жилые комплексы
             </h1>
-            <p className="text-xl text-primary-100 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-200 max-w-3xl mx-auto">
               Выберите идеальный жилой комплекс из нашего широкого портфолио современных проектов
             </p>
           </div>
@@ -115,11 +115,11 @@ const ComplexesPage = () => {
                       className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
                       loading="lazy"
                     />
-                    <div className="absolute top-4 right-4 bg-primary-600 text-secondary-100 px-3 py-1 rounded-full text-sm font-medium shadow">
+                    <div className="absolute top-4 right-4 bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow">
                       {complex.numberOfFloors ?? "–"} этажей
                     </div>
                     {complex.features?.some(f => f.toLowerCase().includes('горячее предложение')) && (
-                      <div className="absolute bottom-3 left-3 bg-red-600 text-secondary-100 px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
+                      <div className="absolute bottom-3 left-3 bg-red-600 text-white px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
                         <span>🔥</span> Горячее предложение
                       </div>
                     )}

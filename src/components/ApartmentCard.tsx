@@ -53,7 +53,7 @@ const ApartmentCard = ({
           autoPlay={false}
         />
 
-        <div className="absolute top-2 right-2 bg-green-500 text-secondary-100 px-4 py-2 rounded-lg font-semibold shadow-lg text-md">
+        <div className="absolute top-2 right-2 bg-green-500 text-white px-4 py-2 rounded-lg font-semibold shadow-lg text-md">
           {formatPrice(apartment.flat.price || 0)} ₽
         </div>
 
@@ -64,7 +64,7 @@ const ApartmentCard = ({
         {apartment.flat.features?.some(el =>
           el.toLowerCase().includes('горячее предложение')
         ) && (
-          <div className="absolute bottom-2 left-2 bg-red-600 text-secondary-100 px-2 py-2 rounded-lg text-xs font-semibold flex items-center gap-1">
+          <div className="absolute bottom-2 left-2 bg-red-600 text-white px-2 py-2 rounded-lg text-xs font-semibold flex items-center gap-1">
             <span>🔥</span> Горячее предложение
           </div>
         )}
@@ -231,7 +231,7 @@ const ApartmentCard = ({
                 e.stopPropagation();
                 onBookingClick();
               }}
-              className="font-bold flex-1 bg-primary-600 hover:bg-primary-700 text-secondary-100 py-4 px-4 rounded-lg transition-colors text-sm"
+              className="font-bold flex-1 bg-primary-600 hover:bg-primary-700 text-white py-4 px-4 rounded-lg transition-colors text-sm"
               type="button"
             >
               Записаться

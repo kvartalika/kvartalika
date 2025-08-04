@@ -31,9 +31,9 @@ interface UnifiedFileManagerProps {
 const isImageName = (name: string) => /\.(jpe?g|png|webp|gif)$/i.test(name);
 
 const btnBase = "inline-flex items-center gap-1 px-3 py-1 rounded shadow-sm font-medium transition";
-const btnPrimary = "bg-indigo-600 text-secondary-100 hover:bg-indigo-700";
+const btnPrimary = "bg-indigo-600 text-white hover:bg-indigo-700";
 const btnSecondary = "bg-gray-100 text-gray-800 hover:bg-gray-200";
-const btnSuccess = "bg-green-600 text-secondary-100 hover:bg-green-700";
+const btnSuccess = "bg-green-600 text-white hover:bg-green-700";
 const btnDanger = "bg-red-500 text-white hover:bg-red-600";
 const btnDisabled = "opacity-50 cursor-not-allowed";
 
@@ -174,7 +174,7 @@ const UnifiedFileManager: FC<UnifiedFileManagerProps> = ({
           {directories.map((dir) => (
             <div
               key={dir}
-              className="border rounded-lg p-4 bg-primary-50 hover:bg-primary-100 transition-colors"
+              className="border rounded-lg p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
             >
               <div className="flex items-center justify-between mb-2">
                 <div
