@@ -38,17 +38,6 @@ export class AuthService {
     }
   }
 
-  static async adminSetup(): Promise<RegisterResponse> {
-    try {
-      const response = await apiClient.post<RegisterResponse>('/admin/setup');
-      return response.data;
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        throw new Error(error.response?.data?.message || 'Admin setup failed');
-      }
-      throw error;
-    }
-  }
 
   static async contentManagerLogin(credentials: LoginRequest): Promise<AuthResponse> {
     try {
@@ -92,7 +81,6 @@ export class AuthService {
 export const {
   adminLogin,
   adminRegister,
-  adminSetup,
   contentManagerLogin,
   contentManagerRegister,
   logout,

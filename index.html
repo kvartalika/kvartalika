@@ -2,13 +2,63 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
+    <title>Кварталика</title>
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="alternate" href="https://kvartalika.ru/" hreflang="ru" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Кварталика - найдите квартиру для себя в лучших жилых комплексах" />
-    <title>Кварталика - Поиск квартир</title>
+
+    <meta name="description" content="Кварталика - найдите квартиру в Томске по выгодным ценам" />
+
+    <meta property="og:title" content="Кварталика" />
+    <meta property="og:description" content="Кварталика - найдите квартиру в Томске по выгодным ценам" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://kvartalica.ru/" />
+    <meta property="og:image" content="https://kvartalica.ru/preview.png" />
+
+    <script type="text/javascript">
+      (function(m,e,t,r,i,k,a){
+          m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+          m[i].l=1*new Date();
+          for (var j = 0; j < document.scripts.length; j++) {
+            if (document.scripts[j].src === r) { return; }
+          }
+          k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+      })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=103607632', 'ym');
+
+      ym(103607632, 'init', {
+          ssr:true,
+          webvisor:true,
+          clickmap:true,
+          ecommerce:"dataLayer",
+          accurateTrackBounce:true,
+          trackLinks:true
+      });
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Кварталика",
+      "url": "https://kvartalika.ru",
+      "logo": "https://kvartalika.ru/logo.svg",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "info@kvartalika.ru",
+        "contactType": "sales"
+      }
+    }
+    </script>
+
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <div>
+        <img src="https://mc.yandex.ru/watch/103607632" style="position:absolute; left:-9999px;" alt="" />
+      </div>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
