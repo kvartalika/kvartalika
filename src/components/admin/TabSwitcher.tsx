@@ -1,13 +1,15 @@
-import {type FC} from "react";
-import {type Tab, TABS} from "../../services";
+import { type FC } from 'react'
+import { type Tab, TABS } from '../../services'
+import type { UserRole } from '../../store/auth.store.ts'
 
 const TabSwitcher: FC<{
   activeTab: Tab;
   setActiveTab: (t: Tab) => void
-}> = ({activeTab, setActiveTab}) => (
+  role: UserRole;
+}> = ({ activeTab, setActiveTab, role }) => (
   <div className="border-b border-gray-200">
     <nav className="-mb-px flex space-x-8">
-      {TABS.map(tab => (
+      {TABS.filter(tab => role === 'ADMIN' || tab === 'files').map(tab => (
         <button
           key={tab}
           onClick={() => setActiveTab(tab)}
@@ -22,6 +24,6 @@ const TabSwitcher: FC<{
       ))}
     </nav>
   </div>
-);
+)
 
-export default TabSwitcher;
+export default TabSwitcher

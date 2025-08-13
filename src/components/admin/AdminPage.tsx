@@ -4,23 +4,23 @@ import {
   useState,
   useCallback,
   type FC, type ChangeEvent,
-} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {useAdminStore} from '../../store/admin.store.ts';
-import type {Tab, UserDto} from '../../services';
-import TabSwitcher from './TabSwitcher.tsx';
-import Panel from './Panel.tsx';
-import UserForm from './UserForm.tsx';
-import UserList from "./UserList.tsx";
-import Alert from './Alert.tsx';
-import UnifiedFileManager from "../file-explorer/UnifiedFileManager.tsx";
-import {useAuthStore} from "../../store/auth.store.ts";
-import {useUIStore} from "../../store/ui.store.ts";
+} from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAdminStore } from '../../store/admin.store.ts'
+import type { Tab, UserDto } from '../../services'
+import TabSwitcher from './TabSwitcher.tsx'
+import Panel from './Panel.tsx'
+import UserForm from './UserForm.tsx'
+import UserList from './UserList.tsx'
+import Alert from './Alert.tsx'
+import UnifiedFileManager from '../file-explorer/UnifiedFileManager.tsx'
+import { useAuthStore } from '../../store/auth.store.ts'
+import { useUIStore } from '../../store/ui.store.ts'
 
 const AdminPage: FC = () => {
-  const {role, isAuthenticated} = useAuthStore();
-  const navigate = useNavigate();
-  const {addNotification} = useUIStore();
+  const { role, isAuthenticated } = useAuthStore()
+  const navigate = useNavigate()
+  const { addNotification } = useUIStore()
 
   const {
     contentManagers,
@@ -52,9 +52,9 @@ const AdminPage: FC = () => {
     uploadFile,
     downloadFile,
     deleteFile,
-  } = useAdminStore();
+  } = useAdminStore()
 
-  const [activeTab, setActiveTab] = useState<Tab>('managers');
+  const [activeTab, setActiveTab] = useState<Tab>('files')
   const [formData, setFormData] = useState<UserDto>(() => ({
     name: '',
     surname: '',
@@ -62,43 +62,41 @@ const AdminPage: FC = () => {
     email: '',
     phone: '',
     password: '',
-    role: "CONTENT_MANAGER",
+    role: 'CONTENT_MANAGER',
     telegramId: '',
-  }));
-  const [editingType, setEditingType] = useState<'manager' | 'admin'>('manager');
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [newDirectoryName, setNewDirectoryName] = useState('');
+  }))
+  const [editingType, setEditingType] = useState<'manager' | 'admin'>('manager')
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [newDirectoryName, setNewDirectoryName] = useState('')
 
   useEffect(() => {
-    if (!isAuthenticated || role !== 'ADMIN') {
-      navigate('/auth');
-      return;
+    if (!isAuthenticated || !['ADMIN', 'CONTENT_MANAGER'].includes(role || '')) {
+      navigate('/auth')
+      return
     }
-    void loadContentManagers();
-    void loadAdmins();
-  }, [isAuthenticated, role, navigate, loadContentManagers, loadAdmins]);
+  }, [isAuthenticated, role, navigate])
 
-  const [prevTab, setPrevTab] = useState<Tab | null>(null);
+  const [prevTab, setPrevTab] = useState<Tab | null>(null)
 
-  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null)
 
   useEffect(() => {
     if (activeTab === 'files') {
-      void listDirectories();
-      void listFilesInDir(currentPath);
-      void getDirectory(currentPath);
+      void listDirectories()
+      void listFilesInDir(currentPath)
+      void getDirectory(currentPath)
     }
 
-    setPrevTab(activeTab);
-  }, [
-    activeTab,
-    currentPath,
-    listDirectories,
-    getDirectory,
-    listFilesInDir,
-    setCurrentPath,
-    prevTab,
-  ]);
+    if (activeTab === 'managers') {
+      void loadContentManagers()
+    }
+
+    if (activeTab === 'admins') {
+      void loadAdmins()
+    }
+
+    setPrevTab(activeTab)
+  }, [activeTab, currentPath, listDirectories, getDirectory, listFilesInDir, setCurrentPath, prevTab, loadContentManagers, loadAdmins])
 
   const resetForm = useCallback(() => {
     setFormData({
@@ -108,65 +106,65 @@ const AdminPage: FC = () => {
       email: '',
       phone: '',
       password: '',
-      role: editingType === "admin" ? "ADMIN" : "CONTENT_MANAGER",
+      role: editingType === 'admin' ? 'ADMIN' : 'CONTENT_MANAGER',
       telegramId: '',
-    });
-    setIsEditMode(false);
-    setEditingType('manager');
-  }, [editingType]);
+    })
+    setIsEditMode(false)
+    setEditingType('manager')
+  }, [editingType])
 
   const handleSubmitManager = async (e: FormEvent) => {
-    e.preventDefault();
-    clearError();
+    e.preventDefault()
+    clearError()
     try {
       if (isEditMode && editingType === 'manager') {
-        await editContentManager(formData.email, formData);
+        await editContentManager(formData.email, formData)
         addNotification({
           type: 'success',
           title: 'Обновлено',
           message: 'Content-менеджер обновлён'
-        });
+        })
       } else {
-        await addContentManager(formData);
+        await addContentManager(formData)
         addNotification({
           type: 'success',
           title: 'Создано',
           message: 'Content-менеджер добавлен'
-        });
+        })
       }
-      resetForm();
+      resetForm()
     } catch {
       // store shows error
     }
-  };
+  }
 
   const handleSubmitAdmin = async (e: FormEvent) => {
-    e.preventDefault();
-    clearError();
+    e.preventDefault()
+    clearError()
     try {
       if (isEditMode && editingType === 'admin') {
-        await editAdmin(formData.email, formData);
+        await editAdmin(formData.email, formData)
         addNotification({
           type: 'success',
           title: 'Обновлено',
           message: 'Админ обновлён'
-        });
+        })
       } else {
-        await addAdmin(formData);
+        await addAdmin(formData)
         addNotification({
           type: 'success',
           title: 'Создано',
           message: 'Админ добавлен'
-        });
+        })
       }
-      resetForm();
+      resetForm()
     } catch {
       // store shows error
     }
-  };
+  }
 
   const startEdit = (item: UserDto, type: 'manager' | 'admin') => {
-    setEditingType(type);
+    setEditingType(type)
     setFormData({
       name: item.name || '',
       surname: item.surname || '',
@@ -176,86 +174,86 @@ const AdminPage: FC = () => {
       password: '',
       role: type === 'manager' ? 'CONTENT_MANAGER' : 'ADMIN',
       telegramId: item.telegramId || '',
-    });
-    setIsEditMode(true);
-  };
+    })
+    setIsEditMode(true)
+  }
 
   const handleDelete = async (email: string, type: 'manager' | 'admin') => {
-    if (!window.confirm('Вы уверены?')) return;
+    if (!window.confirm('Вы уверены?')) return
     try {
       if (type === 'manager') {
-        await removeContentManager(email);
+        await removeContentManager(email)
         addNotification({
           type: 'success',
           title: 'Удалено',
           message: 'Content-менеджер удалён'
-        });
+        })
       } else {
-        await removeAdmin(email);
+        await removeAdmin(email)
         addNotification({
           type: 'success',
           title: 'Удалено',
           message: 'Админ удалён'
-        });
+        })
       }
     } catch {
       // error from store
     }
-  };
+  }
 
   const handleCreateDirectory = async () => {
-    if (!newDirectoryName.trim()) return;
+    if (!newDirectoryName.trim()) return
     try {
-      await createDirectory([...currentPath, newDirectoryName.trim()]);
-      setNewDirectoryName('');
-      await getDirectory(currentPath);
+      await createDirectory([...currentPath, newDirectoryName.trim()])
+      setNewDirectoryName('')
+      await getDirectory(currentPath)
     } catch {
       // handled in store
     }
-  };
+  }
 
   const handleNavigateDirectory = async (nextPath: string[]) => {
-    setCurrentPath(nextPath);
-    await getDirectory(nextPath);
-    await listFilesInDir(nextPath);
-  };
+    setCurrentPath(nextPath)
+    await getDirectory(nextPath)
+    await listFilesInDir(nextPath)
+  }
 
   const handleUploadClick = async () => {
-    if (!pendingFile) return;
-    await uploadFile(currentPath, pendingFile);
-    setPendingFile(null);
-    await listFilesInDir(currentPath);
-  };
+    if (!pendingFile) return
+    await uploadFile(currentPath, pendingFile)
+    setPendingFile(null)
+    await listFilesInDir(currentPath)
+  }
 
   const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0] ?? null;
-    setPendingFile(f);
-    e.currentTarget.value = "";
-  };
+    const f = e.target.files?.[0] ?? null
+    setPendingFile(f)
+    e.currentTarget.value = ''
+  }
 
   const handleDownload = async (path: string[]) => {
     try {
-      const blob = await downloadFile(path);
-      if (!blob) return;
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = path[path.length - 1];
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      const blob = await downloadFile(path)
+      if (!blob) return
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = path[path.length - 1]
+      a.click()
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
     } catch (e) {
-      console.error("Download failed", e);
+      console.error('Download failed', e)
     }
-  };
+  }
 
 
   const handleDeleteFile = async (path: string[]) => {
-    if (!window.confirm('Вы уверены?')) return;
-    await deleteFile(path);
-    await listFilesInDir(currentPath);
-  };
+    if (!window.confirm('Вы уверены?')) return
+    await deleteFile(path)
+    await listFilesInDir(currentPath)
+  }
 
-  if (!isAuthenticated || role !== 'ADMIN') return null;
+  if (!isAuthenticated || !['ADMIN', 'CONTENT_MANAGER'].includes(role || '')) return null
 
   return (
     <div className="min-h-screen bg-gray-100 pt-16">
@@ -263,6 +261,7 @@ const AdminPage: FC = () => {
         <TabSwitcher
           activeTab={activeTab}
           setActiveTab={setActiveTab}
+          role={role || 'CLIENT'}
         />
 
         {(error) && (
@@ -335,10 +334,10 @@ const AdminPage: FC = () => {
                   onNavigate={handleNavigateDirectory}
                   onCreateDirectory={handleCreateDirectory}
                   onDeleteDirectory={async (name: string) => {
-                    if (!window.confirm('Вы уверены?')) return;
-                    await deleteDirectory([name]);
-                    await getDirectory(currentPath);
-                    await listDirectories();
+                    if (!window.confirm('Вы уверены?')) return
+                    await deleteDirectory([name])
+                    await getDirectory(currentPath)
+                    await listDirectories()
                   }}
 
                   pendingFile={pendingFile}
@@ -349,9 +348,9 @@ const AdminPage: FC = () => {
                   onDownload={handleDownload}
                   onDeleteFile={handleDeleteFile}
                   onRefresh={async () => {
-                    await listDirectories();
-                    await listFilesInDir(currentPath);
-                    await getDirectory(currentPath);
+                    await listDirectories()
+                    await listFilesInDir(currentPath)
+                    await getDirectory(currentPath)
                   }}
                 />
               </Panel>
@@ -360,7 +359,7 @@ const AdminPage: FC = () => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AdminPage;
+export default AdminPage

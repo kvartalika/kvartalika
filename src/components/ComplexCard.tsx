@@ -1,18 +1,27 @@
-import {Link} from 'react-router-dom';
-import type {ResolvedHome} from "../services";
-import {safeImage} from "../utils/safeImage.ts";
+import { Link, useNavigate } from 'react-router-dom'
+import type { ResolvedHome } from '../services'
+import { safeImage } from '../utils/safeImage.ts'
 
 interface ComplexCardProps {
   complex: ResolvedHome;
 }
 
-const ComplexCard = ({complex}: ComplexCardProps) => {
+const ComplexCard = ({ complex }: ComplexCardProps) => {
 
-  let images = safeImage(complex.imagesResolved, 'home');
-  images = Array.isArray(images) ? images : [images];
+  const navigate = useNavigate()
+
+  let images = safeImage(complex.imagesResolved, 'home')
+  images = Array.isArray(images) ? images : [images]
+
+  const handleCardClick = () => {
+    navigate(`/complex/${complex.id}`)
+  }
 
   return (
-    <div className="flex flex-col h-full group relative bg-surface-50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-surface-200 hover:border-surface-300">
+    <div
+      onClick={handleCardClick}
+      className="flex flex-col h-full group relative bg-surface-50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-surface-200 hover:border-surface-300"
+    >
       <div className="relative aspect-[16/9] w-full overflow-hidden">
         <img
           src={images[0]}
@@ -24,7 +33,7 @@ const ComplexCard = ({complex}: ComplexCardProps) => {
         <div className="absolute inset-0 bg-gradient-to-t from-surface-900/20 via-transparent to-transparent"></div>
 
         <div className="absolute top-4 right-4 bg-primary-600 text-surface-50 px-4 py-2 rounded-xl font-bold shadow-lg text-sm backdrop-blur-sm bg-opacity-95">
-          {complex.numberOfFloors ?? "—"} этажей
+          {complex.numberOfFloors ?? '—'} этажей
         </div>
 
         <div className="absolute inset-0 bg-surface-900/0 group-hover:bg-surface-900/10 transition-all duration-300"></div>
@@ -120,7 +129,7 @@ const ComplexCard = ({complex}: ComplexCardProps) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ComplexCard;
+export default ComplexCard

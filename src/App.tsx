@@ -3,69 +3,69 @@ import {
   Route,
   Routes,
   useLocation,
-} from 'react-router-dom';
-import {useEffect, lazy, Suspense} from 'react';
+} from 'react-router-dom'
+import { useEffect, lazy, Suspense } from 'react'
 
-import Header from './components/Header';
-import Footer from './components/Footer';
-import PageLoader from './components/PageLoader';
-import BookingModal from './components/BookingModal';
-import ScrollToAnchor from './components/ScrollToAnchor';
-import ProtectedRoute from './components/ProtectedRoute';
+import Header from './components/Header'
+import Footer from './components/Footer'
+import PageLoader from './components/PageLoader'
+import BookingModal from './components/BookingModal'
+import ScrollToAnchor from './components/ScrollToAnchor'
+import ProtectedRoute from './components/ProtectedRoute'
 
-const HomePage = lazy(() => import('./pages/HomePage'));
-const ApartmentsPage = lazy(() => import('./pages/ApartmentsPage'));
-const ComplexesPage = lazy(() => import('./pages/ComplexesPage'));
-const ComplexPage = lazy(() => import('./pages/ComplexPage'));
-const ApartmentPage = lazy(() => import('./pages/ApartmentPage'));
-const AuthPage = lazy(() => import('./pages/AuthPage'));
-const AdminPage = lazy(() => import('./components/admin/AdminPage.tsx'));
-const ContentManagementPage = lazy(() => import("./components/content/ContentManagementPage.tsx"));
+const HomePage = lazy(() => import('./pages/HomePage'))
+const ApartmentsPage = lazy(() => import('./pages/ApartmentsPage'))
+const ComplexesPage = lazy(() => import('./pages/ComplexesPage'))
+const ComplexPage = lazy(() => import('./pages/ComplexPage'))
+const ApartmentPage = lazy(() => import('./pages/ApartmentPage'))
+const AuthPage = lazy(() => import('./pages/AuthPage'))
+const AdminPage = lazy(() => import('./components/admin/AdminPage.tsx'))
+const ContentManagementPage = lazy(() => import('./components/content/ContentManagementPage.tsx'))
 
-import {useAuthStore} from "./store/auth.store.ts";
-import RouterListener from "./components/RouterListener.tsx";
-import {useUIStore} from "./store/ui.store.ts";
-import {useFlatsStore} from "./store/flats.store.ts";
+import { useAuthStore } from './store/auth.store.ts'
+import RouterListener from './components/RouterListener.tsx'
+import { useUIStore } from './store/ui.store.ts'
+import { useFlatsStore } from './store/flats.store.ts'
 
 function ScrollToTop() {
-  const {pathname} = useLocation();
+  const { pathname } = useLocation()
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    window.scrollTo(0, 0)
+  }, [pathname])
 
-  return null;
+  return null
 }
 
 const InnerApp = () => {
-  const globalLoading = useUIStore(state => state.loading.global);
-  const setLoading = useUIStore(state => state.setLoading);
-  const modals = useUIStore(state => state.modals);
+  const globalLoading = useUIStore(state => state.loading.global)
+  const setLoading = useUIStore(state => state.setLoading)
+  const modals = useUIStore(state => state.modals)
 
-  const loadPageInfo = useUIStore(state => state.loadPageInfo);
-  const loadSocialMediaList = useUIStore(state => state.loadSocialMediaList);
-  const pageInfo = useUIStore(state => state.pageInfo);
+  const loadPageInfo = useUIStore(state => state.loadPageInfo)
+  const loadSocialMediaList = useUIStore(state => state.loadSocialMediaList)
+  const pageInfo = useUIStore(state => state.pageInfo)
 
-  const loadAllData = useFlatsStore(state => state.loadAllData);
+  const loadAllData = useFlatsStore(state => state.loadAllData)
 
-  const {role, isAuthenticated} = useAuthStore();
-  const location = useLocation();
+  const { role, isAuthenticated } = useAuthStore()
+  const location = useLocation()
 
   useEffect(() => {
     const loadData = async () => {
-      setLoading('global', true);
+      setLoading('global', true)
       try {
-        await Promise.all([loadPageInfo(), loadSocialMediaList()]);
+        await Promise.all([loadPageInfo(), loadSocialMediaList()])
       } catch (error) {
-        console.error('Error loading data:', error);
+        console.error('Error loading data:', error)
       }
-    };
+    }
 
     loadData().then(() => {
-      void loadAllData(true);
-      setTimeout(() => setLoading('global', false), 500);
+      void loadAllData(true)
+      setTimeout(() => setLoading('global', false), 500)
     })
-  }, [loadAllData, loadPageInfo, loadSocialMediaList, setLoading]);
+  }, [loadAllData, loadPageInfo, loadSocialMediaList, setLoading])
 
   const shouldShowLoader =
     (!['/auth', '/admin', '/content'].includes(location.pathname)) &&
@@ -78,10 +78,10 @@ const InnerApp = () => {
           (role !== 'ADMIN' && role !== 'CONTENT_MANAGER')
         )
       )
-    );
+    )
 
   if (shouldShowLoader) {
-    return <PageLoader />;
+    return <PageLoader />
   }
 
   return (
@@ -105,7 +105,7 @@ const InnerApp = () => {
               <Route
                 path="/admin"
                 element={
-                  <ProtectedRoute requiredRole="ADMIN">
+                  <ProtectedRoute requiredRole={['CONTENT_MANAGER', 'ADMIN']}>
                     <AdminPage />
                   </ProtectedRoute>
                 }
@@ -113,7 +113,7 @@ const InnerApp = () => {
               <Route
                 path="/content"
                 element={
-                  <ProtectedRoute requiredRole={["CONTENT_MANAGER", "ADMIN"]}>
+                  <ProtectedRoute requiredRole={['CONTENT_MANAGER', 'ADMIN']}>
                     <ContentManagementPage />
                   </ProtectedRoute>
                 }
@@ -154,15 +154,15 @@ const InnerApp = () => {
       </div>
       <RouterListener />
     </>
-  );
-};
+  )
+}
 
 function App() {
   return (
     <BrowserRouter>
       <InnerApp />
     </BrowserRouter>
-  );
+  )
 }
 
-export default App;
+export default App
