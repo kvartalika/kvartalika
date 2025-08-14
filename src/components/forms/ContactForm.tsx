@@ -85,6 +85,17 @@ const ContactForm: React.FC<ContactFormProps> = ({
         />
       </div>
 
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Политика конфиденциальности
+        </label>
+        <textarea
+          value={contactData.privacy ?? ''}
+          onChange={(e) => onContactChange('privacy', e.target.value ?? '')}
+          className="w-full border rounded px-3 py-2 h-24"
+        />
+      </div>
+
       <div className="flex items-center">
         <input
           type="checkbox"

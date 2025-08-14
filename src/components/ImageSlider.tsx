@@ -1,4 +1,4 @@
-import {useState, useCallback, useEffect, type FC} from 'react';
+import { useState, useCallback, useEffect, type FC } from 'react'
 
 interface ImageSliderProps {
   images: string[];
@@ -7,7 +7,6 @@ interface ImageSliderProps {
   showThumbnails?: boolean;
   autoPlay?: boolean;
   autoPlayInterval?: number;
-  needDots?: boolean;
 }
 
 const ImageSlider: FC<ImageSliderProps> = ({
@@ -17,27 +16,26 @@ const ImageSlider: FC<ImageSliderProps> = ({
                                              showThumbnails = true,
                                              autoPlay = false,
                                              autoPlayInterval = 5000,
-                                             needDots = false,
                                            }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0)
 
   const nextSlide = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % images.length);
-  }, [images.length]);
+    setCurrentIndex((prev) => (prev + 1) % images.length)
+  }, [images.length])
 
   const prevSlide = useCallback(() => {
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-  }, [images.length]);
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length)
+  }, [images.length])
 
   const goToSlide = useCallback((index: number) => {
-    setCurrentIndex(index);
-  }, []);
+    setCurrentIndex(index)
+  }, [])
 
   useEffect(() => {
-    if (!autoPlay || images.length <= 1) return;
-    const interval = setInterval(nextSlide, autoPlayInterval);
-    return () => clearInterval(interval);
-  }, [autoPlay, autoPlayInterval, nextSlide, images.length]);
+    if (!autoPlay || images.length <= 1) return
+    const interval = setInterval(nextSlide, autoPlayInterval)
+    return () => clearInterval(interval)
+  }, [autoPlay, autoPlayInterval, nextSlide, images.length])
 
   if (!images || images.length === 0) {
     return (
@@ -57,7 +55,7 @@ const ImageSlider: FC<ImageSliderProps> = ({
           <p>Нет изображений</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -129,7 +127,7 @@ const ImageSlider: FC<ImageSliderProps> = ({
         <div className="z-20 mt-3 flex gap-2 overflow-x-auto pb-1">
           {images.map((image, index) => (
             <button
-              key={index}
+              key={image}
               onClick={() => goToSlide(index)}
               className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                 index === currentIndex ? 'border-primary-500 scale-105' : 'border-gray-200 hover:border-gray-300'
@@ -146,24 +144,8 @@ const ImageSlider: FC<ImageSliderProps> = ({
           ))}
         </div>
       )}
-
-      {needDots && !showThumbnails && images.length > 1 && (
-        <div className="flex justify-center mt-3 gap-2">
-          {images.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                index === currentIndex ? 'bg-primary-500 scale-110' : 'bg-gray-300 hover:bg-gray-400'
-              }`}
-              aria-label={`Слайд ${index + 1}`}
-              type="button"
-            />
-          ))}
-        </div>
-      )}
     </div>
-  );
-};
+  )
+}
 
-export default ImageSlider;
+export default ImageSlider

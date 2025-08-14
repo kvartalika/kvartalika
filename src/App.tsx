@@ -21,6 +21,7 @@ const ApartmentPage = lazy(() => import('./pages/ApartmentPage'))
 const AuthPage = lazy(() => import('./pages/AuthPage'))
 const AdminPage = lazy(() => import('./components/admin/AdminPage.tsx'))
 const ContentManagementPage = lazy(() => import('./components/content/ContentManagementPage.tsx'))
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage.tsx'))
 
 import { useAuthStore } from './store/auth.store.ts'
 import RouterListener from './components/RouterListener.tsx'
@@ -133,6 +134,10 @@ const InnerApp = () => {
               <Route
                 path="/apartment/:apartmentId"
                 element={<ApartmentPage />}
+              />
+              <Route
+                path="/privacy"
+                element={<PrivacyPage />}
               />
               <Route
                 path="*"

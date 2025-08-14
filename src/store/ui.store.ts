@@ -1,7 +1,7 @@
-import {create} from 'zustand';
-import {persist} from "zustand/middleware";
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
-import type {BidRequest, RequestCreate} from '../services';
+import type { BidRequest, RequestCreate } from '../services'
 import {
   addSocialMedia,
   createRequest,
@@ -10,7 +10,7 @@ import {
   getSocialMedia,
   updatePageInfo,
   updateSocialMedia
-} from '../services';
+} from '../services'
 
 export interface BidForm {
   id: number;
@@ -31,6 +31,7 @@ export interface PageInfo {
   address?: string
   description?: string;
   published?: boolean;
+  privacy?: string
 }
 
 export interface SocialMedia {
@@ -146,9 +147,9 @@ export const initialBidForm: BidRequest = {
   email: '',
   createdAt: Date.now(),
   isChecked: false,
-};
+}
 
-const generateId = () => Math.random().toString(36).substring(2, 9);
+const generateId = () => Math.random().toString(36).substring(2, 9)
 
 export const useUIStore = create<
   UIState & UIActions
@@ -196,119 +197,119 @@ export const useUIStore = create<
 
       openModal: (modal, data) => {
         set(state => ({
-          modals: {...state.modals, [modal]: true},
-          modalData: data ? {...state.modalData, ...data} : state.modalData,
-        }));
+          modals: { ...state.modals, [modal]: true },
+          modalData: data ? { ...state.modalData, ...data } : state.modalData,
+        }))
       },
 
       closeModal: (modal) => {
         set(state => ({
-          modals: {...state.modals, [modal]: false},
-        }));
+          modals: { ...state.modals, [modal]: false },
+        }))
       },
 
       loadPageInfo: async () => {
-        const {setLoading, addNotification} = get();
-        setLoading('global', true);
+        const { setLoading, addNotification } = get()
+        setLoading('global', true)
         try {
-          const info = await getPageInfo();
-          set({pageInfo: info});
+          const info = await getPageInfo()
+          set({ pageInfo: info })
         } catch {
           addNotification({
             type: 'error',
             title: 'Ошибка',
             message: 'Не удалось загрузить настройки страницы',
             duration: 2500,
-          });
+          })
         }
       },
 
       loadSocialMediaList: async () => {
-        const {addNotification} = get();
+        const { addNotification } = get()
         try {
-          const list = await getSocialMedia();
-          set({socialMediaList: list});
+          const list = await getSocialMedia()
+          set({ socialMediaList: list })
         } catch {
           addNotification({
             type: 'error',
             title: 'Ошибка',
             message: 'Не удалось загрузить соцсети',
             duration: 2500,
-          });
+          })
         }
       },
 
       updateSocialMediaList: async (list: SocialMedia[]) => {
-        const {setLoading, addNotification} = get();
-        setLoading('upload', true);
+        const { setLoading, addNotification } = get()
+        setLoading('upload', true)
 
         try {
-          await updateSocialMedia(list);
+          await updateSocialMedia(list)
         } catch {
           addNotification({
             type: 'error',
             title: 'Ошибка',
             message: 'Не удалось обновить медиа',
             duration: 2500,
-          });
+          })
         } finally {
-          setLoading('upload', false);
+          setLoading('upload', false)
         }
       },
 
       addSocialMediaList: async (media: SocialMedia) => {
-        const {setLoading, addNotification} = get();
-        setLoading('upload', true);
+        const { setLoading, addNotification } = get()
+        setLoading('upload', true)
 
         try {
-          await addSocialMedia(media);
-          set({socialMediaList: [...get().socialMediaList, media]});
+          await addSocialMedia(media)
+          set({ socialMediaList: [...get().socialMediaList, media] })
         } catch {
           addNotification({
             type: 'error',
             title: 'Ошибка',
             message: 'Не удалось обновить медиа',
             duration: 2500,
-          });
+          })
         } finally {
-          setLoading('upload', false);
+          setLoading('upload', false)
         }
       },
 
       deleteSocialMediaList: async (id: number) => {
-        const {setLoading, addNotification} = get();
-        setLoading('upload', true);
+        const { setLoading, addNotification } = get()
+        setLoading('upload', true)
 
         try {
-          await deleteSocialMedia(id);
+          await deleteSocialMedia(id)
         } catch {
           addNotification({
             type: 'error',
             title: 'Ошибка',
             message: 'Не удалось удалить медиа',
             duration: 2500,
-          });
+          })
         } finally {
-          setLoading('upload', false);
+          setLoading('upload', false)
         }
       },
 
       updatePageInfo: async (newPageInfo: PageInfo) => {
-        const {setLoading, addNotification} = get();
-        setLoading('upload', true);
+        const { setLoading, addNotification } = get()
+        setLoading('upload', true)
 
         try {
-          await updatePageInfo(newPageInfo);
-          set({pageInfo: newPageInfo})
+          await updatePageInfo(newPageInfo)
+          set({ pageInfo: newPageInfo })
         } catch {
           addNotification({
             type: 'error',
             title: 'Ошибка',
             message: 'Не удалось обновить настройки страницы',
             duration: 2500,
-          });
+          })
         } finally {
-          setLoading('upload', false);
+          setLoading('upload', false)
         }
       },
 
@@ -319,65 +320,65 @@ export const useUIStore = create<
             [key]: false,
           }), {} as UIState['modals']),
           modalData: {},
-        }));
+        }))
       },
 
       // Gallery actions
       openGallery: (images, index = 0) => {
         set(state => ({
-          modals: {...state.modals, gallery: true},
+          modals: { ...state.modals, gallery: true },
           modalData: {
             ...state.modalData,
             galleryImages: images,
             galleryIndex: index
           },
-        }));
+        }))
       },
 
       setGalleryIndex: (index) => {
         set(state => ({
-          modalData: {...state.modalData, galleryIndex: index},
-        }));
+          modalData: { ...state.modalData, galleryIndex: index },
+        }))
       },
 
       // Image preview
       openImagePreview: (image) => {
         set(state => ({
-          modals: {...state.modals, imagePreview: true},
-          modalData: {...state.modalData, previewImage: image},
-        }));
+          modals: { ...state.modals, imagePreview: true },
+          modalData: { ...state.modalData, previewImage: image },
+        }))
       },
 
       // Confirm dialog
       showConfirmDialog: (config) => {
         set(state => ({
-          modals: {...state.modals, confirmDialog: true},
-          modalData: {...state.modalData, confirmDialog: config},
-        }));
+          modals: { ...state.modals, confirmDialog: true },
+          modalData: { ...state.modalData, confirmDialog: config },
+        }))
       },
 
       hideConfirmDialog: () => {
         set(state => ({
-          modals: {...state.modals, confirmDialog: false},
-          modalData: {...state.modalData, confirmDialog: undefined},
-        }));
+          modals: { ...state.modals, confirmDialog: false },
+          modalData: { ...state.modalData, confirmDialog: undefined },
+        }))
       },
 
       // bid form
       setBidForm: (form) => {
         set(state => ({
-          bidForm: {...state.bidForm, ...form},
-        }));
+          bidForm: { ...state.bidForm, ...form },
+        }))
       },
 
       resetBidForm: () => {
-        set({bidForm: initialBidForm});
+        set({ bidForm: initialBidForm })
       },
 
       submitBid: async () => {
-        const {bidForm, addNotification, setLoading} = get();
+        const { bidForm, addNotification, setLoading } = get()
 
-        setLoading('bid', true);
+        setLoading('bid', true)
 
         try {
           const requestData: RequestCreate = {
@@ -386,78 +387,78 @@ export const useUIStore = create<
             patronymic: bidForm.patronymic,
             phone: bidForm.phone,
             email: bidForm.email,
-          };
+          }
 
-          await createRequest(requestData);
+          await createRequest(requestData)
 
           addNotification({
             type: 'success',
             title: 'Заявка принята!',
             message: 'С вами свяжутся в течение 2-х рабочих дней',
             duration: 3500,
-          });
+          })
 
-          get().resetBidForm();
-          setTimeout(() => get().closeModal('bid'), 3500);
-          setLoading('bid', false);
+          get().resetBidForm()
+          setTimeout(() => get().closeModal('bid'), 3500)
+          setLoading('bid', false)
 
-          return true;
+          return true
         } catch {
           addNotification({
             type: 'error',
             title: 'Ошибка отправки',
             message: 'Не удалось отправить заявку',
             duration: 1500,
-          });
+          })
 
-          setLoading('bid', false);
-          return false;
+          setLoading('bid', false)
+          return false
         }
       },
 
       setLoading: (key, loadingFlag) => {
         set(state => ({
-          loading: {...state.loading, [key]: loadingFlag},
-        }));
+          loading: { ...state.loading, [key]: loadingFlag },
+        }))
       },
 
       addNotification: (notification) => {
-        const id = generateId();
+        const id = generateId()
         const newNotification: Notification = {
           id,
           duration: 5000,
           ...notification,
-        };
+        }
 
         set(state => ({
           notifications: [...state.notifications, newNotification],
-        }));
+        }))
 
         if (newNotification.duration && newNotification.duration > 0) {
           setTimeout(() => {
-            get().removeNotification(id);
-          }, newNotification.duration);
+            get().removeNotification(id)
+          }, newNotification.duration)
         }
       },
 
       removeNotification: (id) => {
         set(state => ({
           notifications: state.notifications.filter(n => n.id !== id),
-        }));
+        }))
       },
 
       clearNotifications: () => {
-        set({notifications: []});
+        set({ notifications: [] })
       },
 
       setError: (key, error) => {
         set(state => ({
-          errors: {...state.errors, [key]: error},
-        }));
+          errors: { ...state.errors, [key]: error },
+        }))
       },
 
       clearErrors: () => {
-        set({errors: {}});
+        set({ errors: {} })
       }
     }),
     {
@@ -471,4 +472,4 @@ export const useUIStore = create<
       }),
     }
   )
-);
+)

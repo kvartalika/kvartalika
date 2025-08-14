@@ -1,17 +1,17 @@
-import {lazy, useEffect, useState} from 'react';
-import {Link, useParams} from 'react-router-dom';
-import ApartmentCard from '../components/ApartmentCard';
+import { lazy, useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import ApartmentCard from '../components/ApartmentCard'
 
-import {useFlatsStore} from "../store/flats.store.ts";
-import {safeImage} from "../utils/safeImage.ts";
-import ImageSlider from "../components/ImageSlider.tsx";
-import {useUIStore} from "../store/ui.store.ts";
+import { useFlatsStore } from '../store/flats.store.ts'
+import { safeImage } from '../utils/safeImage.ts'
+import ImageSlider from '../components/ImageSlider.tsx'
+import { useUIStore } from '../store/ui.store.ts'
 
-const Map = lazy(() => import('../components/Map.tsx'));
-const Scene3D = lazy(() => import('../components/Scene3D'));
+const Map = lazy(() => import('../components/Map.tsx'))
+const Scene3D = lazy(() => import('../components/Scene3D'))
 
 const ComplexPage = () => {
-  const {homeId} = useParams<{ homeId: string }>();
+  const { homeId } = useParams<{ homeId: string }>()
 
   const {
     flatsByHome,
@@ -19,38 +19,37 @@ const ComplexPage = () => {
     getHomeById,
     loadFlatsByHome,
     selectedHome
-  } = useFlatsStore();
+  } = useFlatsStore()
 
-  const openModal = useUIStore(state => state.openModal);
+  const openModal = useUIStore(state => state.openModal)
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [currentHistoryIndex, setCurrentHistoryIndex] = useState(0);
+  const [currentHistoryIndex, setCurrentHistoryIndex] = useState(0)
 
-  const [yardSlideIndex, setYardSlideIndex] = useState(0);
+  const [yardSlideIndex, setYardSlideIndex] = useState(0)
 
   useEffect(() => {
     const load = async () => {
-      if (!homeId) return;
-      const id = Number(homeId);
+      if (!homeId) return
+      const id = Number(homeId)
       if (Number.isNaN(id)) {
-        console.warn('Invalid homeId:', homeId);
-        return;
+        console.warn('Invalid homeId:', homeId)
+        return
       }
-      const home = await getHomeById(id);
+      const home = await getHomeById(id)
       if (home) {
-        setSelectedHome(home);
+        setSelectedHome(home)
       } else {
-        setSelectedHome(null);
+        setSelectedHome(null)
       }
-    };
+    }
     void load()
-  }, [getHomeById, homeId, setSelectedHome]);
+  }, [getHomeById, homeId, setSelectedHome])
 
   useEffect(() => {
-    const id = selectedHome?.id;
-    if (!id) return;
-    void loadFlatsByHome(id);
-  }, [loadFlatsByHome, selectedHome]);
+    const id = selectedHome?.id
+    if (!id) return
+    void loadFlatsByHome(id)
+  }, [loadFlatsByHome, selectedHome])
 
   if (!selectedHome) {
     return (
@@ -67,17 +66,17 @@ const ComplexPage = () => {
           </Link>
         </div>
       </div>
-    );
+    )
   }
 
-  let images = safeImage(selectedHome.imagesResolved, 'home');
-  images = Array.isArray(images) ? images : [images];
+  let images = safeImage(selectedHome.imagesResolved, 'home')
+  images = Array.isArray(images) ? images : [images]
 
-  let historyImages = safeImage(selectedHome.historyImagesResolved, 'history');
-  historyImages = Array.isArray(historyImages) ? historyImages : [historyImages];
+  let historyImages = safeImage(selectedHome.historyImagesResolved, 'history')
+  historyImages = Array.isArray(historyImages) ? historyImages : [historyImages]
 
-  let yardsImages = safeImage(selectedHome.yardsImagesResolved, 'history');
-  yardsImages = Array.isArray(yardsImages) ? yardsImages : [yardsImages];
+  let yardsImages = safeImage(selectedHome.yardsImagesResolved, 'history')
+  yardsImages = Array.isArray(yardsImages) ? yardsImages : [yardsImages]
 
   return (
     <div className="min-h-screen pt-20">
@@ -111,13 +110,13 @@ const ComplexPage = () => {
           <div className="absolute inset-0 flex items-center justify-center z-10">
             <div className="text-center text-white max-w-4xl px-4">
               <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
-                {selectedHome.name ?? "Неизвестное ЖК"}
+                {selectedHome.name ?? 'Неизвестное ЖК'}
               </h1>
               <p className="text-xl md:text-2xl mb-6 text-gray-100 drop-shadow-md">
-                {selectedHome.description ?? "Пока здесь ничего нет..."}
+                {selectedHome.description ?? 'Пока здесь ничего нет...'}
               </p>
               <p className="text-lg mb-8 text-gray-200 drop-shadow-md">
-                📍 {selectedHome.address ?? "Требуется уточнение"}
+                📍 {selectedHome.address ?? 'Требуется уточнение'}
               </p>
               <button
                 onClick={() => openModal('bid')}
@@ -128,22 +127,6 @@ const ComplexPage = () => {
             </div>
           </div>
         </div>
-
-        {Array.isArray(images) && images.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
-            {images.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentImageIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all shadow-lg ${
-                  index === currentImageIndex
-                    ? 'bg-sky-300'
-                    : 'bg-white bg-opacity-50 hover:bg-opacity-75'
-                }`}
-              />
-            ))}
-          </div>
-        )}
       </section>
 
       <section className="py-12">
@@ -243,7 +226,7 @@ const ComplexPage = () => {
                 <div className="bg-white rounded-xl p-8 shadow-lg flex flex-col lg:flex-row gap-8">
                   <div className="lg:w-[60%] space-y-6">
                     <div className="text-center mb-4">
-                      <p className="text-gray-600">Год постройки: {selectedHome.yearBuilt ?? "-"}</p>
+                      <p className="text-gray-600">Год постройки: {selectedHome.yearBuilt ?? '-'}</p>
                     </div>
                     {selectedHome.history.map((phase, index) => (
                       <div
@@ -481,7 +464,6 @@ const ComplexPage = () => {
       </section>
     </div>
   )
-    ;
-};
+}
 
-export default ComplexPage;
+export default ComplexPage
