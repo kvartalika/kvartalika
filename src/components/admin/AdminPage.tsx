@@ -279,7 +279,7 @@ const AdminPage: FC = () => {
             {/* Content Managers */}
             {activeTab === 'managers' && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Panel title={isEditMode && editingType === 'manager' ? 'Изменить Content Менеджера' : 'Создать Content Менеджера'}>
+                <Panel title={isEditMode && editingType === 'manager' ? 'Изменить Менеджера' : 'Создать Менеджера'}>
                   <UserForm
                     formData={formData}
                     setFormData={setFormData}
@@ -289,7 +289,7 @@ const AdminPage: FC = () => {
                     requirePassword={!isEditMode}
                   />
                 </Panel>
-                <Panel title="Content Менеджеры">
+                <Panel title="Менеджеры">
                   <UserList
                     items={contentManagers}
                     onEdit={(u) => startEdit(u, 'manager')}
@@ -311,7 +311,7 @@ const AdminPage: FC = () => {
                     requirePassword={!isEditMode}
                   />
                 </Panel>
-                <Panel title="Admins">
+                <Panel title="Админы">
                   <UserList
                     items={admins}
                     onEdit={(u) => startEdit(u, 'admin')}
@@ -322,7 +322,7 @@ const AdminPage: FC = () => {
             )}
 
             {activeTab === 'files' && (
-              <Panel title="File Management">
+              <Panel title="Управление файлами">
                 <UnifiedFileManager
                   currentPath={currentPath}
                   directories={currentDirectoryDirs}

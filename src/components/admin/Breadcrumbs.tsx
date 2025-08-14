@@ -14,7 +14,7 @@ const Breadcrumbs: FC<{
           onClick={() => {
             onCrumbClick(idx)
           }}
-          className="underline"
+          className="underline cursor-pointer"
         >
           {seg === '' ? '/' : seg}
         </button>

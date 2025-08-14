@@ -1,10 +1,11 @@
 import {
   type ChangeEvent,
   type Dispatch,
-  type FC, type SetStateAction,
+  type FC,
+  type SetStateAction,
   useMemo,
-} from 'react';
-import type {FileEntry} from "../../services";
+} from "react";
+import type { FileEntry } from "../../services";
 import Breadcrumbs from "../admin/Breadcrumbs.tsx";
 
 interface UnifiedFileManagerProps {
@@ -30,45 +31,47 @@ interface UnifiedFileManagerProps {
 
 const isImageName = (name: string) => /\.(jpe?g|png|webp|gif)$/i.test(name);
 
-const btnBase = "inline-flex items-center gap-1 px-3 py-1 rounded shadow-sm font-medium transition";
+const btnBase =
+  "inline-flex items-center gap-1 px-3 py-1 rounded shadow-sm font-medium transition";
 const btnPrimary = "bg-indigo-600 text-white hover:bg-indigo-700";
 const btnSecondary = "bg-gray-100 text-gray-800 hover:bg-gray-200";
 const btnSuccess = "bg-green-600 text-white hover:bg-green-700";
 const btnDanger = "bg-red-500 text-white hover:bg-red-600";
 const btnDisabled = "opacity-50 cursor-not-allowed";
 
-
 const UnifiedFileManager: FC<UnifiedFileManagerProps> = ({
-                                                           currentPath,
-                                                           directories,
-                                                           files,
-                                                           isLoadingDirectories,
-                                                           isLoadingFiles,
-                                                           newDirectoryName,
-                                                           setNewDirectoryName,
-                                                           onNavigate,
-                                                           onCreateDirectory,
-                                                           onDeleteDirectory,
-                                                           handleFileSelect,
-                                                           onDownload,
-                                                           onDeleteFile,
-                                                           onRefresh,
-                                                           pendingFile,
-                                                           setPendingFile,
-                                                           handleUploadClick
-                                                         }) => {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL + '/files';
+  currentPath,
+  directories,
+  files,
+  isLoadingDirectories,
+  isLoadingFiles,
+  newDirectoryName,
+  setNewDirectoryName,
+  onNavigate,
+  onCreateDirectory,
+  onDeleteDirectory,
+  handleFileSelect,
+  onDownload,
+  onDeleteFile,
+  onRefresh,
+  pendingFile,
+  setPendingFile,
+  handleUploadClick,
+}) => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL + "/files";
 
   const getFileUrl = (currentDirectory: string[], fileName: string) => {
-    if (fileName.includes('/')) {
+    if (fileName.includes("/")) {
       return `${baseUrl}/${encodeURIComponent(fileName)}`;
     }
-    const fullPath = [...currentDirectory, fileName].map(encodeURIComponent).join('/');
+    const fullPath = [...currentDirectory, fileName]
+      .map(encodeURIComponent)
+      .join("/");
     return `${baseUrl}/${fullPath}`;
   };
 
-  const displayPath = useMemo(() => `/${currentPath.join('/')}`, [currentPath]);
-  const breadcrumbs = useMemo(() => ['root', ...currentPath], [currentPath]);
+  const displayPath = useMemo(() => `/${currentPath.join("/")}`, [currentPath]);
+  const breadcrumbs = useMemo(() => ["root", ...currentPath], [currentPath]);
 
   const navigateTo = (idx: number) => {
     if (idx === 0) onNavigate([]);
@@ -76,20 +79,16 @@ const UnifiedFileManager: FC<UnifiedFileManagerProps> = ({
   };
 
   const handleDirectoryClick = (dirName: string) => {
-    onNavigate(dirName.split('/'));
+    onNavigate(dirName.split("/"));
   };
 
   const isLoading = isLoadingDirectories || isLoadingFiles;
 
   return (
     <div className="space-y-6 flex flex-col">
-
       <div className="flex justify-between items-center gap-4 flex-wrap flex-1">
         <div className="flex items-start gap-4 flex-col bg-gray-200/30 rounded-md px-4 py-2">
-          <Breadcrumbs
-            segments={breadcrumbs}
-            onCrumbClick={navigateTo}
-          />
+          <Breadcrumbs segments={breadcrumbs} onCrumbClick={navigateTo} />
           <button
             onClick={onRefresh}
             className={`${btnBase} ${btnSecondary}`}
@@ -116,7 +115,9 @@ const UnifiedFileManager: FC<UnifiedFileManagerProps> = ({
 
             {pendingFile && (
               <div className="bg-gray-100 px-3 py-1 rounded text-sm">
-                <span className="truncate max-w-[140px]">{pendingFile.name}</span>
+                <span className="truncate max-w-[140px]">
+                  {pendingFile.name}
+                </span>
                 <button
                   onClick={() => setPendingFile(null)}
                   aria-label="Отменить выбор"
@@ -132,7 +133,9 @@ const UnifiedFileManager: FC<UnifiedFileManagerProps> = ({
               onClick={handleUploadClick}
               disabled={!pendingFile}
               type="button"
-              className={`ml-auto ${btnBase} ${btnSuccess} ${!pendingFile ? btnDisabled : ""}`}
+              className={`ml-auto ${btnBase} ${btnSuccess} ${
+                !pendingFile ? btnDisabled : ""
+              }`}
             >
               Загрузить
             </button>
@@ -148,7 +151,9 @@ const UnifiedFileManager: FC<UnifiedFileManagerProps> = ({
             <button
               onClick={onCreateDirectory}
               disabled={!newDirectoryName.trim()}
-              className={`${btnBase} ${btnPrimary} ${!newDirectoryName.trim() ? btnDisabled : ""}`}
+              className={`${btnBase} ${btnPrimary} ${
+                !newDirectoryName.trim() ? btnDisabled : ""
+              }`}
               type="button"
             >
               Создать папку
@@ -159,8 +164,12 @@ const UnifiedFileManager: FC<UnifiedFileManagerProps> = ({
 
       {/* Current path display */}
       <div className="bg-gray-50 p-3 rounded-lg flex gap-2">
-        <span className="text-sm font-medium text-gray-700">Текущая директория:</span>
-        <span className="text-sm text-gray-900 ml-2 font-mono">{displayPath}</span>
+        <span className="text-sm font-medium text-gray-700">
+          Текущая директория:
+        </span>
+        <span className="text-sm text-gray-900 ml-2 font-mono">
+          {displayPath}
+        </span>
       </div>
 
       {/* Content grid */}
@@ -213,7 +222,7 @@ const UnifiedFileManager: FC<UnifiedFileManagerProps> = ({
           ))}
 
           {/* Files */}
-          {files.map(({name}) => {
+          {files.map(({ name }) => {
             const isImage = isImageName(name);
             const previewUrl = isImage ? getFileUrl(currentPath, name) : null;
 
@@ -223,7 +232,9 @@ const UnifiedFileManager: FC<UnifiedFileManagerProps> = ({
                 className="border rounded-lg p-4 bg-white hover:bg-gray-50 transition-colors"
               >
                 <div className="mb-2">
-                  <div className="font-medium text-gray-900 truncate">{name}</div>
+                  <div className="font-medium text-gray-900 truncate">
+                    {name}
+                  </div>
                   {previewUrl && (
                     <img
                       src={previewUrl}
@@ -233,18 +244,50 @@ const UnifiedFileManager: FC<UnifiedFileManagerProps> = ({
                   )}
                 </div>
 
-                <div className="flex gap-2 text-xs">
+                <div className="flex flex-wrap gap-2 text-xs">
                   <button
-                    onClick={() => onDownload(name.includes('/') ? [name] : [...currentPath, name])}
+                    onClick={() => {
+                      const fileUrl = name;
+                      navigator.clipboard
+                        .writeText(fileUrl)
+                        .then(() => alert("Ссылка скопирована!"))
+                        .catch(() => alert("Не удалось скопировать ссылку"));
+                    }}
+                    className="px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+                  >
+                    Копировать
+                  </button>
+                  <button
+                    onClick={() =>
+                      onDownload(
+                        name.includes("/") ? [name] : [...currentPath, name]
+                      )
+                    }
                     className="px-2 py-1 bg-primary-500 text-white rounded hover:bg-primary-600 transition-colors"
                   >
                     Скачать
                   </button>
                   <button
-                    onClick={() => onDeleteFile(name.includes('/') ? [name] : [...currentPath, name])}
+                    onClick={() =>
+                      onDeleteFile(
+                        name.includes("/") ? [name] : [...currentPath, name]
+                      )
+                    }
                     className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
                   >
                     Удалить
+                  </button>
+                  <button
+                    onClick={() => {
+                      const fileUrl = baseUrl + "/" + name;
+                      navigator.clipboard
+                        .writeText(fileUrl)
+                        .then(() => alert("Ссылка скопирована!"))
+                        .catch(() => alert("Не удалось скопировать ссылку"));
+                    }}
+                    className="px-2 py-1 bg-green-800 text-white rounded hover:bg-green-600 transition-colors"
+                  >
+                    Поделиться
                   </button>
                 </div>
               </div>
@@ -275,3 +318,6 @@ const UnifiedFileManager: FC<UnifiedFileManagerProps> = ({
 };
 
 export default UnifiedFileManager;
+function useState(arg0: boolean): [any, any] {
+  throw new Error("Function not implemented.");
+}
