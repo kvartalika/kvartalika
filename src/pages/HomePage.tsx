@@ -179,10 +179,6 @@ const HomePage = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
               Почему выбирают нас?
             </h2>
-            <p className="text-lg text-gray-600 mb-12">
-              Мы предлагаем только проверенные объекты недвижимости от надежных застройщиков
-            </p>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
                 <div className="w-16 h-16 bg-success-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -201,7 +197,6 @@ const HomePage = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold text-surface-900 mb-2">Проверенные объекты</h3>
-                <p className="text-surface-600">Все квартиры проходят тщательную проверку на юридическую чистоту</p>
               </div>
 
               <div className="text-center">
@@ -221,7 +216,6 @@ const HomePage = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold text-surface-900 mb-2">Быстрый поиск</h3>
-                <p className="text-surface-600">Удобные фильтры помогут найти идеальную квартиру за минуты</p>
               </div>
 
               <div className="text-center">
@@ -241,7 +235,6 @@ const HomePage = () => {
                   </svg>
                 </div>
                 <h3 className="text-xl font-semibold text-surface-900 mb-2">Поддержка 24/7</h3>
-                <p className="text-surface-600">Наши специалисты готовы помочь вам в любое время</p>
               </div>
             </div>
           </div>

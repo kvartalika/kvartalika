@@ -1,20 +1,32 @@
-import { Link, useNavigate } from 'react-router-dom'
-import type { ResolvedHome } from '../services'
-import { safeImage } from '../utils/safeImage.ts'
+import { Link, useNavigate } from "react-router-dom";
+import type { ResolvedHome } from "../services";
+import { safeImage } from "../utils/safeImage.ts";
 
 interface ComplexCardProps {
   complex: ResolvedHome;
 }
 
 const ComplexCard = ({ complex }: ComplexCardProps) => {
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
-
-  let images = safeImage(complex.imagesResolved, 'home')
-  images = Array.isArray(images) ? images : [images]
+  let images = safeImage(complex.imagesResolved, "home");
+  images = Array.isArray(images) ? images : [images];
 
   const handleCardClick = () => {
-    navigate(`/complex/${complex.id}`)
+    navigate(`/complex/${complex.id}`);
+  };
+
+  function formatFloors(count: number): string {
+    if (count === -1) return "—";
+    const abs = Math.abs(count);
+    const mod100 = abs % 100;
+    if (mod100 >= 11 && mod100 <= 14) {
+      return `${count} этажей`;
+    }
+    const mod10 = abs % 10;
+    if (mod10 === 1) return `${count} этаж`;
+    if (mod10 >= 2 && mod10 <= 4) return `${count} этажа`;
+    return `${count} этажей`;
   }
 
   return (
@@ -25,7 +37,7 @@ const ComplexCard = ({ complex }: ComplexCardProps) => {
       <div className="relative aspect-[16/9] w-full overflow-hidden">
         <img
           src={images[0]}
-          alt={complex.name || 'Изображение ЖК'}
+          alt={complex.name || "Изображение ЖК"}
           className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
           loading="lazy"
         />
@@ -33,7 +45,7 @@ const ComplexCard = ({ complex }: ComplexCardProps) => {
         <div className="absolute inset-0 bg-gradient-to-t from-surface-900/20 via-transparent to-transparent"></div>
 
         <div className="absolute top-4 right-4 bg-primary-600 text-surface-50 px-4 py-2 rounded-xl font-bold shadow-lg text-sm backdrop-blur-sm bg-opacity-95">
-          {complex.numberOfFloors ?? '—'} этажей
+          {complex.numberOfFloors ?? "—"} этажей
         </div>
 
         <div className="absolute inset-0 bg-surface-900/0 group-hover:bg-surface-900/10 transition-all duration-300"></div>
@@ -41,7 +53,7 @@ const ComplexCard = ({ complex }: ComplexCardProps) => {
 
       <div className="p-6 flex flex-col flex-1">
         <h3 className="text-xl font-bold text-surface-900 mb-3 group-hover:text-primary-600 transition-colors">
-          {complex.name || 'Без названия'}
+          {complex.name || "Без названия"}
         </h3>
 
         <div className="grid grid-cols-1 gap-3 mb-6">
@@ -65,7 +77,9 @@ const ComplexCard = ({ complex }: ComplexCardProps) => {
                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            <span className="truncate">{complex.address || 'Адрес уточняется'}</span>
+            <span className="truncate">
+              {complex.address || "Адрес уточняется"}
+            </span>
           </div>
 
           <div className="flex items-center text-sm text-surface-700 bg-surface-100 rounded-xl p-3 font-medium border border-surface-200">
@@ -82,13 +96,13 @@ const ComplexCard = ({ complex }: ComplexCardProps) => {
                 d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
               />
             </svg>
-            {complex.numberOfFloors ? `${complex.numberOfFloors} этажей` : '— этажей'}
+            {formatFloors(complex.numberOfFloors ?? -1)}
           </div>
         </div>
 
         <div className="mb-6">
           <p className="text-surface-600 text-sm line-clamp-3">
-            {complex.description || 'Описание отсутствует'}
+            {complex.description || "Описание отсутствует"}
           </p>
         </div>
 
@@ -129,7 +143,7 @@ const ComplexCard = ({ complex }: ComplexCardProps) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ComplexCard
+export default ComplexCard;

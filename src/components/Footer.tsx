@@ -9,11 +9,11 @@ const Footer = () => {
 
   return (
     <footer className="bg-surface-800 text-surface-50">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="container mx-auto px-4 py-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="md:col-span-2 flex flex-col justify-center items-center lg:items-start">
-            <Logo className="text-white mb-4" />
-            <p className="text-surface-300 mb-6 max-w-md">{pageInfo.footerDescription}</p>
+            <Logo className="text-white mb-2" />
+            <p className="text-surface-300 mb-4 max-w-md">{pageInfo.footerDescription}</p>
             <div className="flex space-x-4">
               {socialMediaList && socialMediaList.length > 0
                 && socialMediaList.map(media => (
@@ -26,7 +26,7 @@ const Footer = () => {
           </div>
 
           <div className="flex flex-col items-center lg:items-start">
-            <h3 className="text-lg font-semibold mb-4">Отдел продаж</h3>
+            <h3 className="text-lg font-semibold mb-2">Отдел продаж</h3>
             <div className="space-y-3">
               <div className="flex items-start">
                 <span className="text-gray-300">{pageInfo.address}</span>
@@ -35,7 +35,7 @@ const Footer = () => {
           </div>
 
           <div className="flex flex-col items-center lg:items-start">
-            <h3 className="text-lg font-semibold mb-4">Контакты</h3>
+            <h3 className="text-lg font-semibold mb-2">Контакты</h3>
             <div className="space-y-3">
               <div className="flex items-center">
                 <svg
@@ -83,8 +83,8 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-surface-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-surface-400 text-sm mb-4 md:mb-0">
+        <div className="border-t border-surface-800 mt-2 pt-2 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-surface-400 text-sm md:mb-0">
             © 2025 Кварталика.
           </p>
           <div className="flex space-x-6 text-sm">
