@@ -1,5 +1,6 @@
 import {type FormEvent} from 'react';
 import {useUIStore} from "../store/ui.store.ts";
+import { Link } from 'react-router-dom';
 
 const BookingModal = () => {
   const setBidForm = useUIStore(state => state.setBidForm);
@@ -173,12 +174,13 @@ const BookingModal = () => {
 
         <p className="text-xs text-gray-500 mt-4 text-center">
           Нажимая "Отправить заявку", вы соглашаетесь с{' '}
-          <a
-            href="/privacy"
-            className="text-primary-600 hover:underline"
-          >
-            политикой конфиденциальности
-          </a>
+          <Link
+              to="/privacy"
+              className="text-primary-600 underline"
+              onClick={handleClose}
+            >
+              политикой конфиденциальности
+            </Link>
         </p>
       </div>
     </div>

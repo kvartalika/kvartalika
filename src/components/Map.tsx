@@ -27,7 +27,7 @@ const Map = ({latitude, longitude, description}: MapProps) => {
       className="mx-auto z-10 w-full rounded-2xl shadow-lg aspect-[16/9] min-h-[250px] max-h-[400px] relative"
     >
       <div className='absolute bottom-0 right-0 bg-sky-50 z-2000 rounded-md'>
-        <p className='px-16 font-bold text-lg'>@Кварталика</p>
+        <p className='px-16 font-bold text-lg text-sky-50 select-none'>@Кварталика</p>
       </div>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
