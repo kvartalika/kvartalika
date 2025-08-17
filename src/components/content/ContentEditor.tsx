@@ -346,7 +346,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               }
               className="mr-1"
             />
-            <label htmlFor="hasDecoration">Декорирован</label>
+            <label htmlFor="hasDecoration">Есть отделка</label>
           </div>
           <div className="flex items-center gap-2">
             <input

@@ -6,6 +6,7 @@ import { useFlatsStore } from '../store/flats.store.ts'
 import { safeImage } from '../utils/safeImage.ts'
 import ImageSlider from '../components/ImageSlider.tsx'
 import { useUIStore } from '../store/ui.store.ts'
+import TextSlider from '../components/TextSlider.tsx'
 
 const YandexMap = lazy(() => import("../components/YandexMap.tsx"))
 const Scene3D = lazy(() => import('../components/Scene3D'))
@@ -22,8 +23,6 @@ const ComplexPage = () => {
   } = useFlatsStore()
 
   const openModal = useUIStore(state => state.openModal)
-
-  const [currentHistoryIndex, setCurrentHistoryIndex] = useState(0)
 
   const [yardSlideIndex, setYardSlideIndex] = useState(0)
 
@@ -222,62 +221,29 @@ const ComplexPage = () => {
             )}
             {selectedHome.history && (
               <div className="mb-16">
-                <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center">История строительства</h3>
-                <div className="bg-white rounded-xl p-8 shadow-lg flex flex-col lg:flex-row gap-8">
-                  <div className="lg:w-[60%] space-y-6">
-                    <div className="text-center mb-4">
-                      <p className="text-gray-600">Год постройки: {selectedHome.yearBuilt ?? '-'}</p>
-                    </div>
-                    {selectedHome.history.map((phase, index) => (
-                      <div
-                        key={`${phase}-${index}`}
-                        className="flex items-start"
-                      >
-                        <div className="flex-shrink-0 w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center text-sm font-semibold mr-4">
-                          {index + 1}
-                        </div>
-                        <div className="flex-grow">
-                          <h4 className="font-semibold text-gray-900 mb-1">{phase}</h4>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center">
+                  История строительства
+                </h3>
 
-                  <div className="lg:w-[40%] flex flex-col items-center justify-center">
-                    {historyImages.length > 0 ? (
-                      <div className="relative rounded overflow-hidden">
-                        <img
-                          src={historyImages[currentHistoryIndex]}
-                          alt={`История ${currentHistoryIndex + 1}`}
-                          className="w-full h-full object-cover"
+                <div className="bg-white rounded-xl p-6 sm:p-8 shadow-lg">
+                  <div className="flex flex-col lg:flex-row gap-8">
+
+                    <div className="lg:w-1/2 flex">
+                      <TextSlider
+                        items={selectedHome.history}
+                        autoPlay={false}
+                        className="flex-1 min-h-[280px] sm:min-h-[320px] lg:min-h-[340px]"
+                      />
+                    </div>
+
+                    <div className="lg:w-1/2">
+                      <div className="min-h-[280px] sm:min-h-[320px]">
+                        <ImageSlider
+                          images={historyImages || []}
+                          showThumbnails={true}
                         />
-                        {historyImages.length > 1 && (
-                          <>
-                            <button
-                              onClick={() => setCurrentHistoryIndex(prev => (prev - 1 + historyImages.length) % historyImages.length)}
-                              aria-label="Предыдущее фото истории"
-                              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-primary-600 bg-opacity-50 text-white p-2 rounded-xl hover:bg-opacity-70 transition-all"
-                            >
-                              ‹
-                            </button>
-                            <button
-                              onClick={() => setCurrentHistoryIndex(prev => (prev + 1) % historyImages.length)}
-                              aria-label="Следующее фото истории"
-                              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary-600 bg-opacity-50 text-white p-2 rounded-xl hover:bg-opacity-70 transition-all"
-                            >
-                              ›
-                            </button>
-                            <div className="absolute bottom-2 right-2 bg-primary-600 bg-opacity-60 text-white px-2 py-1 rounded text-xs">
-                              {currentHistoryIndex + 1} / {historyImages.length}
-                            </div>
-                          </>
-                        )}
                       </div>
-                    ) : (
-                      <div className="flex-1 rounded overflow-hidden border bg-gray-100 flex items-center justify-center">
-                        <span className="text-gray-500">Фотографии отсутствуют</span>
-                      </div>
-                    )}
+                    </div>
                   </div>
                 </div>
               </div>
