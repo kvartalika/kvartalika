@@ -1,27 +1,27 @@
-import {Link} from 'react-router-dom';
-import SearchBar from '../components/SearchBar';
-import ApartmentCard from '../components/ApartmentCard';
-import BackgroundPattern from "../components/BackgroundPattern.tsx";
-import HomePageManager from '../components/content/HomePageManager.tsx';
+import { Link } from 'react-router-dom'
+import SearchBar from '../components/SearchBar'
+import ApartmentCard from '../components/ApartmentCard'
+import BackgroundPattern from '../components/BackgroundPattern.tsx'
+import HomePageManager from '../components/content/HomePageManager.tsx'
 
-import type {HomePageFlats} from "../services";
-import PageLoader from "../components/PageLoader.tsx";
-import PageInfoEditor from "../components/content/PageInfoEditor.tsx";
-import SocialMediaEditor from "../components/content/SocialMediaEditor.tsx";
-import {useAuthStore} from "../store/auth.store.ts";
-import {useUIStore} from "../store/ui.store.ts";
-import {useFlatsStore} from "../store/flats.store.ts";
-import {useMemo} from "react";
+import type { HomePageFlats } from '../services'
+import PageLoader from '../components/PageLoader.tsx'
+import PageInfoEditor from '../components/content/PageInfoEditor.tsx'
+import SocialMediaEditor from '../components/content/SocialMediaEditor.tsx'
+import { useAuthStore } from '../store/auth.store.ts'
+import { useUIStore } from '../store/ui.store.ts'
+import { useFlatsStore } from '../store/flats.store.ts'
+import { useMemo } from 'react'
 
 const HomePage = () => {
-  const role = useAuthStore(state => state.role);
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const role = useAuthStore(state => state.role)
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated)
 
-  const pageInfo = useUIStore(state => state.pageInfo);
+  const pageInfo = useUIStore(state => state.pageInfo)
 
-  const openModal = useUIStore(state => state.openModal);
-  const modals = useUIStore(state => state.modals);
-  const closeModal = useUIStore(state => state.closeModal);
+  const openModal = useUIStore(state => state.openModal)
+  const modals = useUIStore(state => state.modals)
+  const closeModal = useUIStore(state => state.closeModal)
 
   const {
     homePageFlats,
@@ -30,9 +30,9 @@ const HomePage = () => {
     isLoadingHomes,
     homes,
     flats,
-  } = useFlatsStore();
+  } = useFlatsStore()
 
-  const flatSum = useMemo(() => flats.reduce((sm, fl) => sm + (fl?.flat?.numberForSale || 0), 0), [flats]);
+  const flatSum = useMemo(() => flats.reduce((sm, fl) => sm + (fl?.flat?.numberForSale || 0), 0), [flats])
 
   const renderSection = (section: HomePageFlats, idx: number) => {
     return (
@@ -50,7 +50,7 @@ const HomePage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {section.flats.map(apartment => (
               <ApartmentCard
-                homeName={homes.find(item => item.id === apartment.flat.homeId)?.name ?? "?"}
+                homeName={homes.find(item => item.id === apartment.flat.homeId)?.name ?? '?'}
                 key={apartment.flat.id}
                 apartment={apartment}
                 onBookingClick={() => openModal('bid')}
@@ -81,8 +81,8 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-    );
-  };
+    )
+  }
 
   return (
     <div className="min-h-screen">
@@ -103,11 +103,11 @@ const HomePage = () => {
           {homes.length > 5 && flatSum >= 50 &&
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 max-w-4xl mx-auto">
               <div className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">{homes.length > 25 ? "25+" : homes.length}</div>
+                <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">{homes.length > 25 ? '25+' : homes.length}</div>
                 <div className="text-sm md:text-base text-gray-200">Жилых комплексов</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">{flatSum > 500 ? "500+" : flatSum}</div>
+                <div className="text-4xl md:text-5xl font-bold text-gray-300 mb-2">{flatSum > 500 ? '500+' : flatSum}</div>
                 <div className="text-sm md:text-base text-gray-200">Квартир в продаже</div>
               </div>
             </div>}
@@ -131,31 +131,31 @@ const HomePage = () => {
         </div>
 
         {isAuthenticated && role && role !== 'CLIENT' && (
-          <div className='fixed bottom-4 flex items-center justify-between w-[90vw] flex-wrap gap-2 z-100'>
-            <div className='flex flex-col gap-2 text-white '>
+          <div className="fixed bottom-4 flex items-center justify-between w-[90vw] flex-wrap gap-2 z-100">
+            <div className="flex flex-col gap-2 text-white ">
               <Link
                 to={`/admin`}
-                className="bg-black  px-4 py-2 rounded-md shadow"
+                className="bg-primary-700  px-4 py-2 rounded-md shadow"
               >
                 Админ Панель
               </Link>
               <Link
                 to={`/content`}
-                className="bg-black px-4 py-2 rounded-md shadow"
+                className="bg-primary-700 px-4 py-2 rounded-md shadow"
               >
                 Управление контентом
               </Link>
             </div>
-            <div className='flex flex-col gap-2 text-white'>
+            <div className="flex flex-col gap-2 text-white">
               <button
                 onClick={() => openModal('mainPage')}
-                className="px-4 py-2 shadow bg-black rounded-md"
+                className="px-4 py-2 shadow bg-primary-700 rounded-md"
               >
                 Редактировать главную
               </button>
               <button
                 onClick={() => openModal('social')}
-                className="px-4 py-2 shadow bg-black rounded-md"
+                className="px-4 py-2 shadow bg-primary-700 rounded-md"
               >
                 Редактировать медиа
               </button>
@@ -271,7 +271,7 @@ const HomePage = () => {
         />
       )}
     </div>
-  );
-};
+  )
+}
 
-export default HomePage;
+export default HomePage

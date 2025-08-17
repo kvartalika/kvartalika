@@ -1,5 +1,5 @@
-import type {UserRole} from "../store/auth.store.ts";
-import type {TABS} from "./index.ts";
+import type { UserRole } from '../store/auth.store.ts'
+import type { TABS } from './index.ts'
 
 export interface LoginRequest {
   username?: string;
@@ -83,6 +83,7 @@ export interface FlatRequest {
   hasDecoration?: boolean;
   numberForSale?: number
   published?: boolean;
+  imagesClean?: string[];
 }
 
 export interface HomeRequest {
@@ -189,33 +190,6 @@ export interface Photo {
   updatedAt: string;
 }
 
-export interface Flat {
-  id: number;
-  name: string;
-  description: string;
-  images: string[];
-  layout: string;
-  address: string;
-  price: number;
-  latitude: number;
-  longitude: number;
-  features: string[];
-  numberOfRooms: number;
-  area: number;
-  about: string;
-  floor: number;
-  homeId: number;
-  numberOfBathrooms: number
-  hasDecoration: boolean;
-  numberForSale: number
-  published: boolean;
-}
-
-export interface FlatWithCategory {
-  flat: Flat;
-  categories: Category[];
-}
-
 export interface FlatWithCategoryRequest {
   flat: FlatRequest;
   categories: Partial<Category>[];
@@ -224,33 +198,12 @@ export interface FlatWithCategoryRequest {
 export interface ResolvedFlat extends FlatWithCategoryRequest {
   imagesResolved?: string[];
   layoutResolved?: string;
+  imagesCleanResolved?: string[];
 }
 
 export interface HomePageFlats {
   category: Category;
   flats: ResolvedFlat[];
-}
-
-export interface Home {
-  id: number;
-  name: string;
-  description: string;
-  images: string[];
-  address: string;
-  latitude: number;
-  longitude: number;
-  yearBuilt: number;
-  history: string[];
-  historyImages: string[];
-  features: string[];
-  about: string;
-  numberOfFloors: number;
-  storesNearby: boolean;
-  schoolsNearby: boolean;
-  hospitalsNearby: boolean;
-  hasYards: boolean;
-  yardsImages: string[];
-  published: boolean;
 }
 
 export interface ResolvedHome extends HomeRequest {

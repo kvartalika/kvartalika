@@ -1,16 +1,17 @@
-import {lazy, useEffect} from 'react';
-import {Link, useParams} from 'react-router-dom';
-import {useFlatsStore} from "../store/flats.store.ts";
-import {safeImage} from "../utils/safeImage.ts";
-import ImageSlider from "../components/ImageSlider.tsx";
-import {useUIStore} from "../store/ui.store.ts";
+import { lazy, useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import { useFlatsStore } from '../store/flats.store.ts'
+import { safeImage } from '../utils/safeImage.ts'
+import ImageSlider from '../components/ImageSlider.tsx'
+import { useUIStore } from '../store/ui.store.ts'
 
-const Map = lazy(() => import('../components/Map.tsx'));
+const Map = lazy(() => import('../components/Map.tsx'))
 
 const ApartmentPage = () => {
-  const {apartmentId} = useParams<{ apartmentId: string }>();
+  const { apartmentId } = useParams<{ apartmentId: string }>()
 
-  const openModal = useUIStore(state => state.openModal);
+  const openModal = useUIStore(state => state.openModal)
+  const [useDecoration, setUseDecoration] = useState(true)
 
   const {
     setSelectedFlat,
@@ -19,26 +20,26 @@ const ApartmentPage = () => {
     homes,
     setSelectedHome,
     selectedHome
-  } = useFlatsStore();
+  } = useFlatsStore()
 
   useEffect(() => {
     const load = async () => {
-      if (!apartmentId) return;
-      const id = Number(apartmentId);
+      if (!apartmentId) return
+      const id = Number(apartmentId)
       if (Number.isNaN(id)) {
-        console.warn('Invalid apartmentId:', apartmentId);
-        return;
+        console.warn('Invalid apartmentId:', apartmentId)
+        return
       }
-      const flat = await getFlatById(id);
+      const flat = await getFlatById(id)
       if (flat) {
-        setSelectedFlat(flat);
+        setSelectedFlat(flat)
         setSelectedHome(homes.find(home => flat.flat.homeId === home.id) ?? null)
       } else {
-        setSelectedFlat(null);
+        setSelectedFlat(null)
       }
-    };
+    }
     void load()
-  }, [apartmentId, getFlatById, setSelectedFlat, homes, selectedHome, setSelectedHome]);
+  }, [apartmentId, getFlatById, setSelectedFlat, homes, selectedHome, setSelectedHome])
 
   if (!selectedFlat?.flat) {
     return (
@@ -55,20 +56,20 @@ const ApartmentPage = () => {
           </Link>
         </div>
       </div>
-    );
+    )
   }
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('ru-RU').format(price);
-  };
+    return new Intl.NumberFormat('ru-RU').format(price)
+  }
 
-  const pricePerSqm = Math.round((selectedFlat.flat.price || 0) / (selectedFlat.flat?.area || 1));
+  const pricePerSqm = Math.round((selectedFlat.flat.price || 0) / (selectedFlat.flat?.area || 1))
 
-  let images = safeImage(selectedFlat.imagesResolved, 'flat')
+  let images = useDecoration ? safeImage(selectedFlat.imagesResolved, 'flat') : safeImage(selectedFlat.imagesCleanResolved, 'flat')
   images = Array.isArray(images) ? images : [images]
 
-  let layoutImg = safeImage(selectedFlat.layoutResolved, 'layout');
-  layoutImg = Array.isArray(layoutImg) ? layoutImg[0] : layoutImg;
+  let layoutImg = safeImage(selectedFlat.layoutResolved, 'layout')
+  layoutImg = Array.isArray(layoutImg) ? layoutImg[0] : layoutImg
 
   return (
     <div className="min-h-screen pt-20">
@@ -150,7 +151,7 @@ const ApartmentPage = () => {
                   </div>
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Площадь:</span>
-                    <span className="font-medium">{selectedFlat.flat?.area ?? "Неизвестно"} м²</span>
+                    <span className="font-medium">{selectedFlat.flat?.area ?? 'Неизвестно'} м²</span>
                   </div>
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Этаж:</span>
@@ -163,10 +164,27 @@ const ApartmentPage = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="flex justify-between py-3 border-b border-gray-200">
+                  <div className="flex justify-between py-3 border-b border-gray-200 items-center">
                     <span className="text-gray-600">Отделка:</span>
-                    <span className="font-medium">{selectedFlat.flat.hasDecoration ? "Есть" : "Нет"}</span>
+                    {selectedFlat.flat.hasDecoration ? (
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          className="sr-only peer"
+                          checked={useDecoration}
+                          onChange={() => setUseDecoration(!useDecoration)}
+                        />
+                        <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-green-500 transition"></div>
+                        <span className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-5 transition"></span>
+                        <span className="ml-3 text-sm font-medium">
+        {useDecoration ? 'С отделкой' : 'Без отделки'}
+      </span>
+                      </label>
+                    ) : (
+                      <span className="font-medium">Нет</span>
+                    )}
                   </div>
+
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Цена за м²:</span>
                     <span className="font-medium">{formatPrice(pricePerSqm)} ₽/м²</span>
@@ -182,7 +200,7 @@ const ApartmentPage = () => {
                   </div>
                   <div className="flex justify-between py-3 border-b border-gray-200">
                     <span className="text-gray-600">Адрес:</span>
-                    <span className="font-medium">{selectedFlat.flat.address ?? "Нужно уточнить"}</span>
+                    <span className="font-medium">{selectedFlat.flat.address ?? 'Нужно уточнить'}</span>
                   </div>
                 </div>
               </div>
@@ -274,7 +292,7 @@ const ApartmentPage = () => {
                 <div className="space-y-4 mb-6">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Площадь:</span>
-                    <span className="font-medium">{selectedFlat.flat.area ?? "Неизвестно"} м²</span>
+                    <span className="font-medium">{selectedFlat.flat.area ?? 'Неизвестно'} м²</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Комнат:</span>
@@ -299,7 +317,7 @@ const ApartmentPage = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ApartmentPage;
+export default ApartmentPage

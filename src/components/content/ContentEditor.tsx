@@ -4,16 +4,16 @@ import {
   useState,
   useEffect,
   useMemo,
-} from 'react';
+} from 'react'
 import type {
   HomeRequest,
   CategoryRequest,
   FlatWithCategoryRequest,
   Category,
-} from '../../services';
-import ArrayField from "./ArrayField.tsx";
-import type {BidForm} from "../../store/ui.store.ts";
-import {useDeferredNumber} from "../../hooks/useDeferredNumber.ts";
+} from '../../services'
+import ArrayField from './ArrayField.tsx'
+import type { BidForm } from '../../store/ui.store.ts'
+import { useDeferredNumber } from '../../hooks/useDeferredNumber.ts'
 
 export type ContentType = 'flat' | 'home' | 'category' | 'bid';
 
@@ -47,8 +47,8 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
       flat: {},
       categories: [],
     }
-  );
-  const [homePayload, setHomePayload] = useState<HomeRequest>(initialHome || {});
+  )
+  const [homePayload, setHomePayload] = useState<HomeRequest>(initialHome || {})
   const [categoryPayload, setCategoryPayload] = useState<CategoryRequest>(
     initialCategory
       ? {
@@ -56,21 +56,21 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
         name: initialCategory.name,
         isOnMainPage: initialCategory.isOnMainPage,
       }
-      : {id: 0, name: '', isOnMainPage: false}
-  );
+      : { id: 0, name: '', isOnMainPage: false }
+  )
 
-  const [bidPayload, setBidPayload] = useState<Partial<BidForm>>(initialBid || {});
+  const [bidPayload, setBidPayload] = useState<Partial<BidForm>>(initialBid || {})
 
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    if (initialFlat) setFlatPayload(initialFlat);
-  }, [initialFlat]);
+  const [error, setError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    if (initialHome) setHomePayload(initialHome);
-  }, [initialHome]);
+    if (initialFlat) setFlatPayload(initialFlat)
+  }, [initialFlat])
+
+  useEffect(() => {
+    if (initialHome) setHomePayload(initialHome)
+  }, [initialHome])
 
   useEffect(() => {
     if (initialCategory) {
@@ -78,47 +78,47 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
         id: initialCategory.id,
         name: initialCategory.name,
         isOnMainPage: initialCategory.isOnMainPage,
-      });
+      })
     }
-  }, [initialCategory]);
+  }, [initialCategory])
 
   useEffect(() => {
-    if (initialBid) setBidPayload(initialBid);
-  }, [initialBid]);
+    if (initialBid) setBidPayload(initialBid)
+  }, [initialBid])
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    setError(null);
+    e.preventDefault()
+    setSaving(true)
+    setError(null)
     try {
       if (contentType === 'flat') {
-        if (!flatPayload.flat.name) throw new Error('Название квартиры обязательно');
-        await onSave(flatPayload);
+        if (!flatPayload.flat.name) throw new Error('Название квартиры обязательно')
+        await onSave(flatPayload)
       } else if (contentType === 'home') {
-        if (!homePayload.name) throw new Error('Название комплекса обязательно');
-        await onSave(homePayload);
+        if (!homePayload.name) throw new Error('Название комплекса обязательно')
+        await onSave(homePayload)
       } else if (contentType === 'category') {
-        if (!categoryPayload.name) throw new Error('Название категории обязательно');
-        await onSave(categoryPayload);
+        if (!categoryPayload.name) throw new Error('Название категории обязательно')
+        await onSave(categoryPayload)
       } else if (contentType === 'bid') {
-        if (!bidPayload.id) throw new Error('Что это?');
-        await onSave(bidPayload);
+        if (!bidPayload.id) throw new Error('Что это?')
+        await onSave(bidPayload)
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Неизвестная ошибка');
+      setError(err instanceof Error ? err.message : 'Неизвестная ошибка')
     } finally {
-      setSaving(false);
+      setSaving(false)
     }
-  };
+  }
 
   const toggleCategory = (category: Category) => {
     setFlatPayload((prev) => {
-      const exists = prev.categories.find((c) => c.id === category.id);
+      const exists = prev.categories.find((c) => c.id === category.id)
       if (exists) {
         return {
           ...prev,
           categories: prev.categories.filter((c) => c.id !== category.id),
-        };
+        }
       } else {
         return {
           ...prev,
@@ -127,29 +127,29 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
             name: category.name,
             isOnMainPage: category.isOnMainPage
           }],
-        };
+        }
       }
-    });
-  };
+    })
+  }
 
   const isCategorySelected = (category: Category) =>
-    flatPayload.categories.some((c) => c.id === category.id);
+    flatPayload.categories.some((c) => c.id === category.id)
 
   const latControl = useDeferredNumber(flatPayload.flat.latitude, (num) =>
     setFlatPayload((p) => ({
       ...p,
-      flat: {...p.flat, latitude: num ?? undefined},
+      flat: { ...p.flat, latitude: num ?? undefined },
     }))
-  );
+  )
   const lonControl = useDeferredNumber(flatPayload.flat.longitude, (num) =>
     setFlatPayload((p) => ({
       ...p,
-      flat: {...p.flat, longitude: num ?? undefined},
+      flat: { ...p.flat, longitude: num ?? undefined },
     }))
-  );
+  )
 
   const renderFlatForm = () => {
-    const f = flatPayload.flat;
+    const f = flatPayload.flat
     return (
       <form
         onSubmit={handleSubmit}
@@ -175,7 +175,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               value={f.name || ''}
               onChange={(e) => setFlatPayload((p) => ({
                 ...p,
-                flat: {...p.flat, name: e.target.value}
+                flat: { ...p.flat, name: e.target.value }
               }))}
               className="w-full border rounded px-3 py-2"
               required
@@ -189,7 +189,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               onChange={(e) =>
                 setFlatPayload((p) => ({
                   ...p,
-                  flat: {...p.flat, price: Number(e.target.value)}
+                  flat: { ...p.flat, price: Number(e.target.value) }
                 }))
               }
               className="w-full border rounded px-3 py-2"
@@ -204,7 +204,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
             onChange={(e) =>
               setFlatPayload((p) => ({
                 ...p,
-                flat: {...p.flat, description: e.target.value}
+                flat: { ...p.flat, description: e.target.value }
               }))
             }
             className="w-full border rounded px-3 py-2 h-24"
@@ -212,12 +212,22 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
         </div>
 
         <ArrayField
-          label="Изображения"
+          label="Изображения с отделкой"
           values={f.images}
           placeholder="/images/..."
           onChange={(arr) => setFlatPayload((p) => ({
             ...p,
-            flat: {...p.flat, images: arr}
+            flat: { ...p.flat, images: arr }
+          }))}
+        />
+
+        <ArrayField
+          label="Изображения без отделки"
+          values={f.imagesClean}
+          placeholder="/images/..."
+          onChange={(arr) => setFlatPayload((p) => ({
+            ...p,
+            flat: { ...p.flat, imagesClean: arr }
           }))}
         />
 
@@ -231,7 +241,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               onChange={(e) =>
                 setFlatPayload((p) => ({
                   ...p,
-                  flat: {...p.flat, area: Number(e.target.value)}
+                  flat: { ...p.flat, area: Number(e.target.value) }
                 }))
               }
               className="w-full border rounded px-3 py-2"
@@ -245,7 +255,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               onChange={(e) =>
                 setFlatPayload((p) => ({
                   ...p,
-                  flat: {...p.flat, numberOfRooms: Number(e.target.value)}
+                  flat: { ...p.flat, numberOfRooms: Number(e.target.value) }
                 }))
               }
               className="w-full border rounded px-3 py-2"
@@ -259,7 +269,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               onChange={(e) =>
                 setFlatPayload((p) => ({
                   ...p,
-                  flat: {...p.flat, floor: Number(e.target.value)}
+                  flat: { ...p.flat, floor: Number(e.target.value) }
                 }))
               }
               className="w-full border rounded px-3 py-2"
@@ -276,7 +286,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               onChange={(e) =>
                 setFlatPayload(p => ({
                   ...p,
-                  flat: {...p.flat, numberOfBathrooms: Number(e.target.value)}
+                  flat: { ...p.flat, numberOfBathrooms: Number(e.target.value) }
                 }))
               }
               className="w-full border rounded px-3 py-2"
@@ -290,7 +300,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               onChange={(e) =>
                 setFlatPayload(p => ({
                   ...p,
-                  flat: {...p.flat, numberForSale: Number(e.target.value)}
+                  flat: { ...p.flat, numberForSale: Number(e.target.value) }
                 }))
               }
               className="w-full border rounded px-3 py-2"
@@ -304,7 +314,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               onChange={(e) =>
                 setFlatPayload(p => ({
                   ...p,
-                  flat: {...p.flat, homeId: Number(e.target.value)}
+                  flat: { ...p.flat, homeId: Number(e.target.value) }
                 }))
               }
               className="w-full border rounded px-3 py-2"
@@ -318,7 +328,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
           placeholder="например: балкон"
           onChange={(arr) => setFlatPayload((p) => ({
             ...p,
-            flat: {...p.flat, features: arr}
+            flat: { ...p.flat, features: arr }
           }))}
         />
 
@@ -331,7 +341,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               onChange={(e) =>
                 setFlatPayload((p) => ({
                   ...p,
-                  flat: {...p.flat, hasDecoration: e.target.checked}
+                  flat: { ...p.flat, hasDecoration: e.target.checked }
                 }))
               }
               className="mr-1"
@@ -346,7 +356,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               onChange={(e) =>
                 setFlatPayload((p) => ({
                   ...p,
-                  flat: {...p.flat, published: e.target.checked}
+                  flat: { ...p.flat, published: e.target.checked }
                 }))
               }
               className="mr-1"
@@ -394,7 +404,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
             onChange={(e) =>
               setFlatPayload((p) => ({
                 ...p,
-                flat: {...p.flat, layout: e.target.value}
+                flat: { ...p.flat, layout: e.target.value }
               }))
             }
             className="w-full border rounded px-3 py-2"
@@ -410,7 +420,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
             onChange={(e) =>
               setFlatPayload((p) => ({
                 ...p,
-                flat: {...p.flat, address: e.target.value}
+                flat: { ...p.flat, address: e.target.value }
               }))
             }
             className="w-full border rounded px-3 py-2"
@@ -424,7 +434,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
             onChange={(e) =>
               setFlatPayload((p) => ({
                 ...p,
-                flat: {...p.flat, about: e.target.value}
+                flat: { ...p.flat, about: e.target.value }
               }))
             }
             className="w-full border rounded px-3 py-2 h-20"
@@ -483,11 +493,11 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
           </div>
         </div>
       </form>
-    );
-  };
+    )
+  }
 
   const renderHomeForm = () => {
-    const h = homePayload;
+    const h = homePayload
     return (
       <form
         onSubmit={handleSubmit}
@@ -610,14 +620,14 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
           label="Изображения"
           values={h.images}
           placeholder="https://..."
-          onChange={(arr) => setHomePayload((p) => ({...p, images: arr}))}
+          onChange={(arr) => setHomePayload((p) => ({ ...p, images: arr }))}
         />
 
         <ArrayField
           label="История (тексты)"
           values={h.history}
           placeholder="Событие"
-          onChange={(arr) => setHomePayload((p) => ({...p, history: arr}))}
+          onChange={(arr) => setHomePayload((p) => ({ ...p, history: arr }))}
         />
 
         <ArrayField
@@ -689,7 +699,10 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
           label="Изображения дворов"
           values={h.yardsImages}
           placeholder="https://..."
-          onChange={(arr) => setHomePayload((p) => ({...p, yardsImages: arr}))}
+          onChange={(arr) => setHomePayload((p) => ({
+            ...p,
+            yardsImages: arr
+          }))}
         />
 
         <div className="grid grid-cols-2 gap-4">
@@ -765,8 +778,8 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
           </div>
         </div>
       </form>
-    );
-  };
+    )
+  }
 
   const renderCategoryForm = () => (
     <form
@@ -841,7 +854,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
         </div>
       </div>
     </form>
-  );
+  )
 
   const renderBidForm = () => {
     return (
@@ -942,16 +955,16 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
           </div>
         </div>
       </form>
-    );
-  };
+    )
+  }
 
 
   const title = useMemo(() => {
-    if (contentType === 'flat') return isEditing ? 'Редактировать квартиру' : 'Создать квартиру';
-    if (contentType === 'home') return isEditing ? 'Редактировать комплекс' : 'Создать комплекс';
-    if (contentType === 'category') return isEditing ? 'Редактировать категорию' : 'Создать категорию';
-    if (contentType === 'bid') return isEditing ? 'Редактировать заявку' : 'Создать заявку?';
-  }, [contentType, isEditing]);
+    if (contentType === 'flat') return isEditing ? 'Редактировать квартиру' : 'Создать квартиру'
+    if (contentType === 'home') return isEditing ? 'Редактировать комплекс' : 'Создать комплекс'
+    if (contentType === 'category') return isEditing ? 'Редактировать категорию' : 'Создать категорию'
+    if (contentType === 'bid') return isEditing ? 'Редактировать заявку' : 'Создать заявку?'
+  }, [contentType, isEditing])
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 overflow-auto py-10 px-4">
@@ -978,7 +991,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
         {contentType === 'bid' && renderBidForm()}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ContentEditor;
+export default ContentEditor
