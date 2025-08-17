@@ -318,6 +318,3 @@ const UnifiedFileManager: FC<UnifiedFileManagerProps> = ({
 };
 
 export default UnifiedFileManager;
-function useState(arg0: boolean): [any, any] {
-  throw new Error("Function not implemented.");
-}
