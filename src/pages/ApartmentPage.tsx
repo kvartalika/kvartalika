@@ -5,7 +5,7 @@ import { safeImage } from '../utils/safeImage.ts'
 import ImageSlider from '../components/ImageSlider.tsx'
 import { useUIStore } from '../store/ui.store.ts'
 
-const Map = lazy(() => import('../components/Map.tsx'))
+const YandexMap = lazy(() => import("../components/YandexMap.tsx"))
 
 const ApartmentPage = () => {
   const { apartmentId } = useParams<{ apartmentId: string }>()
@@ -267,7 +267,7 @@ const ApartmentPage = () => {
               <div className="mt-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-6">Расположение квартиры</h3>
                 <div className="bg-gray-100 rounded-xl p-8 text-center mb-8">
-                  <Map
+                  <YandexMap 
                     latitude={selectedFlat.flat.latitude}
                     longitude={selectedFlat.flat.longitude}
                     description={selectedFlat.flat.address}

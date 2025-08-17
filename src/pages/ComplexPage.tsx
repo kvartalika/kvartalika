@@ -7,7 +7,7 @@ import { safeImage } from '../utils/safeImage.ts'
 import ImageSlider from '../components/ImageSlider.tsx'
 import { useUIStore } from '../store/ui.store.ts'
 
-const Map = lazy(() => import('../components/Map.tsx'))
+const YandexMap = lazy(() => import("../components/YandexMap.tsx"))
 const Scene3D = lazy(() => import('../components/Scene3D'))
 
 const ComplexPage = () => {
@@ -303,7 +303,7 @@ const ComplexPage = () => {
               <>
                 <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">Расположение ЖК</h2>
                 <div className="bg-gray-100 rounded-xl px-4 py-6 text-center mb-8">
-                  <Map
+                  <YandexMap 
                     latitude={selectedHome.latitude}
                     longitude={selectedHome.longitude}
                     description={selectedHome.name}

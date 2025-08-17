@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
@@ -8,59 +8,95 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <meta name="keywords" content="кварталика, купить квартиру в томске, жк нижний томск">
-    <meta name="description" content="Кварталика - квартиры в Томске по выгодным ценам" />
-    
+    <meta
+      name="keywords"
+      content="кварталика, купить квартиру в томске, жк нижний томск"
+    />
+    <meta
+      name="description"
+      content="Кварталика - квартиры в Томске по выгодным ценам"
+    />
+
     <meta name="yandex-verification" content="a3dc8fcf9499dad4" />
-    <meta name="google-site-verification" content="RtQtVvLyca8BfpDnzSLWTwMkwD8hPX79YJsasvsS8WY" />
-    
+    <meta
+      name="google-site-verification"
+      content="RtQtVvLyca8BfpDnzSLWTwMkwD8hPX79YJsasvsS8WY"
+    />
+
     <meta property="og:title" content="Кварталика" />
-    <meta property="og:description" content="Кварталика - квартиры в Томске по выгодным ценам" />
+    <meta
+      property="og:description"
+      content="Кварталика - квартиры в Томске по выгодным ценам"
+    />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://kvartalica.ru/" />
     <meta property="og:image" content="./public/preview.png" />
 
-    <script type="text/javascript">
-      (function(m,e,t,r,i,k,a){
-          m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-          m[i].l=1*new Date();
-          for (var j = 0; j < document.scripts.length; j++) {
-            if (document.scripts[j].src === r) { return; }
-          }
-          k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-      })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=103607632', 'ym');
+    <script
+      src="https://api-maps.yandex.ru/2.1/?apikey=%VITE_YANDEX_MAPS_API_KEY%&lang=ru_RU"
+      type="text/javascript"
+    ></script>
 
-      ym(103607632, 'init', {
-          ssr:true,
-          webvisor:true,
-          clickmap:true,
-          ecommerce:"dataLayer",
-          accurateTrackBounce:true,
-          trackLinks:true
+    <script type="text/javascript">
+      (function (m, e, t, r, i, k, a) {
+        m[i] =
+          m[i] ||
+          function () {
+            (m[i].a = m[i].a || []).push(arguments);
+          };
+        m[i].l = 1 * new Date();
+        for (var j = 0; j < document.scripts.length; j++) {
+          if (document.scripts[j].src === r) {
+            return;
+          }
+        }
+        (k = e.createElement(t)),
+          (a = e.getElementsByTagName(t)[0]),
+          (k.async = 1),
+          (k.src = r),
+          a.parentNode.insertBefore(k, a);
+      })(
+        window,
+        document,
+        "script",
+        "https://mc.yandex.ru/metrika/tag.js?id=103607632",
+        "ym"
+      );
+
+      ym(103607632, "init", {
+        ssr: true,
+        webvisor: true,
+        clickmap: true,
+        ecommerce: "dataLayer",
+        accurateTrackBounce: true,
+        trackLinks: true,
       });
     </script>
 
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Кварталика",
-      "url": "https://kvartalika.ru",
-      "logo": "https://kvartalika.ru/logo.svg",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "email": "info@kvartalika.ru",
-        "contactType": "sales"
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Кварталика",
+        "url": "https://kvartalika.ru",
+        "logo": "https://kvartalika.ru/logo.svg",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "email": "info@kvartalika.ru",
+          "contactType": "sales"
+        }
       }
-    }
     </script>
-
   </head>
   <body>
     <div id="root"></div>
     <noscript>
       <div>
-        <img src="https://mc.yandex.ru/watch/103607632" style="position:absolute; left:-9999px;" alt="" />
+        <img
+          src="https://mc.yandex.ru/watch/103607632"
+          style="position: absolute; left: -9999px"
+          alt=""
+        />
       </div>
     </noscript>
     <script type="module" src="/src/main.tsx"></script>
