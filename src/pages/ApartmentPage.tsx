@@ -120,23 +120,7 @@ const ApartmentPage = () => {
                   </div>
                 )}
               </div>
-
             </div>
-
-            {selectedFlat.flat.layout && (
-              <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  Планировка квартиры
-                </h2>
-                <div className="flex justify-center">
-                  <img
-                    src={layoutImg}
-                    alt="Планировка квартиры"
-                    className="max-w-full h-auto rounded-lg border border-gray-200"
-                  />
-                </div>
-              </div>
-            )}
 
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
@@ -174,11 +158,11 @@ const ApartmentPage = () => {
                           checked={useDecoration}
                           onChange={() => setUseDecoration(!useDecoration)}
                         />
-                        <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-green-500 transition"></div>
+                        <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-500 transition"></div>
                         <span className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-5 transition"></span>
                         <span className="ml-3 text-sm font-medium">
-        {useDecoration ? 'С отделкой' : 'Без отделки'}
-      </span>
+                           {useDecoration ? 'С отделкой' : 'Без отделки'}
+                          </span>
                       </label>
                     ) : (
                       <span className="font-medium">Нет</span>
@@ -261,6 +245,21 @@ const ApartmentPage = () => {
                 </div>
               </div>
             </div>
+
+            {selectedFlat.flat.layout && (
+              <div className="bg-white rounded-xl shadow-lg p-6 my-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  Планировка квартиры
+                </h2>
+                <div className="flex justify-center">
+                  <img
+                    src={layoutImg}
+                    alt="Планировка квартиры"
+                    className="max-w-full h-auto rounded-lg border border-gray-200"
+                  />
+                </div>
+              </div>
+            )}
 
 
             {selectedFlat.flat.latitude && selectedFlat.flat.longitude && selectedFlat.flat.address &&
