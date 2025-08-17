@@ -127,7 +127,7 @@ const ImageSlider: FC<ImageSliderProps> = ({
         <div className="z-20 mt-3 flex gap-2 overflow-x-auto pb-1">
           {images.map((image, index) => (
             <button
-              key={image}
+              key={`${image}-${index}`}
               onClick={() => goToSlide(index)}
               className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                 index === currentIndex ? 'border-primary-500 scale-105' : 'border-gray-200 hover:border-gray-300'
