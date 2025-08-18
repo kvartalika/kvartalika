@@ -26,6 +26,7 @@ export interface Apartment {
   latitude: number;
   longitude: number;
   images: string[];
+  pan: string,
 }
 
 export interface Complex {
@@ -38,6 +39,7 @@ export interface Complex {
   latitude: number;
   longitude: number;
   images: string[];
+  pan: string,
   apartments: Apartment[];
 }
 
@@ -92,4 +94,5 @@ export interface FormData {
   hospitalsNearby?: boolean;
   hasYards?: boolean;
   about?: string;
+  pan?: string;
 }

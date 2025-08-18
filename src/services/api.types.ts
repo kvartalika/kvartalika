@@ -84,6 +84,7 @@ export interface FlatRequest {
   numberForSale?: number
   published?: boolean;
   imagesClean?: string[];
+  pan?: string;
 }
 
 export interface HomeRequest {
@@ -106,6 +107,7 @@ export interface HomeRequest {
   hasYards?: boolean;
   yardsImages?: string[];
   model3D?: string;
+  pan?: string;
   published?: boolean;
 }
 
@@ -199,6 +201,7 @@ export interface ResolvedFlat extends FlatWithCategoryRequest {
   imagesResolved?: string[];
   layoutResolved?: string;
   imagesCleanResolved?: string[];
+  panResolved?: string,
 }
 
 export interface HomePageFlats {
@@ -211,6 +214,7 @@ export interface ResolvedHome extends HomeRequest {
   historyImagesResolved?: string[];
   yardsImagesResolved?: string[];
   model3DResolved?: string;
+  panResolved?: string,
 }
 
 export interface AuthResponse {

@@ -1,54 +1,55 @@
-import { lazy, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import ApartmentCard from '../components/ApartmentCard'
+import { lazy, useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import ApartmentCard from "../components/ApartmentCard";
 
-import { useFlatsStore } from '../store/flats.store.ts'
-import { safeImage } from '../utils/safeImage.ts'
-import ImageSlider from '../components/ImageSlider.tsx'
-import { useUIStore } from '../store/ui.store.ts'
-import TextSlider from '../components/TextSlider.tsx'
+import { useFlatsStore } from "../store/flats.store.ts";
+import { safeImage } from "../utils/safeImage.ts";
+import ImageSlider from "../components/ImageSlider.tsx";
+import { useUIStore } from "../store/ui.store.ts";
+import TextSlider from "../components/TextSlider.tsx";
 
-const YandexMap = lazy(() => import("../components/YandexMap.tsx"))
-const Scene3D = lazy(() => import('../components/Scene3D'))
+const YandexMap = lazy(() => import("../components/YandexMap.tsx"));
+const Scene3D = lazy(() => import("../components/Scene3D"));
+const Pan = lazy(() => import("../components/Pan"));
 
 const ComplexPage = () => {
-  const { homeId } = useParams<{ homeId: string }>()
+  const { homeId } = useParams<{ homeId: string }>();
 
   const {
     flatsByHome,
     setSelectedHome,
     getHomeById,
     loadFlatsByHome,
-    selectedHome
-  } = useFlatsStore()
+    selectedHome,
+  } = useFlatsStore();
 
-  const openModal = useUIStore(state => state.openModal)
+  const openModal = useUIStore((state) => state.openModal);
 
-  const [yardSlideIndex, setYardSlideIndex] = useState(0)
+  const [yardSlideIndex, setYardSlideIndex] = useState(0);
 
   useEffect(() => {
     const load = async () => {
-      if (!homeId) return
-      const id = Number(homeId)
+      if (!homeId) return;
+      const id = Number(homeId);
       if (Number.isNaN(id)) {
-        console.warn('Invalid homeId:', homeId)
-        return
+        console.warn("Invalid homeId:", homeId);
+        return;
       }
-      const home = await getHomeById(id)
+      const home = await getHomeById(id);
       if (home) {
-        setSelectedHome(home)
+        setSelectedHome(home);
       } else {
-        setSelectedHome(null)
+        setSelectedHome(null);
       }
-    }
-    void load()
-  }, [getHomeById, homeId, setSelectedHome])
+    };
+    void load();
+  }, [getHomeById, homeId, setSelectedHome]);
 
   useEffect(() => {
-    const id = selectedHome?.id
-    if (!id) return
-    void loadFlatsByHome(id)
-  }, [loadFlatsByHome, selectedHome])
+    const id = selectedHome?.id;
+    if (!id) return;
+    void loadFlatsByHome(id);
+  }, [loadFlatsByHome, selectedHome]);
 
   if (!selectedHome) {
     return (
@@ -65,27 +66,26 @@ const ComplexPage = () => {
           </Link>
         </div>
       </div>
-    )
+    );
   }
 
-  let images = safeImage(selectedHome.imagesResolved, 'home')
-  images = Array.isArray(images) ? images : [images]
+  let images = safeImage(selectedHome.imagesResolved, "home");
+  images = Array.isArray(images) ? images : [images];
 
-  let historyImages = safeImage(selectedHome.historyImagesResolved, 'history')
-  historyImages = Array.isArray(historyImages) ? historyImages : [historyImages]
+  let historyImages = safeImage(selectedHome.historyImagesResolved, "history");
+  historyImages = Array.isArray(historyImages)
+    ? historyImages
+    : [historyImages];
 
-  let yardsImages = safeImage(selectedHome.yardsImagesResolved, 'history')
-  yardsImages = Array.isArray(yardsImages) ? yardsImages : [yardsImages]
+  let yardsImages = safeImage(selectedHome.yardsImagesResolved, "history");
+  yardsImages = Array.isArray(yardsImages) ? yardsImages : [yardsImages];
 
   return (
     <div className="min-h-screen pt-20">
       <section className="bg-gray-50 py-4">
         <div className="container mx-auto px-4">
           <nav className="text-sm">
-            <Link
-              to="/"
-              className="text-primary-600 hover:text-primary-700"
-            >
+            <Link to="/" className="text-primary-600 hover:text-primary-700">
               Главная
             </Link>
             <span className="mx-2 text-gray-400">›</span>
@@ -96,7 +96,6 @@ const ComplexPage = () => {
 
       <section className="relative">
         <div className="relative overflow-hidden mx-auto]">
-
           <div className="aspect-[4/3] w-full">
             <ImageSlider
               images={images || []}
@@ -109,16 +108,16 @@ const ComplexPage = () => {
           <div className="absolute inset-0 flex items-center justify-center z-10">
             <div className="text-center text-white max-w-4xl px-4">
               <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
-                {selectedHome.name ?? 'Неизвестное ЖК'}
+                {selectedHome.name ?? "Неизвестное ЖК"}
               </h1>
               <p className="text-xl md:text-2xl mb-6 text-gray-100 drop-shadow-md">
-                {selectedHome.description ?? 'Пока здесь ничего нет...'}
+                {selectedHome.description ?? "Пока здесь ничего нет..."}
               </p>
               <p className="text-lg mb-8 text-gray-200 drop-shadow-md">
-                📍 {selectedHome.address ?? 'Требуется уточнение'}
+                📍 {selectedHome.address ?? "Требуется уточнение"}
               </p>
               <button
-                onClick={() => openModal('bid')}
+                onClick={() => openModal("bid")}
                 className="bg-primary-600 text-surface-50 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 Записаться на осмотр
@@ -131,7 +130,9 @@ const ComplexPage = () => {
       <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold text-gray-900">Доступные квартиры</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Доступные квартиры
+            </h2>
             {flatsByHome.length > 4 && (
               <Link
                 to={`/apartments?homeId=${selectedHome.id}`}
@@ -143,12 +144,12 @@ const ComplexPage = () => {
           </div>
           {flatsByHome.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {flatsByHome.slice(0, 4).map(apartment => (
+              {flatsByHome.slice(0, 4).map((apartment) => (
                 <ApartmentCard
                   key={apartment.flat.id}
                   homeName={selectedHome.name ?? `ЖК №${apartment.flat.homeId}`}
                   apartment={apartment}
-                  onBookingClick={() => openModal('bid')}
+                  onBookingClick={() => openModal("bid")}
                 />
               ))}
             </div>
@@ -169,10 +170,15 @@ const ComplexPage = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Квартиры временно недоступны</h3>
-              <p className="text-gray-600 mb-6">В данный момент в этом комплексе нет доступных квартир. Оставьте заявку, и мы уведомим вас о новых предложениях.</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                Квартиры временно недоступны
+              </h3>
+              <p className="text-gray-600 mb-6">
+                В данный момент в этом комплексе нет доступных квартир. Оставьте
+                заявку, и мы уведомим вас о новых предложениях.
+              </p>
               <button
-                onClick={() => openModal('bid')}
+                onClick={() => openModal("bid")}
                 className="bg-primary-600 text-surface-50 px-6 py-3 rounded-xl font-medium hover:bg-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 Оставить заявку
@@ -185,13 +191,19 @@ const ComplexPage = () => {
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <div className="mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">О жилом комплексе</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
+              О жилом комплексе
+            </h2>
             <div className="text-center mb-16">
-              <p className="text-lg text-gray-600 leading-relaxed max-w-4xl mx-auto">{selectedHome.about}</p>
+              <p className="text-lg text-gray-600 leading-relaxed max-w-4xl mx-auto">
+                {selectedHome.about}
+              </p>
             </div>
             {selectedHome.features && selectedHome.features.length > 0 && (
               <div className="mb-16">
-                <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center">Особенности ЖК</h3>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center">
+                  Особенности ЖК
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {selectedHome.features.map((feature, index) => (
                     <div
@@ -227,7 +239,6 @@ const ComplexPage = () => {
 
                 <div className="bg-white rounded-xl p-6 sm:p-8 shadow-lg">
                   <div className="flex flex-col lg:flex-row gap-8">
-
                     <div className="lg:w-1/2 flex">
                       <TextSlider
                         items={selectedHome.history}
@@ -251,37 +262,58 @@ const ComplexPage = () => {
           </div>
         </div>
       </section>
-      {selectedHome.model3DResolved &&
+      {selectedHome.panResolved && (
         <section className="py-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">3D-панорама</h2>
-          <div className="lg:w-[100%] flex flex-col items-center justify-center">
-            <Scene3D
-              model={selectedHome.model3DResolved}
-            />
+          <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
+            Круговая панорама
+          </h2>
+          <div className="container mx-auto">
+            <div className="max-w-[75vw] mx-auto">
+              <div className="bg-gray-100 rounded-xl px-4 py-6 text-center mb-8">
+                <Pan src={selectedHome.panResolved} />
+              </div>
+            </div>
           </div>
         </section>
-      }
+      )}
+
+      {selectedHome.model3DResolved && (
+        <section className="py-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
+            3D-панорама
+          </h2>
+          <div className="lg:w-[100%] flex flex-col items-center justify-center">
+            <Scene3D model={selectedHome.model3DResolved} />
+          </div>
+        </section>
+      )}
 
       <section className="py-12">
         <div className="container mx-auto">
           <div className="max-w-[75vw] mx-auto">
-            {selectedHome.latitude !== undefined && selectedHome.longitude !== undefined && selectedHome.name &&
-              <>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">Расположение ЖК</h2>
-                <div className="bg-gray-100 rounded-xl px-4 py-6 text-center mb-8">
-                  <YandexMap 
-                    latitude={selectedHome.latitude}
-                    longitude={selectedHome.longitude}
-                    description={selectedHome.name}
-                  />
-                </div>
-              </>
-            }
+            {selectedHome.latitude !== undefined &&
+              selectedHome.longitude !== undefined &&
+              selectedHome.name && (
+                <>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
+                    Расположение ЖК
+                  </h2>
+                  <div className="bg-gray-100 rounded-xl px-4 py-6 text-center mb-8">
+                    <YandexMap
+                      latitude={selectedHome.latitude}
+                      longitude={selectedHome.longitude}
+                      description={selectedHome.name}
+                    />
+                  </div>
+                </>
+              )}
             <div className="flex justify-center items-center">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Инфраструктура района</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+                  Инфраструктура района
+                </h3>
                 <ul className="space-y-3 text-gray-600">
-                  {selectedHome.schoolsNearby &&
+                  {selectedHome.schoolsNearby && (
                     <li className="flex items-center">
                       <svg
                         className="w-5 h-5 text-red-600 mr-3"
@@ -298,8 +330,8 @@ const ComplexPage = () => {
                       </svg>
                       Школы и детские сады поблизости
                     </li>
-                  }
-                  {selectedHome.storesNearby &&
+                  )}
+                  {selectedHome.storesNearby && (
                     <li className="flex items-center">
                       <svg
                         className="w-5 h-5 text-green-600 mr-3"
@@ -315,8 +347,9 @@ const ComplexPage = () => {
                         />
                       </svg>
                       Торговые центры и магазины
-                    </li>}
-                  {selectedHome.hospitalsNearby &&
+                    </li>
+                  )}
+                  {selectedHome.hospitalsNearby && (
                     <li className="flex items-center">
                       <svg
                         className="w-5 h-5 text-yellow-600 mr-3"
@@ -332,7 +365,8 @@ const ComplexPage = () => {
                         />
                       </svg>
                       Медицинские учреждения
-                    </li>}
+                    </li>
+                  )}
                 </ul>
               </div>
             </div>
@@ -342,10 +376,11 @@ const ComplexPage = () => {
 
       {selectedHome.hasYards && (
         <div className="mb-16">
-          <h3 className="text-2xl font-semibold text-gray-900 mb-6 text-center">Фотографии дворов</h3>
+          <h3 className="text-2xl font-semibold text-gray-900 mb-6 text-center">
+            Фотографии дворов
+          </h3>
 
           <div className="relative w-full max-w-4xl mx-auto">
-
             <div className="relative overflow-hidden rounded-xl bg-gray-100">
               {yardsImages.length > 0 ? (
                 <>
@@ -359,7 +394,10 @@ const ComplexPage = () => {
                       <button
                         aria-label="Предыдущее фото двора"
                         onClick={() =>
-                          setYardSlideIndex(i => (i - 1 + yardsImages.length) % yardsImages.length)
+                          setYardSlideIndex(
+                            (i) =>
+                              (i - 1 + yardsImages.length) % yardsImages.length
+                          )
                         }
                         className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-200/70 hover:bg-gray-100 shadow-lg rounded-3xl px-3 py-6 flex items-center justify-center"
                       >
@@ -379,7 +417,9 @@ const ComplexPage = () => {
                       </button>
                       <button
                         aria-label="Следующее фото двора"
-                        onClick={() => setYardSlideIndex(i => (i + 1) % yardsImages.length)}
+                        onClick={() =>
+                          setYardSlideIndex((i) => (i + 1) % yardsImages.length)
+                        }
                         className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-200/70 hover:bg-gray-100 shadow-lg rounded-3xl px-3 py-6 flex items-center justify-center"
                       >
                         <svg
@@ -418,10 +458,11 @@ const ComplexPage = () => {
             Заинтересовались ЖК?
           </h2>
           <p className="text-xl text-gray-200 mb-8">
-            Запишитесь на персональную экскурсию по жилому комплексу {selectedHome.name}
+            Запишитесь на персональную экскурсию по жилому комплексу{" "}
+            {selectedHome.name}
           </p>
           <button
-            onClick={() => openModal('bid')}
+            onClick={() => openModal("bid")}
             className="bg-white text-primary-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors"
           >
             Записаться на осмотр
@@ -429,7 +470,7 @@ const ComplexPage = () => {
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default ComplexPage
+export default ComplexPage;

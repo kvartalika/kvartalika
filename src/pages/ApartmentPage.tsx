@@ -6,6 +6,7 @@ import ImageSlider from '../components/ImageSlider.tsx'
 import { useUIStore } from '../store/ui.store.ts'
 
 const YandexMap = lazy(() => import("../components/YandexMap.tsx"))
+const Pan = lazy(() => import("../components/Pan"));
 
 const ApartmentPage = () => {
   const { apartmentId } = useParams<{ apartmentId: string }>()
@@ -259,6 +260,21 @@ const ApartmentPage = () => {
                   />
                 </div>
               </div>
+            )}
+
+            {selectedFlat.panResolved && (
+              <section className="py-12">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4 text-center">
+                  Круговая панорама
+                </h2>
+                <div className="container mx-auto">
+                  <div className="max-w-[75vw] mx-auto">
+                    <div className="bg-gray-100 rounded-xl px-4 py-6 text-center mb-8">
+                      <Pan src={selectedFlat.panResolved} />
+                    </div>
+                  </div>
+                </div>
+              </section>
             )}
 
 

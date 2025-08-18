@@ -325,12 +325,28 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
         <ArrayField
           label="Особенности"
           values={f.features}
-          placeholder="например: балкон"
+          placeholder="Например: пластиковые окна"
           onChange={(arr) => setFlatPayload((p) => ({
             ...p,
             flat: { ...p.flat, features: arr }
           }))}
         />
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Круговая панорама</label>
+          <input
+            type="text"
+            value={f.pan || ''}
+            onChange={(e) =>
+              setFlatPayload((p) => ({
+              ...p,
+              flat: { ...p.flat, pan: e.target.value }
+            }))
+            }
+            className="w-full border rounded px-3 py-2"
+            placeholder={'Ссылка на круговую панораму'}
+          />
+        </div>
 
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2">
@@ -377,7 +393,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               onBlur={latControl.commit}
               onKeyDown={latControl.handleKey}
               className="w-full border rounded px-3 py-2"
-              placeholder="например 55,754"
+              placeholder="Например: 55,754"
             />
           </div>
           <div>
@@ -391,7 +407,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               onBlur={lonControl.commit}
               onKeyDown={lonControl.handleKey}
               className="w-full border rounded px-3 py-2"
-              placeholder="например 37,617"
+              placeholder="Например: 37,617"
             />
           </div>
         </div>
@@ -595,7 +611,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
         <ArrayField
           label="Особенности"
           values={h.features}
-          placeholder="например: удобное местоположение"
+          placeholder="Например: удобное местоположение"
           onChange={(arr) => setHomePayload((p) => ({
             ...p,
             features: arr,
@@ -612,14 +628,28 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
               model3D: e.target.value
             }))}
             className="w-full border rounded px-3 py-2"
-            placeholder={'/images/'}
+            placeholder={'Ссылка на 3d модель'}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Круговая панорама</label>
+          <input
+            type="text"
+            value={h.pan || ''}
+            onChange={(e) => setHomePayload(p => ({
+              ...p,
+              pan: e.target.value
+            }))}
+            className="w-full border rounded px-3 py-2"
+            placeholder={'Ссылка на круговую панораму'}
           />
         </div>
 
         <ArrayField
           label="Изображения"
           values={h.images}
-          placeholder="https://..."
+          placeholder="Ссылка на изображение"
           onChange={(arr) => setHomePayload((p) => ({ ...p, images: arr }))}
         />
 
@@ -633,7 +663,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
         <ArrayField
           label="Изображения Истории"
           values={h.historyImages}
-          placeholder="https://..."
+          placeholder="Ссылка на изображение"
           onChange={(arr) => setHomePayload((p) => ({
             ...p,
             historyImages: arr
@@ -698,7 +728,7 @@ const ContentEditor: FC<ContentEditorUnifiedProps> = ({
         <ArrayField
           label="Изображения дворов"
           values={h.yardsImages}
-          placeholder="https://..."
+          placeholder="Ссылка на изобрежение двора"
           onChange={(arr) => setHomePayload((p) => ({
             ...p,
             yardsImages: arr

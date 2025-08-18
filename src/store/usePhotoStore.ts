@@ -48,7 +48,8 @@ export const usePhotoStore = create<PhotoState>()(
       const flatWithResolvedData = await preloadPhotos(flat.flat, {
         images: 'array',
         layout: 'single',
-        imagesClean: 'array'
+        imagesClean: 'array',
+        pan: 'single',
       })
 
       return {
@@ -56,7 +57,8 @@ export const usePhotoStore = create<PhotoState>()(
         categories: flat.categories,
         imagesResolved: flatWithResolvedData.imagesResolved,
         layoutResolved: flatWithResolvedData.layoutResolved ?? undefined,
-        imagesCleanResolved: flatWithResolvedData.imagesCleanResolved ?? undefined
+        imagesCleanResolved: flatWithResolvedData.imagesCleanResolved ?? undefined,
+        panResolved: flatWithResolvedData.panResolved ?? undefined,
       }
     },
 
@@ -66,6 +68,7 @@ export const usePhotoStore = create<PhotoState>()(
         historyImages: 'array',
         yardsImages: 'array',
         model3D: 'single',
+        pan: 'single',
       })
     },
 
